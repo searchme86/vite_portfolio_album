@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
 import PostWriteTitleInput from './parts/PostWriteTitleInput';
@@ -9,9 +10,8 @@ import ImageUploadManager from '@/components/handleImage/ImageUploadManager/Imag
 import { useCreatePost } from '@/api/post/write/useCreatePost';
 import { useSafeAuthToken } from '@/lib/auth/useSafeAuthToken';
 import { usePostWriteNavigation } from './hooks/usePostWriteNavigation';
-import type { PostWriteFormData } from './hooks/usePostWriteState';
 import { postWriteFormDefaultValues } from './hooks/usePostWriteState';
-import { useState } from 'react';
+import type { PostWriteFormData } from './hooks/usePostWriteState';
 
 // 폼 컴포넌트 속성 타입 정의
 interface PostWriteFormProps {
