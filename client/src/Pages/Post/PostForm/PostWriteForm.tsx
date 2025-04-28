@@ -1,16 +1,16 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
-import PostWriteTitleInput from './PostWriteTitleInput';
-import PostWriteDescriptionTextarea from './PostWriteDescriptionTextarea';
-import PostWriteContentEditor from './PostWriteContentEditor';
-import PostWriteTagManager from './PostWriteTagManager';
-import PostWriteSubmitButton from './PostWriteSubmitButton';
+import PostWriteTitleInput from './parts/PostWriteTitleInput';
+import PostWriteDescriptionTextarea from './parts/PostWriteDescriptionTextarea';
+import PostWriteContentEditor from './parts/PostWriteContentEditor';
+import PostWriteTagManager from './parts/PostWriteTagManager';
+import PostWriteSubmitButton from './parts/PostWriteSubmitButton';
 import ImageUploadManager from '@/components/handleImage/ImageUploadManager/ImageUploadManager';
 import { useCreatePost } from '@/api/post/write/useCreatePost';
 import { useSafeAuthToken } from '@/lib/auth/useSafeAuthToken';
-import { usePostWriteNavigation } from '../hooks/usePostWriteNavigation';
-import type { PostWriteFormData } from '../hooks/usePostWriteState';
-import { postWriteFormDefaultValues } from '../hooks/usePostWriteState';
+import { usePostWriteNavigation } from './hooks/usePostWriteNavigation';
+import type { PostWriteFormData } from './hooks/usePostWriteState';
+import { postWriteFormDefaultValues } from './hooks/usePostWriteState';
 import { useState } from 'react';
 
 // 폼 컴포넌트 속성 타입 정의
