@@ -1,17 +1,18 @@
-//====여기부터 수정됨====
-// ImageUploadManager 컴포넌트: 이미지 업로드 관련 모든 기능을 통합 관리
-// 단일 책임: 컨텍스트 제공 및 하위 컴포넌트 조합
-// import { ImageUploadContext } from '../context/ImageUploadContext';
 import { ImageUploadContext } from '../context/ImageUploadContext';
-// import useImageUploadState from './hooks/useImageUploadState';
 import useImageUploadState from './hooks/useImageUploadState';
-// import useBaseFileNamesWithoutSuffix from './hooks/useBaseFileNamesWithoutSuffix';
 import useBaseFileNamesWithoutSuffix from './hooks/useBaseFileNamesWithoutSuffix';
-// import useImageUploaderKey from './hooks/useImageUploaderKey';
 import useImageUploaderKey from './hooks/useImageUploaderKey';
-// import ImageUploadLayout from './components/ImageUploadLayout';
-// import ImageUploadLayout
 import ImageUploadLayout from './components/ImageUploadLayout';
+
+type ImageUploadManagerType = {
+  postId: string;
+  initialImageUrls: string[];
+  onImageUrlsChange: (data: string[]) => void;
+  progressBarColor: string;
+  minImages: number;
+  maxImages: number;
+  showSlide: boolean;
+};
 
 function ImageUploadManager({
   postId,
@@ -21,7 +22,7 @@ function ImageUploadManager({
   minImages = 1,
   maxImages = 10,
   showSlide = false,
-}) {
+}: ImageUploadManagerType) {
   // postId가 문자열인지 확인, 아니면 기본값으로 대체
   // API 호출 시 문제가 발생하지 않도록 기본값 부여
   const safePostId = typeof postId === 'string' ? postId : 'default-post-id';
@@ -147,4 +148,3 @@ function ImageUploadManager({
 }
 
 export default ImageUploadManager;
-//====여기까지 수정됨====
