@@ -5,28 +5,8 @@
  * @analogy 도서관에서 대여 기록을 주기적으로 자동 저장하는 시스템
  */
 
-import { useState, useEffect } from 'react'; // @type {Function} - React 훅
-// @description useState와 useEffect 훅 가져오기
-// @reason 자동저장 상태 관리 및 주기적 실행
-// @analogy 도서관에서 자동 저장 타이머와 상태 관리 도구 사용
-
-// 드래프트 데이터 타입 정의 (draftStore.ts와 동일)
-// @type {Object} - 드래프트 데이터의 구조
-// @description 드래프트 데이터의 타입을 정의하여 TypeScript에서 타입 안정성 보장
-// @reason 타입 오류 방지 및 코드 가독성 향상
-// @analogy 도서관에서 대여 기록부의 형식을 미리 정의
-interface DraftState {
-  postTitle: string; // @type {string} - 포스트 제목
-  postDesc: string; // @type {string} - 포스트 설명
-  postContent: string; // @type {string} - 포스트 본문
-  tags: string[]; // @type {string[]} - 태그 배열
-  imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
-  custom: { [key: string]: any }; // @type {Object} - 커스텀 데이터
-  draftId: string; // @type {string} - 드래프트 ID
-  createdAt: Date; // @type {Date} - 생성 시간
-  updatedAt: Date; // @type {Date} - 수정 시간
-  isTemporary: boolean; // @type {boolean} - 임시저장 여부
-}
+import { useState, useEffect } from 'react';
+import type { DraftState } from '../../../../../stores/draft/initialDraftState';
 
 // 자동저장 간격 상수
 // @description 자동저장 주기 (밀리초 단위)
@@ -39,13 +19,15 @@ const AUTO_SAVE_INTERVAL = 30000; // 30초
 // @reason 데이터 손실 방지 및 사용자 편의 제공
 // @analogy 도서관에서 대여 기록을 주기적으로 저장
 const useAutoSave = (draft: DraftState) => {
-  const [isSaving, setIsSaving] = useState<boolean>(false); // @type {boolean} - 저장 중 여부
+  // @type {boolean} - 저장 중 여부
   // @description 저장 상태 관리
   // @reason UI에서 저장 상태 표시
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const [lastSaved, setLastSaved] = useState<Date | null>(null); // @type {Date | null} - 마지막 저장 시간
+  // @type {Date | null} - 마지막 저장 시간
   // @description 마지막 저장 시간 관리
   // @reason 사용자에게 마지막 저장 시간 표시
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   // 드래프트 저장 함수
   // @description 드래프트 데이터를 저장하는 함수

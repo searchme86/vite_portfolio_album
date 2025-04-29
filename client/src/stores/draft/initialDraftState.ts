@@ -22,6 +22,7 @@ export interface DraftState {
   createdAt: Date; // @type {Date} - 생성 시간
   updatedAt: Date; // @type {Date} - 업데이트 시간
   isTemporary: boolean; // @type {boolean} - 임시저장 여부
+  updateDraft: (draft: DraftState) => void; // @type {Function} - 드래프트 업데이트 함수
 }
 
 // 초기 상태 정의
@@ -59,6 +60,7 @@ const initialDraftState: DraftState = {
   isTemporary: false, // @type {boolean} - 초기값: false
   // @description 임시저장 여부 초기화
   // @reason 기본적으로 임시저장이 아님
+  updateDraft: (_draft: DraftState) => {}, // @type {Function} - 드래프트 업데이트 함수
 };
 
 // 초기 상태 내보내기

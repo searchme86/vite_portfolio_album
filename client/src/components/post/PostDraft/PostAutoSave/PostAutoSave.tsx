@@ -5,11 +5,6 @@
  * @analogy 도서관에서 대여 기록을 주기적으로 자동 저장하고 사용자에게 알리는 시스템
  */
 
-import React from 'react'; // @type {Object} - React 라이브러리
-// @description React 가져오기
-// @reason JSX 컴포넌트 작성 및 상태 관리
-// @analogy 도서관에서 기본적인 관리 도구 가져오기
-
 import useAutoSave from './hooks/useAutoSave'; // @type {Function} - 자동저장 훅
 // @description 자동저장 훅 가져오기
 // @reason 드래프트 데이터 자동저장 로직 사용
@@ -25,29 +20,12 @@ import AutoSaveNotification from './parts/AutoSaveNotification'; // @type {Funct
 // @reason 저장 상태를 사용자에게 알림
 // @analogy 도서관에서 사용자에게 저장 완료 메시지 표시
 
-import useDraftStore from '../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
+import useDraftStore from '../../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
 // @description Zustand 스토어 가져오기
 // @reason 드래프트 데이터 상태 관리 및 가져오기
 // @analogy 도서관에서 중앙 대여 기록 시스템에 접근
 
-// 드래프트 데이터 타입 정의 (draftStore.ts와 동일)
-// @type {Object} - 드래프트 데이터의 구조
-// @description 드래프트 데이터의 타입을 정의하여 TypeScript에서 타입 안정성 보장
-// @reason 타입 오류 방지 및 코드 가독성 향상
-// @analogy 도서관에서 대여 기록부의 형식을 미리 정의
-interface DraftState {
-  postTitle: string;
-  postDesc: string;
-  postContent: string;
-  tags: string[];
-  imageUrls: string[];
-  custom: { [key: string]: any };
-  draftId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  isTemporary: boolean;
-}
-
+import type { DraftState } from '../../../../stores/draft/initialDraftState'; // @type {Object} - 드래프트 상태 타입
 // 자동저장 컴포넌트 정의
 // @description 드래프트 데이터를 자동저장하고 알림 UI 표시
 // @reason 자동저장 기능과 사용자 피드백 제공
@@ -67,6 +45,7 @@ function PostAutoSave() {
     createdAt: state.createdAt || new Date(), // @type {Date} - Fallback: 현재 날짜
     updatedAt: state.updatedAt || new Date(), // @type {Date} - Fallback: 현재 날짜
     isTemporary: state.isTemporary || false, // @type {boolean} - Fallback: false
+    updateDraft: state.updateDraft, // @type {Function} - 드래프트 업데이트 함수
   })); // @description 드래프트 데이터 객체 생성
   // @reason 자동저장 시 사용할 데이터 준비
   // @analogy 도서관에서 대여 기록 정보를 수집
