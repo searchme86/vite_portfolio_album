@@ -5,7 +5,10 @@
  * @analogy 도서관에서 저장된 자료를 불러오는 시스템
  */
 
-import { axiosBase } from '../../base/axiosBase';
+import { axiosBase } from '../../base/axiosBase'; // @type {Object} - 커스텀 Axios 인스턴스
+// @description 커스텀 Axios 인스턴스 가져오기
+// @reason HTTP 요청 처리
+// @analogy 도서관에서 자료 조회 요청 도구 가져오기
 
 import draftApiPaths from './draftApiPaths'; // @type {Object} - API 경로 상수
 // @description API 경로 상수 가져오기
@@ -44,11 +47,29 @@ interface FetchDraftResponse {
 // @reason 저장된 드래프트 데이터를 불러옴
 // @analogy 도서관에서 특정 자료를 조회
 const fetchDraftAxios = async (
-  draftId: string
+  draftId: string,
+  token: string
 ): Promise<FetchDraftResponse> => {
+  //====여기부터 수정됨====
+  // 의미: token이 누락되었는지 확인
+  // 이유: 인증 실패 방지
+  // 비유: 도서관에서 회원증 번호가 누락되었는지 확인
+  if (!token) {
+    console.error('fetchDraftAxios - Token is missing'); // @description 토큰 누락 디버깅
+    // @reason 문제 원인 추적
+    // @analogy 도서관에서 회원증 번호 누락 기록
+    throw new Error('Authentication token is missing'); // @description 에러 발생
+    // @reason 상위 함수에서 에러 처리
+    // @analogy 도서관에서 회원증 없음을 알림
+  }
+  //====여기까지 수정됨====
+
   try {
-    console.log('fetchDraftAxios - Fetching draft with ID:', draftId); // @description 디버깅용 로그
-    // @description 요청 ID 디버깅
+    console.log('fetchDraftAxios - Fetching draft with ID:', {
+      draftId,
+      token,
+    }); // @description 디버깅용 로그
+    // @description 요청 ID와 토큰 디버깅
     // @reason 요청 상태 확인
 
     // 동적 경로 생성
@@ -65,6 +86,10 @@ const fetchDraftAxios = async (
       headers: {
         'Content-Type': 'application/json', // @description 요청 헤더 설정
         // @reason JSON 데이터 요청
+        Authorization: `Bearer ${token}`, // @type {string} - 인증 헤더
+        // @description 요청에 인증 토큰 추가
+        // @reason 로그인 유저 인증
+        // @analogy 도서관에서 회원증 번호를 서버에 전달
       },
     }); // @type {AxiosResponse<FetchDraftResponse>} - API 응답
 
@@ -86,9 +111,18 @@ const fetchDraftAxios = async (
     // @description 성공 응답 반환
     // @reason 호출자에게 결과 전달
   } catch (error) {
-    console.error('fetchDraftAxios - Fetch failed:', error); // @description 에러 로그
-    // @description 요청 실패 디버깅
-    // @reason 문제 해결 지원
+    //====여기부터 수정됨====
+    // 의미: 더 구체적인 에러 로깅 추가
+    // 이유: 에러 원인 파악
+    // 비유: 도서관에서 실패 원인을 더 자세히 기록
+    console.error('fetchDraftAxios - Fetch failed:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response ? error.response.data : null,
+      status: error.response ? error.response.status : null,
+    }); // @description 요청 실패 로깅
+    // @reason 디버깅, 에러 상세 확인
+    // @analogy 도서관에서 서버 요청 실패 기록
 
     // Fallback 처리: 에러 발생 시 기본 응답 반환
     // @description 에러 발생 시 기본 응답 생성
@@ -105,6 +139,7 @@ const fetchDraftAxios = async (
 
     return fallbackResponse; // @description 기본 응답 반환
     // @reason 호출자에게 에러 결과 전달
+    //====여기까지 수정됨====
   }
 };
 
@@ -117,11 +152,12 @@ export default fetchDraftAxios;
 // **작동 매커니즘**
 // 1. `DraftData` 타입 정의: 응답 데이터 구조 명시.
 // 2. `FetchDraftResponse` 타입 정의: 응답 데이터 구조 명시.
-// 3. `fetchDraftAxios` 함수 정의: Axios를 사용하여 드래프트 불러오기 API 요청.
-// 4. 동적 경로 생성: `draftId`를 경로에 삽입하여 URL 생성.
-// 5. `axios.get` 호출: 드래프트 데이터를 API에서 조회.
-// 6. 응답 검증: 성공 여부 확인 후 결과 반환.
-// 7. 에러 발생 시 Fallback 처리: 기본 응답 반환으로 충돌 방지.
-// 8. `export default`로 외부에서 사용할 수 있도록 내보냄.
+// 3. `fetchDraftAxios` 함수 정의: `token` 파라미터 추가 후 Axios를 사용하여 드래프트 불러오기 API 요청.
+// 4. 토큰 검증: `token`이 없으면 에러 발생.
+// 5. 동적 경로 생성: `draftId`를 경로에 삽입하여 URL 생성.
+// 6. `axiosBase.get` 호출: `Authorization` 헤더에 토큰 추가 후 드래프트 데이터 조회.
+// 7. 응답 검증: 성공 여부 확인 후 결과 반환.
+// 8. 에러 발생 시 개선된 에러 로깅 및 Fallback 처리: 기본 응답 반환으로 충돌 방지.
+// 9. `export default`로 외부에서 사용할 수 있도록 내보냄.
 // @reason 드래프트 불러오기 로직을 캡슐화하여 코드 재사용성과 유지보수성 향상.
 // @analogy 도서관에서 저장된 자료를 조회.

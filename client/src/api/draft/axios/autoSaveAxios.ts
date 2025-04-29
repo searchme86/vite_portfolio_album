@@ -5,7 +5,11 @@
  * @analogy 도서관에서 자료를 자동으로 저장하는 시스템
  */
 
-import { axiosBase } from '../../base/axiosBase';
+import { axiosBase } from '../../base/axiosBase'; // @type {Object} - 커스텀 Axios 인스턴스
+// @description 커스텀 Axios 인스턴스 가져오기
+// @reason HTTP 요청 처리
+// @analogy 도서관에서 자료 저장 요청 도구 가져오기
+
 import draftApiPaths from './draftApiPaths'; // @type {Object} - API 경로 상수
 // @description API 경로 상수 가져오기
 // @reason 자동저장 경로 사용
@@ -43,11 +47,29 @@ interface AutoSaveResponse {
 // @reason 주기적으로 드래프트 데이터를 저장
 // @analogy 도서관에서 자료를 주기적으로 저장
 const autoSaveAxios = async (
-  draftData: DraftData
+  draftData: DraftData,
+  token: string
 ): Promise<AutoSaveResponse> => {
+  //====여기부터 수정됨====
+  // 의미: token이 누락되었는지 확인
+  // 이유: 인증 실패 방지
+  // 비유: 도서관에서 회원증 번호가 누락되었는지 확인
+  if (!token) {
+    console.error('autoSaveAxios - Token is missing'); // @description 토큰 누락 디버깅
+    // @reason 문제 원인 추적
+    // @analogy 도서관에서 회원증 번호 누락 기록
+    throw new Error('Authentication token is missing'); // @description 에러 발생
+    // @reason 상위 함수에서 에러 처리
+    // @analogy 도서관에서 회원증 없음을 알림
+  }
+  //====여기까지 수정됨====
+
   try {
-    console.log('autoSaveAxios - Sending auto-save request:', draftData); // @description 디버깅용 로그
-    // @description 요청 데이터 디버깅
+    console.log('autoSaveAxios - Sending auto-save request:', {
+      draftData,
+      token,
+    }); // @description 디버깅용 로그
+    // @description 요청 데이터와 토큰 디버깅
     // @reason 요청 상태 확인
 
     // Axios를 사용한 POST 요청
@@ -60,6 +82,10 @@ const autoSaveAxios = async (
         headers: {
           'Content-Type': 'application/json', // @description 요청 헤더 설정
           // @reason JSON 데이터 전송
+          Authorization: `Bearer ${token}`, // @type {string} - 인증 헤더
+          // @description 요청에 인증 토큰 추가
+          // @reason 로그인 유저 인증
+          // @analogy 도서관에서 회원증 번호를 서버에 전달
         },
       }
     ); // @type {AxiosResponse<AutoSaveResponse>} - API 응답
@@ -80,9 +106,18 @@ const autoSaveAxios = async (
     // @description 성공 응답 반환
     // @reason 호출자에게 결과 전달
   } catch (error) {
-    console.error('autoSaveAxios - Auto-save failed:', error); // @description 에러 로그
-    // @description 요청 실패 디버깅
-    // @reason 문제 해결 지원
+    //====여기부터 수정됨====
+    // 의미: 더 구체적인 에러 로깅 추가
+    // 이유: 에러 원인 파악
+    // 비유: 도서관에서 실패 원인을 더 자세히 기록
+    console.error('autoSaveAxios - Auto-save failed:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response ? error.response.data : null,
+      status: error.response ? error.response.status : null,
+    }); // @description 요청 실패 로깅
+    // @reason 디버깅, 에러 상세 확인
+    // @analogy 도서관에서 서버 요청 실패 기록
 
     // Fallback 처리: 에러 발생 시 기본 응답 반환
     // @description 에러 발생 시 기본 응답 생성
@@ -99,6 +134,7 @@ const autoSaveAxios = async (
 
     return fallbackResponse; // @description 기본 응답 반환
     // @reason 호출자에게 에러 결과 전달
+    //====여기까지 수정됨====
   }
 };
 
@@ -111,10 +147,11 @@ export default autoSaveAxios;
 // **작동 매커니즘**
 // 1. `DraftData` 타입 정의: 요청 데이터 구조 명시.
 // 2. `AutoSaveResponse` 타입 정의: 응답 데이터 구조 명시.
-// 3. `autoSaveAxios` 함수 정의: Axios를 사용하여 자동저장 API 요청.
-// 4. `axios.post` 호출: 드래프트 데이터를 API로 전송.
-// 5. 응답 검증: 성공 여부 확인 후 결과 반환.
-// 6. 에러 발생 시 Fallback 처리: 기본 응답 반환으로 충돌 방지.
-// 7. `export default`로 외부에서 사용할 수 있도록 내보냄.
+// 3. `autoSaveAxios` 함수 정의: `token` 파라미터 추가 후 Axios를 사용하여 자동저장 API 요청.
+// 4. 토큰 검증: `token`이 없으면 에러 발생.
+// 5. `axiosBase.post` 호출: `Authorization` 헤더에 토큰 추가 후 드래프트 데이터 API로 전송.
+// 6. 응답 검증: 성공 여부 확인 후 결과 반환.
+// 7. 에러 발생 시 개선된 에러 로깅 및 Fallback 처리: 기본 응답 반환으로 충돌 방지.
+// 8. `export default`로 외부에서 사용할 수 있도록 내보냄.
 // @reason 자동저장 요청 로직을 캡슐화하여 코드 재사용성과 유지보수성 향상.
 // @analogy 도서관에서 자료를 주기적으로 저장.
