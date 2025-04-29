@@ -5,27 +5,19 @@
  * @analogy 도서관에서 대여 기록을 주기적으로 자동 저장하고 사용자에게 알리는 시스템
  */
 
-import useDraftStore from '../../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
-// @description Zustand 스토어 가져오기
-// @reason 드래프트 데이터 상태 관리 및 가져오기
-// @analogy 도서관에서 중앙 대여 기록 시스템에 접근
-
 import useAutoSave from './hooks/useAutoSave'; // @type {Function} - 자동저장 훅
 // @description 자동저장 훅 가져오기
 // @reason 드래프트 데이터 자동저장 로직 사용
 // @analogy 도서관에서 자동 저장 시스템 연결
-
-import useAutoSaveAnimation from './hooks/useAutoSaveAnimation'; // @type {Function} - 애니메이션 훅
-// @description 자동저장 애니메이션 훅 가져오기
-// @reason 저장 시 애니메이션 효과 적용
-// @analogy 도서관에서 저장 알림에 시각적 효과 추가
 
 import AutoSaveNotification from './parts/AutoSaveNotification'; // @type {Function} - 알림 UI 컴포넌트
 // @description 자동저장 알림 UI 컴포넌트 가져오기
 // @reason 저장 상태를 사용자에게 알림
 // @analogy 도서관에서 사용자에게 저장 완료 메시지 표시
 
-import type { DraftState } from '../../../../stores/draft/initialDraftState'; // @type {Object} - 드래프트 상태 타입
+import useDraftStore from '../../../../stores/draft/draftStore';
+import type { DraftState } from '../../../../stores/draft/initialDraftState';
+
 // 자동저장 컴포넌트 정의
 // @description 드래프트 데이터를 자동저장하고 알림 UI 표시
 // @reason 자동저장 기능과 사용자 피드백 제공
@@ -57,13 +49,6 @@ function PostAutoSave() {
   // @description 자동저장 훅에서 저장 상태와 마지막 저장 시간 가져오기
   // @reason UI 업데이트 및 사용자 피드백 제공
 
-  // 자동저장 애니메이션 훅 사용
-  // @description 저장 시 애니메이션 효과 적용
-  // @reason 사용자에게 시각적 피드백 제공
-  const { animationProps } = useAutoSaveAnimation(isSaving); // @type {Object} - 애니메이션 속성
-  // @description 애니메이션 훅에서 애니메이션 속성 가져오기
-  // @reason 저장 상태에 따라 애니메이션 적용
-
   return (
     <div className="post-auto-save">
       {/* @description 자동저장 섹션의 컨테이너 */}
@@ -74,7 +59,6 @@ function PostAutoSave() {
       <AutoSaveNotification
         isSaving={isSaving} // @type {boolean} - 저장 중 여부
         lastSaved={lastSaved} // @type {Date | null} - 마지막 저장 시간
-        animationProps={animationProps} // @type {Object} - 애니메이션 속성
       />
       {/* @description 자동저장 알림 UI 렌더링 */}
       {/* @reason 사용자에게 저장 상태 알림 */}
@@ -92,9 +76,8 @@ export default PostAutoSave;
 // 1. `DraftState` 타입 정의: 드래프트 데이터 구조 명시.
 // 2. `useDraftStore` 훅 호출: Zustand 스토어에서 드래프트 데이터 가져옴.
 // 3. `useAutoSave` 훅 호출: 드래프트 데이터를 주기적으로 자동저장.
-// 4. `useAutoSaveAnimation` 훅 호출: 저장 시 애니메이션 효과 적용.
-// 5. `AutoSaveNotification` 컴포넌트 렌더링: 저장 상태와 애니메이션 적용하여 사용자에게 알림.
-// 6. `export default`로 외부에서 사용할 수 있도록 내보냄.
-// 7. 상위 컴포넌트에서 `PostAutoSave`를 사용하여 자동저장 기능 통합.
+// 4. `AutoSaveNotification` 컴포넌트 렌더링: 저장 상태 표시.
+// 5. `export default`로 외부에서 사용할 수 있도록 내보냄.
+// 6. 상위 컴포넌트에서 `PostAutoSave`를 사용하여 자동저장 기능 통합.
 // @reason 자동저장 기능과 사용자 피드백을 중앙에서 관리하여 코드 재사용성과 유지보수성 향상.
 // @analogy 도서관에서 대여 기록을 자동 저장하고 사용자에게 알리는 시스템.
