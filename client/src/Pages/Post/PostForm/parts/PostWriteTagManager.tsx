@@ -1,8 +1,8 @@
 import { useFormContext } from 'react-hook-form';
 import TagInput from './TagInput';
 import TagWriteList from './TagWriteList';
-import { usePostWriteTagManager } from '../hooks/usePostWriteTagManager';
-import type { PostWriteFormData } from '../hooks/usePostWriteState';
+import { usePostWriteTagManager } from '../../PostForm/hooks/usePostWriteTagManager';
+import type { PostWriteFormData } from '../../PostForm/hooks/usePostWriteState';
 import { FormField, FormItem, FormLabel } from '@/components/ui/form';
 
 function PostWriteTagManager() {

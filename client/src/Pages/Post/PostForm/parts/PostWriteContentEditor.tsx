@@ -1,6 +1,6 @@
 import ReactQuill from 'react-quill-new';
 import { useFormContext } from 'react-hook-form';
-import type { PostWriteFormData } from '../hooks/usePostWriteState';
+import type { PostWriteFormData } from '../../PostForm/hooks/usePostWriteState';
 import {
   FormField,
   FormItem,
