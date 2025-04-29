@@ -10,7 +10,7 @@ import { useEffect } from 'react'; // @type {Function} - React 훅
 // @reason 저장 상태 변경 시 애니메이션 트리거
 // @analogy 도서관에서 알림 상태 변화를 감지하는 도구 사용
 
-import { gsap } from 'gsap'; // @type {Object} - GSAP 라이브러리
+import gsap from 'gsap'; // @type {Object} - GSAP 라이브러리
 // @description GSAP 가져오기
 // @reason 애니메이션 효과 구현
 // @analogy 도서관에서 깜빡이는 알림 효과를 위한 도구 가져오기

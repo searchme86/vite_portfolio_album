@@ -5,11 +5,6 @@
  * @analogy 도서관에서 선택한 사진을 확대해서 미리 보는 화면
  */
 
-import React from 'react'; // @type {Object} - React 라이브러리
-// @description React 가져오기
-// @reason JSX 컴포넌트 작성
-// @analogy 도서관에서 기본적인 UI 도구 가져오기
-
 // 컴포넌트 Props 타입 정의
 // @type {Object} - 컴포넌트 속성
 // @description 컴포넌트 Props 타입 정의
