@@ -8,6 +8,7 @@ import webhookRouter from './routes/webhook.route.js';
 import tagRoute from './tag/routes/tag.route.js';
 import likeRouter from './like/routes/like.route.js';
 import sessionRouter from './session/routes/session.route.js';
+import draftRouter from './draft/routes/draft.route.js';
 import { clerkMiddleware } from '@clerk/express';
 import { configureCors } from './lib/corsConfig.js';
 import { clerkHandshakeMiddleware } from './middlewares/clerkHandshakeMiddleware.js';
@@ -64,6 +65,8 @@ app.use('/api/tags', tagRoute); // 의미: 태그 라우터 등록
 app.use('/like', likeRouter); // 의미: 좋아요 라우터 등록
 // 이유: 좋아요 관련 엔드포인트 처리
 // 비유: 도서관에 좋아요 안내 표지판 설치
+
+app.use('/draft', draftRouter);
 
 app.use('/api/session', sessionRouter);
 
