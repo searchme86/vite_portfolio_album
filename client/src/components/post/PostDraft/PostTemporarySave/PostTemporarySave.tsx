@@ -15,7 +15,7 @@ import DraftSaveButton from './parts/DraftSaveButton'; // @type {Function} - 버
 // @reason 사용자에게 임시저장 버튼 제공
 // @analogy 도서관에서 사용자에게 임시 저장 버튼 표시
 
-import useDraftStore from '../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
+import useDraftStore from '../../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
 // @description Zustand 스토어 가져오기
 // @reason 드래프트 데이터 상태 관리 및 가져오기
 // @analogy 도서관에서 중앙 대여 기록 시스템에 접근

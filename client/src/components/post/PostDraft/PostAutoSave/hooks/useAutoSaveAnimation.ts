@@ -6,30 +6,15 @@
  */
 
 import { useState, useEffect } from 'react'; // @type {Function} - React 훅
-// @description useState와 useEffect 훅 가져오기
-// @reason 애니메이션 상태 관리 및 트리거
-// @analogy 도서관에서 알림 효과를 관리하는 도구 사용
-
 import { gsap } from 'gsap'; // @type {Object} - GSAP 라이브러리
-// @description GSAP 가져오기
-// @reason 애니메이션 효과 구현
-// @analogy 도서관에서 깜빡이는 알림 효과를 위한 도구 가져오기
 
 // 애니메이션 속성 타입 정의
-// @type {Object} - 애니메이션 속성
-// @description 애니메이션 속성의 타입을 정의하여 TypeScript에서 타입 안정성 보장
-// @reason 타입 오류 방지 및 코드 가독성 향상
-// @analogy 도서관에서 알림 효과의 형식을 미리 정의
 interface AnimationProps {
   opacity: number; // @type {number} - 투명도
   scale: number; // @type {number} - 크기 변화
   duration: number; // @type {number} - 애니메이션 지속 시간
 }
 
-// 커스텀 훅 정의
-// @description 자동저장 시 애니메이션 속성 반환
-// @reason 저장 상태에 따라 애니메이션 효과 제공
-// @analogy 도서관에서 저장 시 알림이 깜빡이도록 설정
 const useAutoSaveAnimation = (isSaving: boolean) => {
   const [animationProps, setAnimationProps] = useState<AnimationProps>({
     opacity: 1, // @type {number} - 초기 투명도

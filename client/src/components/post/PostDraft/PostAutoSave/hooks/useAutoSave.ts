@@ -11,8 +11,8 @@ import type { DraftState } from '../../../../../stores/draft/initialDraftState';
 // 자동저장 간격 상수
 // @description 자동저장 주기 (밀리초 단위)
 // @reason 사용자 수정 가능하도록 상수로 분리
-// @analogy 도서관에서 자동 저장 주기를 설정
-const AUTO_SAVE_INTERVAL = 30000; // 30초
+
+const AUTO_SAVE_INTERVAL = 15000;
 
 // 커스텀 훅 정의
 // @description 드래프트 데이터를 주기적으로 자동저장

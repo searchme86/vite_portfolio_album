@@ -10,7 +10,7 @@ import { useState } from 'react'; // @type {Function} - React 훅
 // @reason 임시저장 상태 관리
 // @analogy 도서관에서 임시 저장 상태를 관리하는 도구 사용
 
-import useDraftStore from '../../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
+import useDraftStore from '../../../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
 // @description Zustand 스토어 가져오기
 // @reason 드래프트 데이터 상태 업데이트
 // @analogy 도서관에서 중앙 대여 기록 시스템에 접근

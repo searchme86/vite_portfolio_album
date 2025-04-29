@@ -5,11 +5,6 @@
  * @analogy 도서관에서 대여 기록 저장 상태를 사용자에게 알리는 게시판
  */
 
-import React from 'react'; // @type {Object} - React 라이브러리
-// @description React 가져오기
-// @reason JSX 컴포넌트 작성 및 상태 관리
-// @analogy 도서관에서 기본적인 관리 도구 가져오기
-
 // 애니메이션 속성 타입 정의
 // @type {Object} - GSAP 애니메이션 속성
 // @description 애니메이션 속성의 타입을 정의하여 TypeScript에서 타입 안정성 보장

@@ -5,6 +5,11 @@
  * @analogy 도서관에서 대여 기록을 주기적으로 자동 저장하고 사용자에게 알리는 시스템
  */
 
+import useDraftStore from '../../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
+// @description Zustand 스토어 가져오기
+// @reason 드래프트 데이터 상태 관리 및 가져오기
+// @analogy 도서관에서 중앙 대여 기록 시스템에 접근
+
 import useAutoSave from './hooks/useAutoSave'; // @type {Function} - 자동저장 훅
 // @description 자동저장 훅 가져오기
 // @reason 드래프트 데이터 자동저장 로직 사용
@@ -19,11 +24,6 @@ import AutoSaveNotification from './parts/AutoSaveNotification'; // @type {Funct
 // @description 자동저장 알림 UI 컴포넌트 가져오기
 // @reason 저장 상태를 사용자에게 알림
 // @analogy 도서관에서 사용자에게 저장 완료 메시지 표시
-
-import useDraftStore from '../../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
-// @description Zustand 스토어 가져오기
-// @reason 드래프트 데이터 상태 관리 및 가져오기
-// @analogy 도서관에서 중앙 대여 기록 시스템에 접근
 
 import type { DraftState } from '../../../../stores/draft/initialDraftState'; // @type {Object} - 드래프트 상태 타입
 // 자동저장 컴포넌트 정의
