@@ -10,18 +10,8 @@
 // @description 드래프트 데이터의 타입을 정의하여 TypeScript에서 타입 안정성 보장
 // @reason 타입 오류 방지 및 코드 가독성 향상
 // @analogy 도서관에서 대여 기록부의 형식을 미리 정의
-interface DraftState {
-  postTitle: string;
-  postDesc: string;
-  postContent: string;
-  tags: string[];
-  imageUrls: string[];
-  custom: { [key: string]: any };
-  draftId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  isTemporary: boolean;
-}
+
+import { DraftState } from './initialDraftState';
 
 // Getter 함수 타입 정의
 // @type {Object} - Getter 함수들의 객체

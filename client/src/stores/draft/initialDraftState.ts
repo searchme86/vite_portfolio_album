@@ -10,7 +10,8 @@
 // @description 드래프트 데이터의 타입을 정의하여 TypeScript에서 타입 안정성 보장
 // @reason 타입 오류 방지 및 코드 가독성 향상
 // @analogy 도서관에서 대여 기록부의 형식을 미리 정의
-interface DraftState {
+
+export interface DraftState {
   postTitle: string; // @type {string} - 포스트 제목
   postDesc: string; // @type {string} - 포스트 설명
   postContent: string; // @type {string} - 포스트 본문
