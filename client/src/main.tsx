@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Homepage from './routes/Homepage';
 import PostListPage from './routes/PostListPage';
 import Write from './Pages/Post/Write';
+import PostWriteForm from './Pages/Post/PostWrite/parts/PostWriteForm';
 import EditPostPage from './Pages/Post/EditPostPage';
 import LoginPage from './routes/LoginPage';
 import RegisterPage from './routes/RegisterPage';
@@ -43,7 +44,8 @@ const router = createBrowserRouter([
       },
       {
         path: '/write',
-        element: <Write />,
+        // element: <Write />,
+        element: <PostWriteForm />,
       },
       {
         path: '/login',
