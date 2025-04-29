@@ -111,35 +111,35 @@ const fetchDraftAxios = async (
     // @description 성공 응답 반환
     // @reason 호출자에게 결과 전달
   } catch (error) {
-    //====여기부터 수정됨====
-    // 의미: 더 구체적인 에러 로깅 추가
-    // 이유: 에러 원인 파악
-    // 비유: 도서관에서 실패 원인을 더 자세히 기록
-    console.error('fetchDraftAxios - Fetch failed:', {
-      message: error.message,
-      stack: error.stack,
-      response: error.response ? error.response.data : null,
-      status: error.response ? error.response.status : null,
-    }); // @description 요청 실패 로깅
-    // @reason 디버깅, 에러 상세 확인
-    // @analogy 도서관에서 서버 요청 실패 기록
+    if (error instanceof Error) {
+      //====여기부터 수정됨====
+      // 의미: 더 구체적인 에러 로깅 추가
+      // 이유: 에러 원인 파악
+      // 비유: 도서관에서 실패 원인을 더 자세히 기록
+      console.error('fetchDraftAxios - Fetch failed:', {
+        message: error.message,
+        stack: error.stack,
+      }); // @description 요청 실패 로깅
+      // @reason 디버깅, 에러 상세 확인
+      // @analogy 도서관에서 서버 요청 실패 기록
 
-    // Fallback 처리: 에러 발생 시 기본 응답 반환
-    // @description 에러 발생 시 기본 응답 생성
-    // @reason 애플리케이션 충돌 방지
-    const fallbackResponse: FetchDraftResponse = {
-      success: false, // @type {boolean} - 실패 상태
-      data: null, // @type {DraftData | null} - Fallback: null
-      message:
-        error instanceof Error
-          ? error.message
-          : '알 수 없는 에러가 발생했습니다.', // @type {string} - 에러 메시지
-    }; // @description 기본 응답 데이터 생성
-    // @reason 에러 발생 시 기본값 제공
+      // Fallback 처리: 에러 발생 시 기본 응답 반환
+      // @description 에러 발생 시 기본 응답 생성
+      // @reason 애플리케이션 충돌 방지
+      const fallbackResponse: FetchDraftResponse = {
+        success: false, // @type {boolean} - 실패 상태
+        data: null, // @type {DraftData | null} - Fallback: null
+        message:
+          error instanceof Error
+            ? error.message
+            : '알 수 없는 에러가 발생했습니다.', // @type {string} - 에러 메시지
+      }; // @description 기본 응답 데이터 생성
+      // @reason 에러 발생 시 기본값 제공
 
-    return fallbackResponse; // @description 기본 응답 반환
-    // @reason 호출자에게 에러 결과 전달
-    //====여기까지 수정됨====
+      return fallbackResponse; // @description 기본 응답 반환
+      // @reason 호출자에게 에러 결과 전달
+      //====여기까지 수정됨====
+    }
   }
 };
 
