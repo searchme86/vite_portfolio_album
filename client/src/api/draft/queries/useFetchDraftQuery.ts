@@ -46,7 +46,11 @@ interface FetchDraftResponse {
 // @description React Query를 사용하여 드래프트 데이터 조회
 // @reason 비동기 조회 작업 관리
 // @analogy 도서관에서 자료 조회 요청 관리
-const useFetchDraftQuery = (draftId: string) => {
+const useFetchDraftQuery = (
+  draftId: string,
+  isAuthenticated: boolean,
+  safeGetToken: () => Promise<string | null>
+) => {
   // React Query query 훅 사용
   // @description 드래프트 데이터를 query로 조회
   // @reason 비동기 작업 상태 관리 및 캐싱
@@ -54,17 +58,59 @@ const useFetchDraftQuery = (draftId: string) => {
     queryKey: ['draft', draftId], // @type {Array<string>} - 쿼리 키
     // @description 고유 쿼리 키 설정
     // @reason 캐싱 및 쿼리 식별
-    queryFn: () => fetchDraftAxios(draftId), // @description 쿼리 함수 정의
-    // @reason fetchDraftAxios를 호출하여 드래프트 조회
-    enabled: !!draftId, // @description draftId가 있을 때만 쿼리 실행
+    queryFn: async () => {
+      console.log('useFetchDraftQuery - getToken: async (options) => { ... }'); // @description 토큰 함수 로그
+      // @reason 토큰 함수 디버깅
+      // @analogy 도서관에서 회원증 준비 확인
+
+      //====여기부터 수정됨====
+      const token = await safeGetToken(); // @type {string | null} - 토큰 가져오기
+      // @description safeGetToken으로 토큰 동적으로 가져오기
+      // @reason 인증된 요청을 위해 토큰 필요
+      console.log('useFetchDraftQuery - Retrieved token:', token); // @description 토큰 디버깅
+      // @reason 토큰 상태 확인
+
+      if (!isAuthenticated || !token) {
+        throw new Error('User is not authenticated or token is missing'); // @description 인증 실패 처리
+        // @reason 인증되지 않은 경우 에러 발생
+        // @analogy 도서관에서 회원증이 없으면 조회 불가
+      }
+
+      const response = await fetchDraftAxios(draftId, token); // @description fetchDraftAxios 호출
+      // @reason 토큰과 함께 드래프트 조회 요청 실행
+      console.log('useFetchDraftQuery - fetchDraftAxios response:', response); // @description 응답 디버깅
+      // @reason 응답 상태 확인
+
+      if (!response || !response.success) {
+        throw new Error(response?.message || 'Failed to fetch draft'); // @description 응답 실패 처리
+        // @reason 실제 에러 발생 시 에러 던짐
+        // @analogy 도서관에서 응답이 없으면 실패로 처리
+      }
+
+      if (!response.data) {
+        throw new Error('Draft data is missing'); // @description 데이터 누락 처리
+        // @reason 데이터가 없는 경우 에러
+        // @analogy 도서관에서 자료가 없으면 실패로 처리
+      }
+
+      return response; // @type {FetchDraftResponse} - 응답 반환
+      // @description 성공 응답 반환
+      // @reason 쿼리 훅에서 사용
+      //====여기까지 수정됨====
+    },
+    enabled: !!draftId && isAuthenticated, // @description draftId와 인증 상태 확인 후 쿼리 실행
     // @reason 불필요한 요청 방지
+    // @analogy 도서관에서 회원증과 자료 ID가 있어야 요청 가능
     onSuccess: (data) => {
       console.log('useFetchDraftQuery - Fetch succeeded:', data); // @description 디버깅용 로그
       // @description 성공 상태 디버깅
       // @reason 성공 상태 확인
     },
     onError: (error) => {
-      console.error('useFetchDraftQuery - Fetch failed:', error); // @description 에러 로그
+      console.error('useFetchDraftQuery - Fetch failed:', {
+        message: error.message,
+        stack: error.stack,
+      }); // @description 에러 로그
       // @description 실패 상태 디버깅
       // @reason 문제 해결 지원
     },
@@ -98,12 +144,15 @@ export default useFetchDraftQuery;
 // 1. `DraftData` 타입 정의: 응답 데이터 구조 명시.
 // 2. `FetchDraftResponse` 타입 정의: 응답 데이터 구조 명시.
 // 3. `useQuery` 훅 호출: React Query를 사용하여 드래프트 조회 query 정의.
-// 4. `queryKey` 설정: 고유 키로 캐싱 및 쿼리 식별.
-// 5. `queryFn`으로 `fetchDraftAxios` 호출: 드래프트 데이터 조회 실행.
-// 6. `enabled` 옵션 설정: `draftId`가 있을 때만 쿼리 실행.
-// 7. `onSuccess`, `onError` 콜백 정의: 쿼리 상태 디버깅.
-// 8. `draftData` 추출 및 Fallback 처리: 성공 시 데이터 반환, 실패 시 null.
-// 9. `draftData`, `isLoading`, `error`, `isSuccess` 반환: 컴포넌트에서 상태와 데이터 사용 가능.
-// 10. `export default`로 외부에서 사용할 수 있도록 내보냄.
+// 4. `safeGetToken`으로 토큰 가져오기: 인증된 요청을 위해 토큰 동적으로 획득.
+// 5. `isAuthenticated` 및 토큰 검증: 인증되지 않은 경우 에러 발생.
+// 6. `queryKey` 설정: 고유 키로 캐싱 및 쿼리 식별.
+// 7. `queryFn`으로 `fetchDraftAxios` 호출: 토큰과 함께 드래프트 데이터 조회 실행.
+// 8. `enabled` 옵션 설정: `draftId`와 `isAuthenticated`가 있을 때만 쿼리 실행.
+// 9. 응답 검증 강화: `success`와 `data` 유효성 확인.
+// 10. `onSuccess`, `onError` 콜백 정의: 쿼리 상태 디버깅.
+// 11. `draftData` 추출 및 Fallback 처리: 성공 시 데이터 반환, 실패 시 null.
+// 12. `draftData`, `isLoading`, `error`, `isSuccess` 반환: 컴포넌트에서 상태와 데이터 사용 가능.
+// 13. `export default`로 외부에서 사용할 수 있도록 내보냄.
 // @reason 드래프트 조회 query 로직을 캡슐화하여 코드 재사용성과 유지보수성 향상.
 // @analogy 도서관에서 저장된 자료를 조회.

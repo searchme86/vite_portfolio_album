@@ -46,22 +46,66 @@ interface TemporarySaveResponse {
 // @description React Query를 사용하여 임시저장 mutation 처리
 // @reason 비동기 저장 작업 관리
 // @analogy 도서관에서 임시 저장 요청 관리
-const useTemporarySaveMutation = () => {
+const useTemporarySaveMutation = (
+  isAuthenticated: boolean,
+  safeGetToken: () => Promise<string | null>
+) => {
   // React Query mutation 훅 사용
   // @description 임시저장 요청을 mutation으로 처리
   // @reason 비동기 작업 상태 관리 및 에러 처리
   const mutation = useMutation<TemporarySaveResponse, Error, DraftData>({
-    mutationFn: (draftData: DraftData) => temporarySaveAxios(draftData), // @description mutation 함수 정의
-    // @reason temporarySaveAxios를 호출하여 임시저장 실행
+    mutationFn: async (draftData: DraftData) => {
+      console.log(
+        'useTemporarySaveMutation - Mutation started for draft:',
+        draftData
+      ); // @description 디버깅용 로그
+      // @description mutation 시작 디버깅
+      // @reason 요청 상태 확인
+
+      //====여기부터 수정됨====
+      const token = await safeGetToken(); // @type {string | null} - 토큰 가져오기
+      // @description safeGetToken으로 토큰 동적으로 가져오기
+      // @reason 인증된 요청을 위해 토큰 필요
+      console.log('useTemporarySaveMutation - Retrieved token:', token); // @description 토큰 디버깅
+      // @reason 토큰 상태 확인
+
+      console.log('useTemporarySaveMutation - Mutation params:', {
+        draftData,
+        token,
+        isAuthenticated,
+      }); // @description 파라미터 디버깅
+      // @reason 요청 파라미터 상태 확인
+
+      if (!isAuthenticated || !token) {
+        throw new Error('User is not authenticated or token is missing'); // @description 인증 실패 처리
+        // @reason 인증되지 않은 경우 에러 발생
+        // @analogy 도서관에서 회원증이 없으면 저장 불가
+      }
+
+      const response = await temporarySaveAxios(draftData, token); // @description temporarySaveAxios 호출
+      // @reason 토큰과 함께 임시저장 요청 실행
+      console.log('useTemporarySaveMutation - Mutation response:', response); // @description 응답 디버깅
+      // @reason 응답 상태 확인
+
+      return response; // @type {TemporarySaveResponse} - 응답 반환
+      // @description 성공 응답 반환
+      // @reason 상위 함수에서 응답 사용
+      //====여기까지 수정됨====
+    },
     onSuccess: (data) => {
       console.log('useTemporarySaveMutation - Temporary-save succeeded:', data); // @description 디버깅용 로그
       // @description 성공 상태 디버깅
       // @reason 성공 상태 확인
     },
     onError: (error) => {
-      console.error('useTemporarySaveMutation - Temporary-save failed:', error); // @description 에러 로그
+      //====여기부터 수정됨====
+      console.error('useTemporarySaveMutation - Temporary-save failed:', {
+        message: error.message,
+        stack: error.stack,
+      }); // @description 에러 로그
       // @description 실패 상태 디버깅
       // @reason 문제 해결 지원
+      //====여기까지 수정됨====
     },
     onSettled: () => {
       console.log('useTemporarySaveMutation - Mutation settled'); // @description 디버깅용 로그
@@ -105,10 +149,12 @@ export default useTemporarySaveMutation;
 // 1. `DraftData` 타입 정의: 요청 데이터 구조 명시.
 // 2. `TemporarySaveResponse` 타입 정의: 응답 데이터 구조 명시.
 // 3. `useMutation` 훅 호출: React Query를 사용하여 임시저장 mutation 정의.
-// 4. `mutationFn`으로 `temporarySaveAxios` 호출: 임시저장 API 요청 실행.
-// 5. `onSuccess`, `onError`, `onSettled` 콜백 정의: mutation 상태 디버깅.
-// 6. `handleTemporarySave` 함수 정의: mutation 실행 및 Fallback 처리.
-// 7. `temporarySave`, `isLoading`, `error`, `data` 반환: 컴포넌트에서 상태와 함수 사용 가능.
-// 8. `export default`로 외부에서 사용할 수 있도록 내보냄.
+// 4. `safeGetToken`으로 토큰 가져오기: 인증된 요청을 위해 토큰 동적으로 획득.
+// 5. `isAuthenticated` 및 토큰 검증: 인증되지 않은 경우 에러 발생.
+// 6. `mutationFn`으로 `temporarySaveAxios` 호출: 토큰과 함께 임시저장 API 요청 실행.
+// 7. `onSuccess`, `onError`, `onSettled` 콜백 정의: mutation 상태 디버깅.
+// 8. `handleTemporarySave` 함수 정의: mutation 실행 및 Fallback 처리.
+// 9. `temporarySave`, `isLoading`, `error`, `data` 반환: 컴포넌트에서 상태와 함수 사용 가능.
+// 10. `export default`로 외부에서 사용할 수 있도록 내보냄.
 // @reason 임시저장 mutation 로직을 캡슐화하여 코드 재사용성과 유지보수성 향상.
 // @analogy 도서관에서 자료를 임시로 저장.
