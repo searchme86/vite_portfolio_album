@@ -65,6 +65,7 @@ app.use('/api/tags', tagRoute); // 의미: 태그 라우터 등록
 app.use('/like', likeRouter); // 의미: 좋아요 라우터 등록
 // 이유: 좋아요 관련 엔드포인트 처리
 // 비유: 도서관에 좋아요 안내 표지판 설치
+app.use('/draft', draftRouter); // 의미: 초안 라우터 등록
 
 app.use('/draft', draftRouter);
 
