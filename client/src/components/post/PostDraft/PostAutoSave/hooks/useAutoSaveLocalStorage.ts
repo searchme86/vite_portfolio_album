@@ -7,6 +7,10 @@ import { useEffect, useState } from 'react'; // @type {Function} - React 훅
 // @description 상태와 이펙트 관리
 // @reason 주기적 저장 실행 및 저장 상태 관리
 
+import { v4 as uuidv4 } from 'uuid'; // @type {Function} - UUID 생성 함수
+// @description 고유 ID 생성
+// @reason draftId가 없을 경우 고유 ID 생성
+
 import type { DraftState } from '../../../../../stores/draft/initialDraftState'; // @type {Object} - 드래프트 상태 타입
 // @description 드래프트 상태 타입 가져오기
 // @reason 타입 안정성 보장
@@ -26,16 +30,22 @@ export function useAutoSaveLocalStorage(draft: DraftState) {
       setIsSaving(true); // 저장 상태 활성화
       // @description 저장 시작 시 상태 업데이트
       // @reason 저장 중임을 표시
-      const draftKey = `draft_${draftData.draftId || 'default'}`; // @type {string} - localStorage 키
+
+      // draftId가 없으면 고유 ID 생성
+      const safeDraftId = draftData.draftId || uuidv4(); // @type {string} - 고유 드래프트 ID
+      // @description draftId가 없으면 UUID로 생성
+      // @reason localStorage 저장 시 고유 ID 보장
+
+      const draftKey = `draft_${safeDraftId}`; // @type {string} - localStorage 키
       // @description 드래프트 데이터 저장 키 생성
       // @reason 고유한 키로 데이터 저장
 
       // createdAt을 Date 객체로 변환하거나 기본값 제공
       const createdAtValue = draftData.createdAt
         ? draftData.createdAt instanceof Date
-          ? draftData.createdAt.toISOString() // Date 객체이면 toISOString 호출
-          : new Date(draftData.createdAt).toISOString() // string이면 Date로 변환
-        : new Date().toISOString(); // 없으면 현재 시간
+          ? draftData.createdAt.toISOString()
+          : new Date(draftData.createdAt).toISOString()
+        : new Date().toISOString(); // @type {string} - 생성 시간
       // @description createdAt을 Date 객체로 변환하거나 기본값 설정
       // @reason toISOString 호출 전 Date 객체 보장
 
@@ -46,13 +56,14 @@ export function useAutoSaveLocalStorage(draft: DraftState) {
         tags: draftData.tags || [], // @type {string[]} - 태그
         imageUrls: draftData.imageUrls || [], // @type {string[]} - 이미지 URL
         custom: draftData.custom || {}, // @type {Record<string, any>} - 커스텀 데이터
-        draftId: draftData.draftId || '', // @type {string} - 드래프트 ID
+        draftId: safeDraftId, // @type {string} - 드래프트 ID
         createdAt: createdAtValue, // @type {string} - 생성 시간
         updatedAt: new Date().toISOString(), // @type {string} - 수정 시간
         isTemporary: draftData.isTemporary || false, // @type {boolean} - 임시저장 여부
       }; // @type {Object} - 저장할 드래프트 데이터
       // @description localStorage에 저장할 데이터 준비
       // @reason 데이터 직렬화 준비
+
       localStorage.setItem(draftKey, JSON.stringify(draftToSave)); // localStorage에 저장
       // @description localStorage에 데이터 저장
       // @reason 데이터 지속성 보장

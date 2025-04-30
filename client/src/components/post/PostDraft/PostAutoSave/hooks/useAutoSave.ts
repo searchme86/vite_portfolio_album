@@ -79,7 +79,12 @@ export function useAutoSave(
   // @description 드래프트 데이터 로그
   // @reason 데이터 확인
 
-  return { isSaving: isLocalSaving || isServerSaving, lastSaved }; // 저장 상태와 마지막 저장 시간 반환
+  // isSaving이 항상 정의되도록 보장
+  const finalIsSaving = isLocalSaving || isServerSaving || false; // @type {boolean} - 최종 저장 상태
+  // @description isLocalSaving과 isServerSaving이 undefined일 경우 false로 대체
+  // @reason isSaving이 undefined가 되지 않도록 보장
+
+  return { isSaving: finalIsSaving, lastSaved }; // 저장 상태와 마지막 저장 시간 반환
   // @description 저장 상태와 마지막 저장 시간 반환
   // @reason 컴포넌트에서 사용
 }

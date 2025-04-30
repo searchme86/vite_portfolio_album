@@ -67,8 +67,6 @@ app.use('/like', likeRouter); // 의미: 좋아요 라우터 등록
 // 비유: 도서관에 좋아요 안내 표지판 설치
 app.use('/draft', draftRouter); // 의미: 초안 라우터 등록
 
-app.use('/draft', draftRouter);
-
 app.use('/api/session', sessionRouter);
 
 app.use(errorHandlerMiddleware); // 의미: 전역 에러 핸들링 미들웨어 등록

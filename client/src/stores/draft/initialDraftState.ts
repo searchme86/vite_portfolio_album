@@ -3,6 +3,10 @@
  * @description 드래프트 상태 타입 정의
  * @location src/stores/draft/initialDraftState.ts
  */
+import { v4 as uuidv4 } from 'uuid'; // @type {Function} - UUID 생성 함수
+// @description 고유 ID 생성
+// @reason 초기 draftId 생성
+
 export interface DraftState {
   postTitle: string; // @type {string} - 포스트 제목
   postDesc: string; // @type {string} - 포스트 설명
@@ -28,7 +32,9 @@ export const initialDraftState: DraftState = {
   tags: [], // @type {string[]} - 초기 태그
   imageUrls: [], // @type {string[]} - 초기 이미지 URL
   custom: {}, // @type {Record<string, any>} - 초기 커스텀 데이터
-  draftId: '', // @type {string} - 초기 드래프트 ID
+  draftId: uuidv4(), // @type {string} - 초기 드래프트 ID (UUID로 생성)
+  // @description 초기 고유 ID 설정
+  // @reason draftId 필수 보장
   createdAt: undefined, // @type {undefined} - 초기 생성 시간
   updatedAt: undefined, // @type {undefined} - 초기 수정 시간
   isTemporary: false, // @type {boolean} - 초기 임시저장 여부
