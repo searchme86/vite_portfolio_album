@@ -11,6 +11,7 @@ import { useCreatePost } from '@/api/post/write/useCreatePost';
 import { useSafeAuthToken } from '@/lib/auth/useSafeAuthToken';
 import { usePostWriteNavigation } from './hooks/usePostWriteNavigation';
 import { postWriteFormDefaultValues } from './hooks/usePostWriteState';
+import PostAutoSave from '@/components/post/PostDraft/PostAutoSave/PostAutoSave';
 import type { PostWriteFormData } from './hooks/usePostWriteState';
 
 // 폼 컴포넌트 속성 타입 정의
@@ -50,6 +51,8 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
     <div className="max-w-4xl p-4 mx-auto">
       <div className="mb-8">
         <h1 className="mb-4 text-2xl font-bold">Create a New Post</h1>
+
+        <PostAutoSave />
         <ImageUploadManager
           postId="temp"
           initialImageUrls={initialImageUrls}
