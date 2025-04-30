@@ -5,20 +5,15 @@
  * @analogy 도서관에서 저장된 대여 기록을 불러오고 버튼으로 사용자에게 제공
  */
 
-import useFetchDraft from './hooks/useFetchDraft'; // @type {Function} - 불러오기 훅
 // @description 드래프트 불러오기 훅 가져오기
 // @reason 저장된 드래프트 데이터 로드 로직 사용
 // @analogy 도서관에서 저장된 기록 불러오기 시스템 연결
-
-import DraftLoadButton from './parts/DraftLoadButton'; // @type {Function} - 버튼 UI 컴포넌트
+import useFetchDraft from './hooks/useFetchDraft'; // @type {Function} - 불러오기 훅
 // @description 드래프트 불러오기 버튼 UI 컴포넌트 가져오기
 // @reason 사용자에게 불러오기 버튼 제공
 // @analogy 도서관에서 사용자에게 불러오기 버튼 표시
+import DraftLoadButton from './parts/DraftLoadButton'; // @type {Function} - 버튼 UI 컴포넌트
 
-// 불러오기 컴포넌트 정의
-// @description 저장된 드래프트 데이터를 불러오고 버튼 UI 표시
-// @reason 드래프트 불러오기 기능과 사용자 피드백 제공
-// @analogy 도서관에서 저장된 대여 기록을 불러오고 버튼으로 알림
 function PostFetchDraft() {
   // 드래프트 불러오기 훅 사용
   // @description 드래프트 불러오기 로직 실행

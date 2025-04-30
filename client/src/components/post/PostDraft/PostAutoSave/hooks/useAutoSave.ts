@@ -1,37 +1,20 @@
 /**
  * @file useAutoSave.ts
  * @description 드래프트 데이터를 주기적으로 자동저장하는 커스텀 훅
- * @reason 자동저장 로직을 분리하여 단일 책임 원칙 준수
- * @analogy 도서관에서 대여 기록을 주기적으로 자동 저장하는 시스템
  */
 
 import { useState, useEffect } from 'react';
 import type { DraftState } from '../../../../../stores/draft/initialDraftState';
 
-// 자동저장 간격 상수
 // @description 자동저장 주기 (밀리초 단위)
-// @reason 사용자 수정 가능하도록 상수로 분리
-
 const AUTO_SAVE_INTERVAL = 15000;
 
-// 커스텀 훅 정의
 // @description 드래프트 데이터를 주기적으로 자동저장
-// @reason 데이터 손실 방지 및 사용자 편의 제공
-// @analogy 도서관에서 대여 기록을 주기적으로 저장
 const useAutoSave = (draft: DraftState) => {
-  // @type {boolean} - 저장 중 여부
-  // @description 저장 상태 관리
-  // @reason UI에서 저장 상태 표시
   const [isSaving, setIsSaving] = useState<boolean>(false);
-
-  // @type {Date | null} - 마지막 저장 시간
-  // @description 마지막 저장 시간 관리
-  // @reason 사용자에게 마지막 저장 시간 표시
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   // 드래프트 저장 함수
-  // @description 드래프트 데이터를 저장하는 함수
-  // @reason 실제 저장 로직 구현
   const saveDraft = async (draftData: DraftState) => {
     try {
       setIsSaving(true); // @description 저장 상태를 true로 설정

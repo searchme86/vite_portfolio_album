@@ -6,38 +6,9 @@
  */
 
 import useTemporarySave from './hooks/useTemporarySave'; // @type {Function} - 임시저장 훅
-// @description 임시저장 훅 가져오기
-// @reason 드래프트 데이터 임시저장 로직 사용
-// @analogy 도서관에서 임시 저장 시스템 연결
-
 import DraftSaveButton from './parts/DraftSaveButton'; // @type {Function} - 버튼 UI 컴포넌트
-// @description 임시저장 버튼 UI 컴포넌트 가져오기
-// @reason 사용자에게 임시저장 버튼 제공
-// @analogy 도서관에서 사용자에게 임시 저장 버튼 표시
-
 import useDraftStore from '../../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
-// @description Zustand 스토어 가져오기
-// @reason 드래프트 데이터 상태 관리 및 가져오기
-// @analogy 도서관에서 중앙 대여 기록 시스템에 접근
-
-// 드래프트 데이터 타입 정의 (draftStore.ts와 동일)
-// @type {Object} - 드래프트 데이터의 구조
-// @description 드래프트 데이터의 타입을 정의하여 TypeScript에서 타입 안정성 보장
-// @reason 타입 오류 방지 및 코드 가독성 향상
-// @analogy 도서관에서 대여 기록부의 형식을 미리 정의
-interface DraftState {
-  postTitle: string;
-  postDesc: string;
-  postContent: string;
-  tags: string[];
-  imageUrls: string[];
-  custom: { [key: string]: any };
-  draftId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  isTemporary: boolean;
-  updateDraft: (draft: DraftState) => void;
-}
+import type { DraftState } from '../../../../stores/draft/initialDraftState'; // @type {Object} - 드래프트 데이터 타입
 
 // 임시저장 컴포넌트 정의
 // @description 드래프트 데이터를 임시저장하고 버튼 UI 표시

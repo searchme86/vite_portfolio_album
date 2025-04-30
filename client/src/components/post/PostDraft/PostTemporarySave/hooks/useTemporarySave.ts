@@ -6,34 +6,8 @@
  */
 
 import { useState } from 'react'; // @type {Function} - React 훅
-// @description useState 훅 가져오기
-// @reason 임시저장 상태 관리
-// @analogy 도서관에서 임시 저장 상태를 관리하는 도구 사용
-
-import useDraftStore from '../../../../../stores/draft/draftStore'; // @type {Object} - Zustand 스토어
-// @description Zustand 스토어 가져오기
-// @reason 드래프트 데이터 상태 업데이트
-// @analogy 도서관에서 중앙 대여 기록 시스템에 접근
-
-// 드래프트 데이터 타입 정의 (draftStore.ts와 동일)
-// @type {Object} - 드래프트 데이터의 구조
-// @description 드래프트 데이터의 타입을 정의하여 TypeScript에서 타입 안정성 보장
-// @reason 타입 오류 방지 및 코드 가독성 향상
-// @analogy 도서관에서 대여 기록부의 형식을 미리 정의
-interface DraftState {
-  postTitle: string; // @type {string} - 포스트 제목
-  postDesc: string; // @type {string} - 포스트 설명
-  postContent: string; // @type {string} - 포스트 본문
-  tags: string[]; // @type {string[]} - 태그 배열
-  imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
-  custom: { [key: string]: any }; // @type {Object} - 커스텀 데이터
-  draftId: string; // @type {string} - 드래프트 ID
-  createdAt: Date; // @type {Date} - 생성 시간
-  updatedAt: Date; // @type {Date} - 수정 시간
-  isTemporary: boolean; // @type {boolean} - 임시저장 여부
-  updateDraft: (draft: DraftState) => void;
-}
-
+import useDraftStore from '../../../../../stores/draft/draftStore';
+import type { DraftState } from '../../../../../stores/draft/initialDraftState'; // @type {Object} - 드래프트 데이터 타입
 // 커스텀 훅 정의
 // @description 드래프트 데이터를 임시저장
 // @reason 데이터 손실 방지 및 사용자 편의 제공
