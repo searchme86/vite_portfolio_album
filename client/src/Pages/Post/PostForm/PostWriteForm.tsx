@@ -64,15 +64,11 @@ import type { PostWriteFormData } from './hooks/usePostWriteState'; // @type {Ob
 // @description 폼 데이터 타입 정의
 // @reason 타입 안정성 보장
 
-import useGetDraftState from '@/stores/draft/useGetDraftState'; // @type {Function} - 드래프트 데이터 가져오기 훅
-// @description Zustand 스토어에서 드래프트 데이터 가져오기
-// @reason 드래프트 데이터 접근
-
 import useDraftStore from '../../../stores/draft/draftStore'; // @type {Function} - Zustand 스토어 훅
 // @description 드래프트 스토어 접근
-// @reason 상태 업데이트
+// @reason 상태 업데이트 및 가져오기
 
-import { useCheckAuthToken } from '@/hooks/useCheckUserAuthToken'; // @type {Function} - 인증 상태 확인 훅
+import { useCheckAuthToken } from '../../../hooks/useCheckUserAuthToken'; // @type {Function} - 인증 상태 확인 훅
 // @description 인증 상태와 토큰 가져오기
 // @reason 인증 상태 확인
 
@@ -84,27 +80,23 @@ interface PostWriteFormProps {
 }
 
 function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
+  // 모든 훅 호출을 조건문 이전에 배치
   const [imageUrls, setImageUrls] = useState<string[]>(initialImageUrls); // @type {string[]} - 이미지 URL 상태
   // @description 이미지 URL 관리
   // @reason 이미지 업로드 상태 관리
 
-  const draft = useGetDraftState(); // 드래프트 데이터 가져오기
-  // @description Zustand 스토어에서 드래프트 데이터 가져오기
-  // @reason 폼 초기값 및 자동저장 데이터
-
-  // draft 속성 추출
-  // @description draft 값을 개별 변수로 추출하여 useMemo 내부 참조 방지
-  // @reason React 훅 규칙 위반 방지
-  const {
-    postTitle,
-    postDesc,
-    postContent,
-    tags,
-    custom,
-    draftId,
-    createdAt,
-    isTemporary,
-  } = draft;
+  // Zustand 셀렉터로 직접 값 가져오기
+  // @description Zustand 스토어에서 드래프트 데이터 직접 가져오기
+  // @reason 무한 렌더링 방지 및 성능 최적화
+  const postTitle = useDraftStore.use.postTitle(); // @type {string} - 포스트 제목
+  const postDesc = useDraftStore.use.postDesc(); // @type {string} - 포스트 설명
+  const postContent = useDraftStore.use.postContent(); // @type {string} - 포스트 본문
+  const tags = useDraftStore.use.tags(); // @type {string[]} - 포스트 태그
+  const draftImageUrls = useDraftStore.use.imageUrls(); // @type {string[]} - 이미지 URL
+  const custom = useDraftStore.use.custom(); // @type {Record<string, any>} - 커스텀 데이터
+  const draftId = useDraftStore.use.draftId(); // @type {string} - 드래프트 ID
+  const createdAt = useDraftStore.use.createdAt(); // @type {Date} - 생성 시간
+  const isTemporary = useDraftStore.use.isTemporary(); // @type {boolean} - 임시저장 여부
 
   const updateDraft = useDraftStore.use.updateDraft(); // 드래프트 업데이트 함수
   // @description Zustand 스토어의 드래프트 업데이트 함수
@@ -114,43 +106,18 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
   // @description useCheckAuthToken으로 토큰 가져오기
   // @reason 포스트 생성 및 자동저장에 필요
 
-  // 인증 상태 처리
-  // @description 인증 로딩 및 실패 상태에 따른 UI 표시
-  // @reason 사용자 경험 개선
-  if (authState.isAuthFetchingLoadingStatus) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-gray-600">Loading authentication...</div>
-      </div>
-    );
-  }
-
-  if (authState.isSignedIn === false) {
-    return (
-      <div className="mt-8 text-center text-red-500">
-        {authState.authStatusMessage || '로그인이 필요합니다.'}
-        <div className="mt-4">
-          <a href="/login" className="text-blue-500 underline">
-            로그인 페이지로 이동
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  if (authState.isSignedIn === undefined) {
-    return (
-      <div className="mt-8 text-center text-red-500">
-        {authState.authStatusMessage || '인증 상태를 확인할 수 없습니다.'}
-      </div>
-    );
-  }
-
   const form = useForm<PostWriteFormData>({
     mode: 'onChange', // @type {string} - 폼 변경 시 유효성 검사
     // @description 폼 변경 시 즉시 유효성 검사
     // @reason 실시간 유효성 검사
-    defaultValues: postWriteFormDefaultValues, // 최소화된 초기값 설정
+    defaultValues: {
+      ...postWriteFormDefaultValues, // 기본값 병합
+      postTitle: postTitle || '', // 초기 제목 설정
+      postDesc: postDesc || '', // 초기 설명 설정
+      postContent: postContent || '', // 초기 본문 설정
+      tags: tags || [], // 초기 태그 설정
+    }, // @description 폼 초기값 설정
+    // @reason 초기 로드 시 드래프트 데이터 반영
   });
 
   const { handleSubmit, formState, watch, reset } = form; // 폼 메서드 및 상태
@@ -177,9 +144,9 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
   // @description 포스트 생성 API 호출
   // @reason 폼 데이터 제출
 
-  // draft 변경 시 폼 값 업데이트
-  // @description draft 값이 변경될 때 폼 초기값 업데이트
-  // @reason 초기 로드 시 draft 값 반영
+  // 초기 로드 시 드래프트 데이터로 폼 초기화
+  // @description 초기 로드 시 폼 값을 드래프트 데이터로 설정
+  // @reason 사용자 경험 개선
   useEffect(() => {
     reset({
       ...postWriteFormDefaultValues, // 기본값 병합
@@ -188,7 +155,8 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
       postContent: postContent || '', // 드래프트 본문 초기값
       tags: tags || [], // 드래프트 태그 초기값
     }); // 폼 초기값 리셋
-  }, [reset, postTitle, postDesc, postContent, tags]); // draft 속성 변경 시 실행
+  }, [reset]); // @description reset 함수만 의존
+  // @reason 무한 렌더링 방지
 
   // 폼 값 변경 감지 및 Zustand 스토어 업데이트
   useEffect(() => {
@@ -216,7 +184,8 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
       subscription.unsubscribe(); // 구독 해제
       updateDraftDebounced.cancel(); // 디바운싱 취소
     };
-  }, [watch, updateDraft, imageUrls, custom, draftId, createdAt, isTemporary]); // draft 속성 사용
+  }, [watch, updateDraft, imageUrls, custom, draftId, createdAt, isTemporary]); // @description 필요한 값만 의존
+  // @reason 무한 렌더링 방지
 
   // imageUrls 변경 시 Zustand 스토어 업데이트
   useEffect(() => {
@@ -233,78 +202,100 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
       updatedAt: new Date(), // 수정 시간 업데이트
       isTemporary: isTemporary, // 임시저장 여부 유지
     });
-  }, [
-    imageUrls,
-    updateDraft,
-    postTitle,
-    postDesc,
-    postContent,
-    tags,
-    custom,
-    draftId,
-    createdAt,
-    isTemporary,
-  ]); // draft 속성 사용
+  }, [imageUrls, updateDraft]); // @description 필요한 값만 의존
+  // @reason 무한 렌더링 방지
 
   const postFormSubmitHandler: SubmitHandler<PostWriteFormData> = (data) => {
     console.log('PostWriteForm - Submitted data:', data);
     createPostSubmit(new Event('submit') as any); // 포스트 제출
   };
 
-  return (
-    <div className="max-w-4xl p-4 mx-auto">
-      <div className="mb-8">
-        <h1 className="mb-4 text-2xl font-bold">Create a New Post</h1>
-        <PostAutoSave /> {/* PostAutoSave 컴포넌트 */}
-        {/* @description 자동저장 컴포넌트 렌더링 */}
-        {/* @reason 드래프트 주기적 저장 */}
-        <ImageUploadManager
-          postId="temp" // @type {string} - 임시 포스트 ID
-          initialImageUrls={initialImageUrls} // 초기 이미지 URL
-          onImageUrlsChange={(urls) => {
-            console.log('PostWriteForm - Image URLs updated:', urls);
-            setImageUrls(urls || []); // 이미지 URL 업데이트
-          }}
-          progressBarColor="bg-blue-600" // @type {string} - 진행 바 색상
-          minImages={1} // @type {number} - 최소 이미지 수
-          maxImages={10} // @type {number} - 최대 이미지 수
-          showSlide={false} // @type {boolean} - 슬라이드 표시 여부
-        />
+  // 인증 상태에 따른 UI 렌더링
+  // @description 인증 상태에 따라 적절한 UI 반환
+  // @reason 사용자 경험 개선
+  let content: JSX.Element;
+
+  if (authState.isAuthFetchingLoadingStatus) {
+    content = (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-gray-600">Loading authentication...</div>
       </div>
-      <Form {...form}>
-        <form
-          onSubmit={handleSubmit(postFormSubmitHandler)} // 폼 제출 핸들러
-          className="flex flex-col gap-4" // 스타일링
-        >
-          <PostWriteTitleInput /> {/* 제목 입력 컴포넌트 */}
-          <PostWriteDescriptionTextarea /> {/* 설명 입력 컴포넌트 */}
-          <PostWriteContentEditor /> {/* 본문 편집 컴포넌트 */}
-          <PostWriteTagManager /> {/* 태그 관리 컴포넌트 */}
-          <PostWriteSubmitButton
-            isLoading={isLoading} // @type {boolean} - 로딩 상태
-            isDisabled={!formState.isValid || formState.isSubmitting} // @type {boolean} - 비활성화 여부
+    );
+  } else if (authState.isSignedIn === false) {
+    content = (
+      <div className="mt-8 text-center text-red-500">
+        {authState.authStatusMessage || '로그인이 필요합니다.'}
+        <div className="mt-4">
+          <a href="/login" className="text-blue-500 underline">
+            로그인 페이지로 이동
+          </a>
+        </div>
+      </div>
+    );
+  } else if (authState.isSignedIn === undefined) {
+    content = (
+      <div className="mt-8 text-center text-red-500">
+        {authState.authStatusMessage || '인증 상태를 확인할 수 없습니다.'}
+      </div>
+    );
+  } else {
+    content = (
+      <div className="max-w-4xl p-4 mx-auto">
+        <div className="mb-8">
+          <h1 className="mb-4 text-2xl font-bold">Create a New Post</h1>
+          <PostAutoSave /> {/* PostAutoSave 컴포넌트 */}
+          {/* @description 자동저장 컴포넌트 렌더링 */}
+          {/* @reason 드래프트 주기적 저장 */}
+          <ImageUploadManager
+            postId="temp" // @type {string} - 임시 포스트 ID
+            initialImageUrls={initialImageUrls} // 초기 이미지 URL
+            onImageUrlsChange={(urls) => {
+              console.log('PostWriteForm - Image URLs updated:', urls);
+              setImageUrls(urls || []); // 이미지 URL 업데이트
+            }}
+            progressBarColor="bg-blue-600" // @type {string} - 진행 바 색상
+            minImages={1} // @type {number} - 최소 이미지 수
+            maxImages={10} // @type {number} - 최대 이미지 수
+            showSlide={false} // @type {boolean} - 슬라이드 표시 여부
           />
-          {error && (
-            <div className="text-red-500">
-              {error.message || 'An error occurred while submitting the form'}{' '}
-              {/* 에러 메시지 표시 */}
-            </div>
-          )}
-        </form>
-      </Form>
-    </div>
-  );
+        </div>
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(postFormSubmitHandler)} // 폼 제출 핸들러
+            className="flex flex-col gap-4" // 스타일링
+          >
+            <PostWriteTitleInput /> {/* 제목 입력 컴포넌트 */}
+            <PostWriteDescriptionTextarea /> {/* 설명 입력 컴포넌트 */}
+            <PostWriteContentEditor /> {/* 본문 편집 컴포넌트 */}
+            <PostWriteTagManager /> {/* 태그 관리 컴포넌트 */}
+            <PostWriteSubmitButton
+              isLoading={isLoading} // @type {boolean} - 로딩 상태
+              isDisabled={!formState.isValid || formState.isSubmitting} // @type {boolean} - 비활성화 여부
+            />
+            {error && (
+              <div className="text-red-500">
+                {error.message || 'An error occurred while submitting the form'}{' '}
+                {/* 에러 메시지 표시 */}
+              </div>
+            )}
+          </form>
+        </Form>
+      </div>
+    );
+  }
+
+  return content; // 최종 UI 반환
 }
 
 export default PostWriteForm;
 
 // **작동 매커니즘**
-// 1. `useCheckAuthToken`으로 인증 상태 가져오기: 로그인 상태와 토큰 확인.
-// 2. 인증 상태 처리: 로딩, 실패, 미인증 상태에 따라 UI 표시.
-// 3. `useGetDraftState`로 드래프트 데이터 가져오기: Zustand 스토어에서 데이터 가져옴.
-// 4. `draft` 속성 추출: `useMemo` 내부에서 훅 호출 방지.
-// 5. `useForm`으로 폼 상태 관리: 폼 입력값 관리 및 유효성 검사.
-// 6. `useEffect`로 draft 변경 시 폼 초기값 업데이트: 초기 로드 시 반영.
-// 7. `useEffect`로 폼 값 및 이미지 URL 변경 감지: 디바운싱 후 Zustand 스토어 업데이트.
+// 1. 모든 훅 호출: 컴포넌트 최상단에서 `useState`, `useDraftStore`, `useCheckAuthToken`, `useForm`, `usePostWriteNavigation`, `useCreatePost`, `useEffect` 호출.
+// 2. `useCheckAuthToken`으로 인증 상태 가져오기: 로그인 상태와 토큰 확인.
+// 3. `useDraftStore.use`로 드래프트 데이터 가져오기: Zustand 셀렉터로 직접 값 추출.
+// 4. `useForm`으로 폼 상태 관리: 폼 입력값 관리 및 유효성 검사.
+// 5. `useEffect`로 초기 폼 값 설정: 초기 로드 시 드래프트 데이터 반영.
+// 6. `useEffect`로 폼 값 및 이미지 URL 변경 감지: 디바운싱 후 Zustand 스토어 업데이트.
+// 7. 인증 상태에 따른 UI 렌더링: `content` 변수로 UI 결정.
 // 8. `PostAutoSave`로 자동저장 실행: 드래프트 데이터를 주기적으로 저장.
 // 9. 폼 렌더링 및 제출: 사용자 입력을 받아 포스트 생성.

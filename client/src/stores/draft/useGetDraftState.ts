@@ -1,115 +1,84 @@
 /**
  * @file useGetDraftState.ts
- * @description Zustand 스토어에서 전체 드래프트 데이터를 가져오는 커스텀 훅
- * @reason 재렌더링 최적화를 위해 createSelectors 사용, 단일 책임 원칙 준수
- * @analogy 도서관에서 모든 책 정보를 빠르게 가져오는 사서
+ * @description Zustand 스토어에서 드래프트 데이터를 가져오는 커스텀 훅
+ * @location src/stores/draft/useGetDraftState.ts
  */
 
-import { useMemo } from 'react'; // @type {Function} - React의 useMemo 훅
-// @description 객체 참조 안정화를 위해 useMemo 사용
-// @reason 불필요한 리렌더링 방지
-
 import useDraftStore from './draftStore'; // @type {Function} - Zustand 스토어 훅
-// @description 드래프트 스토어 훅 가져오기
-// @reason 스토어 데이터 접근
+// @description 드래프트 스토어 접근
+// @reason 상태 가져오기
 
-import type { DraftState } from './initialDraftState'; // @type {Object} - 드래프트 상태 타입
-// @description 드래프트 상태 타입 가져오기
-// @reason 타입 안정성 보장
+// 드래프트 상태 타입 정의
+interface DraftState {
+  postTitle: string; // @type {string} - 포스트 제목
+  postDesc: string; // @type {string} - 포스트 설명
+  postContent: string; // @type {string} - 포스트 본문
+  tags: string[]; // @type {string[]} - 포스트 태그
+  imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
+  custom: Record<string, any>; // @type {Record<string, any>} - 커스텀 데이터
+  draftId: string; // @type {string} - 드래프트 ID
+  createdAt: Date; // @type {Date} - 생성 시간
+  updatedAt: Date; // @type {Date} - 수정 시간
+  isTemporary: boolean; // @type {boolean} - 임시저장 여부
+}
 
 // 커스텀 훅 정의
-// @description Zustand 스토어에서 전체 드래프트 데이터를 가져옴
-// @reason createSelectors로 재렌더링 최적화 및 전체 데이터 접근
 const useGetDraftState = (): DraftState => {
-  // useDraftStore.use 셀렉터로 전체 상태를 개별적으로 구독
   const {
-    postTitle,
-    postDesc,
-    postContent,
-    tags,
-    imageUrls,
-    custom,
-    draftId,
-    createdAt,
-    updatedAt,
-    isTemporary,
-    updateDraft,
-    resetDraft,
-    getPostTitle,
-    getPostDesc,
-    getPostContent,
-    getTags,
-    getImageUrls,
-    getCustom,
-    getDraftId,
-    getCreatedAt,
-    getUpdatedAt,
-    getIsTemporary,
-  } = useDraftStore.use;
+    postTitle = () => '', // Fallback: 빈 문자열 반환 함수
+    postDesc = () => '', // Fallback: 빈 문자열 반환 함수
+    postContent = () => '', // Fallback: 빈 문자열 반환 함수
+    tags = () => [], // Fallback: 빈 배열 반환 함수
+    imageUrls = () => [], // Fallback: 빈 배열 반환 함수
+    custom = () => ({}), // Fallback: 빈 객체 반환 함수
+    draftId = () => 'default', // Fallback: 기본 ID 반환 함수
+    createdAt = () => new Date(), // Fallback: 현재 시간 반환 함수
+    updatedAt = () => new Date(), // Fallback: 현재 시간 반환 함수
+    isTemporary = () => false, // Fallback: false 반환 함수
+  } = useDraftStore.use; // Zustand 셀렉터
+  // @description Zustand 스토어에서 드래프트 데이터 가져오기
+  // @reason 상태 접근
 
-  // useMemo로 객체 반환하여 참조 안정화
-  // @description 셀렉터 값을 호출하여 값을 얻고, 객체로 반환
-  // @reason draft 객체의 참조가 변경되지 않도록 하여 무한 루프 방지
-  return useMemo(
-    () => ({
-      postTitle: postTitle(),
-      postDesc: postDesc(),
-      postContent: postContent(),
-      tags: tags(),
-      imageUrls: imageUrls(),
-      custom: custom(),
-      draftId: draftId(),
-      createdAt: createdAt(),
-      updatedAt: updatedAt(),
-      isTemporary: isTemporary(),
-      updateDraft,
-      resetDraft,
-      getPostTitle: getPostTitle(),
-      getPostDesc: getPostDesc(),
-      getPostContent: getPostContent(),
-      getTags: getTags(),
-      getImageUrls: getImageUrls(),
-      getCustom: getCustom(),
-      getDraftId: getDraftId(),
-      getCreatedAt: getCreatedAt(),
-      getUpdatedAt: getUpdatedAt(),
-      getIsTemporary: getIsTemporary(),
-    }),
-    [
-      postTitle,
-      postDesc,
-      postContent,
-      tags,
-      imageUrls,
-      custom,
-      draftId,
-      createdAt,
-      updatedAt,
-      isTemporary,
-      updateDraft,
-      resetDraft,
-      getPostTitle,
-      getPostDesc,
-      getPostContent,
-      getTags,
-      getImageUrls,
-      getCustom,
-      getDraftId,
-      getCreatedAt,
-      getUpdatedAt,
-      getIsTemporary,
-    ]
-  );
+  return {
+    postTitle: postTitle(), // @type {string} - 셀렉터 호출로 실제 값 추출
+    // @description postTitle 셀렉터 호출하여 문자열 값 반환
+    // @reason 타입 일치
+    postDesc: postDesc(), // @type {string} - 셀렉터 호출로 실제 값 추출
+    // @description postDesc 셀렉터 호출하여 문자열 값 반환
+    // @reason 타입 일치
+    postContent: postContent(), // @type {string} - 셀렉터 호출로 실제 값 추출
+    // @description postContent 셀렉터 호출하여 문자열 값 반환
+    // @reason 타입 일치
+    tags: tags(), // @type {string[]} - 셀렉터 호출로 실제 값 추출
+    // @description tags 셀렉터 호출하여 배열 값 반환
+    // @reason 타입 일치
+    imageUrls: imageUrls(), // @type {string[]} - 셀렉터 호출로 실제 값 추출
+    // @description imageUrls 셀렉터 호출하여 배열 값 반환
+    // @reason 타입 일치
+    custom: custom(), // @type {Record<string, any>} - 셀렉터 호출로 실제 값 추출
+    // @description custom 셀렉터 호출하여 객체 값 반환
+    // @reason 타입 일치
+    draftId: draftId(), // @type {string} - 셀렉터 호출로 실제 값 추출
+    // @description draftId 셀렉터 호출하여 문자열 값 반환
+    // @reason 타입 일치
+    createdAt: createdAt(), // @type {Date} - 셀렉터 호출로 실제 값 추출
+    // @description createdAt 셀렉터 호출하여 Date 값 반환
+    // @reason 타입 일치
+    updatedAt: updatedAt(), // @type {Date} - 셀렉터 호출로 실제 값 추출
+    // @description updatedAt 셀렉터 호출하여 Date 값 반환
+    // @reason 타입 일치
+    isTemporary: isTemporary(), // @type {boolean} - 셀렉터 호출로 실제 값 추출
+    // @description isTemporary 셀렉터 호출하여 불리언 값 반환
+    // @reason 타입 일치
+  }; // @description 드래프트 상태 객체 반환
+  // @reason 컴포넌트에서 사용
 };
 
-// 훅 내보내기
-// @description 커스텀 훅을 다른 파일에서 사용할 수 있도록 내보냄
-// @reason 컴포넌트에서 드래프트 데이터 선택 가능
-export default useGetDraftState;
-
 // **작동 매커니즘**
-// 1. `DraftState` 타입 가져오기: `initialDraftState.ts`에서 타입 정의 사용.
-// 2. `useDraftStore.use` 셀렉터로 상태 구독: 각 상태를 개별적으로 구독하여 재렌더링 최적화.
-// 3. `useMemo`로 객체 반환: 셀렉터 값을 호출하여 값을 얻고, 객체 참조 안정화.
-// 4. `export default`로 훅 내보내기: 컴포넌트에서 사용 가능.
-// @reason 드래프트 데이터를 전체적으로 가져오되, createSelectors와 useMemo로 재렌더링 최적화.
+// 1. `useDraftStore.use`로 Zustand 스토어에서 셀렉터 가져오기: 각 속성에 대한 셀렉터 함수 추출.
+// 2. Fallback 값 설정: 각 속성이 없는 경우 기본값 반환 함수 제공.
+// 3. 셀렉터 호출: 각 셀렉터를 호출하여 실제 값을 추출.
+// 4. 객체 반환: 드래프트 상태를 객체로 구성하여 반환.
+// @reason Zustand 스토어에서 드래프트 데이터를 타입 안전하게 가져옴.
+
+export default useGetDraftState;

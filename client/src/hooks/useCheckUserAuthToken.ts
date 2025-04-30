@@ -49,8 +49,8 @@ export function useCheckAuthToken() {
 
   // 인증 상태 업데이트
   useEffect(() => {
-    let isMounted = true; // @type {boolean} - 컴포넌트 마운트 상태
-    // @description 컴포넌트 언마운트 시 상태 업데이트 방지
+    const controller = new AbortController(); // @type {AbortController} - 비동기 작업 취소 컨트롤러
+    // @description 비동기 작업 취소 관리
     // @reason StrictMode에서 상태 손상 방지
 
     // 초기 상태에서 실행 방지
@@ -62,8 +62,6 @@ export function useCheckAuthToken() {
 
     const processAuth = async () => {
       try {
-        if (!isMounted) return; // 컴포넌트 언마운트 시 중지
-
         setAuthState((prevState) => ({
           ...prevState,
           isAuthFetchingLoadingStatus: true, // 로딩 상태 활성화
@@ -77,6 +75,7 @@ export function useCheckAuthToken() {
             token = await getToken(); // 토큰 가져오기
             authStatusMessage = '현재 유저가 로그인된 상태입니다.';
           } catch (error) {
+            if (controller.signal.aborted) return; // 작업 취소 시 중지
             if (error instanceof Error) {
               console.error('getToken 오류:', error);
               authStatusMessage = error.message;
@@ -87,7 +86,7 @@ export function useCheckAuthToken() {
             '현재 로그인에 실패한 상태입니다. 로그인 상태를 체크해주세요.';
         }
 
-        if (!isMounted) return; // 컴포넌트 언마운트 시 중지
+        if (controller.signal.aborted) return; // 작업 취소 시 중지
 
         setAuthState({
           isSignedIn, // 로그인 상태 업데이트
@@ -97,7 +96,7 @@ export function useCheckAuthToken() {
           isAuthFetchingLoadingStatus: false, // 로딩 상태 비활성화
         });
       } catch (error) {
-        if (!isMounted) return; // 컴포넌트 언마운트 시 중지
+        if (controller.signal.aborted) return; // 작업 취소 시 중지
 
         console.error('useCheckAuthToken - processAuth failed:', error);
         setAuthState((prev) => ({
@@ -111,7 +110,7 @@ export function useCheckAuthToken() {
     processAuth(); // 인증 처리 실행
 
     return () => {
-      isMounted = false; // @description 컴포넌트 언마운트 시 플래그 설정
+      controller.abort(); // @description 컴포넌트 언마운트 시 비동기 작업 취소
       // @reason 상태 업데이트 방지
     };
   }, [isSignedIn, getToken]); // @description isSignedIn, getToken 변경 시 실행
@@ -124,6 +123,6 @@ export function useCheckAuthToken() {
 // 1. `useAuth`로 인증 상태 가져오기: Clerk에서 로그인 상태와 토큰 함수 가져옴.
 // 2. 초기 상태 설정: 안전한 초기값으로 `useState` 초기화.
 // 3. `useEffect`로 인증 처리: `isSignedIn` 변경 시 비동기적으로 토큰 가져오고 상태 업데이트.
-// 4. 언마운트 처리: `isMounted` 플래그로 컴포넌트 언마운트 시 상태 업데이트 방지.
+// 4. `AbortController`로 비동기 작업 관리: 컴포넌트 언마운트 시 작업 취소.
 // 5. `authState` 반환: 로그인 상태, 토큰, 메시지 등을 반환.
 // @reason Clerk를 사용하여 인증 상태를 관리하고, 토큰을 안전하게 가져옴.
