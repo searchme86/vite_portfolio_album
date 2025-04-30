@@ -8,23 +8,17 @@ import useAutoSaveMutation from '../../../../../api/draft/mutations/useAutoSaveM
 import { GetToken } from '@clerk/types';
 import type { DraftState } from '../../../../../stores/draft/initialDraftState';
 
-type useAutoSavePropsType = {
-  draft: DraftState;
-  isSignedIn: boolean | undefined;
-  getToken: GetToken;
-};
-
 // 자동저장 주기 (밀리초 단위)
 const AUTO_SAVE_INTERVAL = 5000; // localStorage 저장 주기: 5초
 const SERVER_SYNC_INTERVAL = 10000; // 서버 동기화 주기: 10초
 
 // 드래프트 데이터를 주기적으로 자동저장
 
-export const useAutoSave = ({
-  draft,
-  isSignedIn,
-  getToken,
-}: useAutoSavePropsType) => {
+export const useAutoSave = (
+  draft: DraftState,
+  isSignedIn: boolean | undefined,
+  getToken: GetToken
+) => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine); // 네트워크 상태
