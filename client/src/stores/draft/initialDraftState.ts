@@ -5,11 +5,7 @@
  * @analogy 도서관에서 대여 기록의 데이터 구조를 정의
  */
 
-// 드래프트 상태 타입 정의
-// @type {Object} - 드래프트 상태 구조
-// @description Zustand 스토어의 상태와 함수 타입 정의
-// @reason 타입 안정성 보장 및 코드 재사용성 향상
-export interface DraftState {
+export type DraftStateType = {
   // 상태 필드
   postTitle: string; // @type {string} - 포스트 제목
   // @description 포스트의 제목
@@ -41,7 +37,9 @@ export interface DraftState {
   isTemporary: boolean; // @type {boolean} - 임시저장 여부
   // @description 임시저장 여부 플래그
   // @reason 자동저장과 임시저장 구분
+};
 
+export type DraftStateActions = {
   // 상태 변경 함수 (draftSetters.ts에서 정의)
   updateDraft: (draft: Partial<DraftState>) => void; // @type {Function} - 드래프트 업데이트 함수
   // @description 드래프트 데이터를 부분적으로 업데이트
@@ -81,13 +79,6 @@ export interface DraftState {
   getIsTemporary: () => boolean; // @type {Function} - 임시저장 여부 조회 함수
   // @description 임시저장 여부 반환
   // @reason 컴포넌트에서 임시저장 상태 표시
-}
+};
 
-// **작동 매커니즘**
-// 1. `DraftState` 인터페이스 정의: 드래프트 상태 필드와 함수 타입 명시.
-// 2. 상태 필드 정의: `postTitle`, `draftId` 등 드래프트 데이터 구조 정의.
-// 3. 상태 변경 함수 정의: `updateDraft`, `resetDraft` 함수 타입 명시 (draftSetters.ts에서 구현).
-// 4. 상태 조회 함수 정의: `getPostTitle`, `getDraftId` 등 getter 함수 타입 명시 (draftGetters.ts에서 구현).
-// 5. `export`로 내보내기: 다른 파일에서 타입 사용 가능.
-// @reason 드래프트 상태 타입을 중앙에서 정의하여 타입 안정성과 재사용성 향상.
-// @analogy 도서관에서 대여 기록의 데이터 구조를 정의.
+export type DraftState = DraftStateType & DraftStateActions;

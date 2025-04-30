@@ -5,38 +5,23 @@
  * @analogy 도서관에서 대여 장부를 업데이트하는 함수
  */
 
-// 드래프트 상태 타입 정의 (draftGetters.ts와 동일)
-// @type {Object} - 드래프트 상태 구조
-// @description Zustand 스토어의 상태 타입 정의
-// @reason 타입 안정성 보장
-interface DraftState {
-  postTitle: string; // @type {string} - 포스트 제목
-  postDesc: string; // @type {string} - 포스트 설명
-  postContent: string; // @type {string} - 포스트 본문
-  tags: string[]; // @type {string[]} - 태그 배열
-  imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
-  custom: { [key: string]: any }; // @type {Object} - 커스텀 데이터
-  draftId: string; // @type {string} - 드래프트 ID
-  createdAt: Date; // @type {Date} - 생성 시간
-  updatedAt: Date; // @type {Date} - 수정 시간
-  isTemporary: boolean; // @type {boolean} - 임시저장 여부
-}
+import { DraftStateType } from './initialDraftState';
 
 // 드래프트 상태를 변경하는 함수 정의
 // @description set과 get 함수를 사용하여 상태 변경 로직 정의
 // @reason 상태 변경 로직 캡슐화
 // @analogy 도서관에서 대여 장부를 업데이트
 export const draftSetters = (
-  set: (fn: (state: DraftState) => DraftState) => void,
-  get: () => DraftState
+  set: (fn: (state: DraftStateType) => DraftStateType) => void,
+  get: () => DraftStateType
 ) => ({
   // updateDraft: 드래프트 데이터 업데이트
   // @type {(draft: Partial<DraftState>) => void}
   // @description 드래프트 데이터를 업데이트
   // @reason 새로운 드래프트 데이터로 상태 갱신
   // @analogy 도서관에서 대여 기록을 새로운 정보로 갱신
-  updateDraft: (draft: Partial<DraftState>): void => {
-    const currentState = get(); // @type {DraftState} - 현재 Zustand 스토어 상태
+  updateDraft: (draft: Partial<DraftStateType>): void => {
+    const currentState = get(); // @type {DraftStateType} - 현재 Zustand 스토어 상태
     // @description 현재 Zustand 스토어 상태 가져오기
     // @reason 상태 변경 전 현재 상태 확인
     // @analogy 도서관에서 대여 장부 현재 상태 확인
@@ -44,7 +29,7 @@ export const draftSetters = (
     // 업데이트된 상태 생성
     // @description 새로운 드래프트 데이터와 기존 상태 병합
     // @reason 새로운 데이터로 상태 갱신
-    const updatedState: DraftState = {
+    const updatedState: DraftStateType = {
       postTitle:
         draft.postTitle !== undefined
           ? draft.postTitle

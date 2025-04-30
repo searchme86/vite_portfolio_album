@@ -1,32 +1,15 @@
 /**
  * @file draftGetters.ts
  * @description 드래프트 Zustand 스토어에서 상태를 가져오는 함수 정의
- * @reason 상태를 읽기 전용으로 제공하여 캡슐화
- * @analogy 도서관에서 대여 장부를 읽기 전용으로 제공
  */
 
-// 드래프트 상태 타입 정의
-// @type {Object} - 드래프트 상태 구조
-// @description Zustand 스토어의 상태 타입 정의
-// @reason 타입 안정성 보장
-interface DraftState {
-  postTitle: string; // @type {string} - 포스트 제목
-  postDesc: string; // @type {string} - 포스트 설명
-  postContent: string; // @type {string} - 포스트 본문
-  tags: string[]; // @type {string[]} - 태그 배열
-  imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
-  custom: { [key: string]: any }; // @type {Object} - 커스텀 데이터
-  draftId: string; // @type {string} - 드래프트 ID
-  createdAt: Date; // @type {Date} - 생성 시간
-  updatedAt: Date; // @type {Date} - 수정 시간
-  isTemporary: boolean; // @type {boolean} - 임시저장 여부
-}
+import { DraftStateType } from './initialDraftState';
 
 // 드래프트 상태를 가져오는 함수 정의
 // @description get 함수를 사용하여 상태를 읽기 전용으로 반환
 // @reason 상태 캡슐화 및 읽기 전용 접근 제공
 // @analogy 도서관에서 대여 장부를 읽기 전용으로 제공
-export const draftGetters = (get: () => DraftState) => ({
+export const draftGetters = (get: () => DraftStateType) => ({
   // getPostTitle: 포스트 제목 반환
   // @type {() => string}
   // @description 포스트 제목을 반환

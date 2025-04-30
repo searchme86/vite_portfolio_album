@@ -24,35 +24,7 @@ import { draftGetters } from './draftGetters'; // @type {Object} - 드래프트 
 // @analogy 도서관에서 장부 조회 도구 가져오기
 
 import { createSelectors } from '../utils/useCreateSelectors';
-
-// 드래프트 상태 타입 정의 (draftGetters.ts, draftSetters.ts와 동일)
-// @type {Object} - 드래프트 상태 구조
-// @description Zustand 스토어의 상태 타입 정의
-// @reason 타입 안정성 보장
-interface DraftState {
-  postTitle: string; // @type {string} - 포스트 제목
-  postDesc: string; // @type {string} - 포스트 설명
-  postContent: string; // @type {string} - 포스트 본문
-  tags: string[]; // @type {string[]} - 태그 배열
-  imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
-  custom: { [key: string]: any }; // @type {Object} - 커스텀 데이터
-  draftId: string; // @type {string} - 드래프트 ID
-  createdAt: Date; // @type {Date} - 생성 시간
-  updatedAt: Date; // @type {Date} - 수정 시간
-  isTemporary: boolean; // @type {boolean} - 임시저장 여부
-  updateDraft: (draft: Partial<DraftState>) => void; // @type {Function} - 드래프트 업데이트 함수
-  resetDraft: () => void; // @type {Function} - 드래프트 초기화 함수
-  getPostTitle: () => string; // @type {Function} - 포스트 제목 조회 함수
-  getPostDesc: () => string; // @type {Function} - 포스트 설명 조회 함수
-  getPostContent: () => string; // @type {Function} - 포스트 본문 조회 함수
-  getTags: () => string[]; // @type {Function} - 태그 조회 함수
-  getImageUrls: () => string[]; // @type {Function} - 이미지 URL 조회 함수
-  getCustom: () => { [key: string]: any }; // @type {Function} - 커스텀 데이터 조회 함수
-  getDraftId: () => string; // @type {Function} - 드래프트 ID 조회 함수
-  getCreatedAt: () => Date; // @type {Function} - 생성 시간 조회 함수
-  getUpdatedAt: () => Date; // @type {Function} - 수정 시간 조회 함수
-  getIsTemporary: () => boolean; // @type {Function} - 임시저장 여부 조회 함수
-}
+import type { DraftState } from './initialDraftState';
 
 // Zustand 스토어 생성 및 셀렉터로 래핑
 // @description 드래프트 데이터를 관리하는 스토어
