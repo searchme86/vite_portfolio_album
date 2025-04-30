@@ -1,78 +1,93 @@
 /**
  * @file initialDraftState.ts
- * @description 드래프트 데이터의 초기 상태를 정의하는 파일
- * @reason 초기 상태를 별도로 분리하여 Zustand 스토어에서 재사용 가능
- * @analogy 도서관에서 새 책 대여 기록부를 초기화하는 것과 같음
+ * @description 드래프트 상태 타입 정의
+ * @reason 타입을 별도로 정의하여 재사용성과 유지보수성 향상
+ * @analogy 도서관에서 대여 기록의 데이터 구조를 정의
  */
 
-// 드래프트 데이터 타입 정의
-// @type {Object} - 드래프트 데이터의 구조
-// @description 드래프트 데이터의 타입을 정의하여 TypeScript에서 타입 안정성 보장
-// @reason 타입 오류 방지 및 코드 가독성 향상
-// @analogy 도서관에서 대여 기록부의 형식을 미리 정의
-
+// 드래프트 상태 타입 정의
+// @type {Object} - 드래프트 상태 구조
+// @description Zustand 스토어의 상태와 함수 타입 정의
+// @reason 타입 안정성 보장 및 코드 재사용성 향상
 export interface DraftState {
+  // 상태 필드
   postTitle: string; // @type {string} - 포스트 제목
+  // @description 포스트의 제목
+  // @reason 포스트 제목 관리
   postDesc: string; // @type {string} - 포스트 설명
+  // @description 포스트의 설명
+  // @reason 포스트 설명 관리
   postContent: string; // @type {string} - 포스트 본문
-  tags: string[]; // @type {string[]} - 포스트 태그 배열
+  // @description 포스트의 본문
+  // @reason 포스트 본문 관리
+  tags: string[]; // @type {string[]} - 태그 배열
+  // @description 포스트의 태그 배열
+  // @reason 태그 관리
   imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
-  custom: { [key: string]: any }; // @type {Object} - 사용자 정의 데이터
-  draftId: string; // @type {string} - 드래프트 고유 ID
+  // @description 포스트의 이미지 URL 배열
+  // @reason 이미지 URL 관리
+  custom: { [key: string]: any }; // @type {Object} - 커스텀 데이터
+  // @description 유연한 커스텀 데이터 저장
+  // @reason 추가적인 데이터 저장
+  draftId: string; // @type {string} - 드래프트 ID
+  // @description 드래프트의 고유 식별자
+  // @reason 드래프트 식별
   createdAt: Date; // @type {Date} - 생성 시간
-  updatedAt: Date; // @type {Date} - 업데이트 시간
+  // @description 드래프트 생성 시간
+  // @reason 생성 시간 기록
+  updatedAt: Date; // @type {Date} - 수정 시간
+  // @description 드래프트 수정 시간
+  // @reason 수정 시간 기록
   isTemporary: boolean; // @type {boolean} - 임시저장 여부
-  updateDraft: (draft: DraftState) => void; // @type {Function} - 드래프트 업데이트 함수
+  // @description 임시저장 여부 플래그
+  // @reason 자동저장과 임시저장 구분
+
+  // 상태 변경 함수 (draftSetters.ts에서 정의)
+  updateDraft: (draft: Partial<DraftState>) => void; // @type {Function} - 드래프트 업데이트 함수
+  // @description 드래프트 데이터를 부분적으로 업데이트
+  // @reason 새로운 데이터로 상태 갱신
+  resetDraft: () => void; // @type {Function} - 드래프트 초기화 함수
+  // @description 드래프트 데이터를 초기 상태로 리셋
+  // @reason 드래프트 작업 초기화
+
+  // 상태 조회 함수 (draftGetters.ts에서 정의)
+  getPostTitle: () => string; // @type {Function} - 포스트 제목 조회 함수
+  // @description 포스트 제목 반환
+  // @reason 컴포넌트에서 제목 표시
+  getPostDesc: () => string; // @type {Function} - 포스트 설명 조회 함수
+  // @description 포스트 설명 반환
+  // @reason 컴포넌트에서 설명 표시
+  getPostContent: () => string; // @type {Function} - 포스트 본문 조회 함수
+  // @description 포스트 본문 반환
+  // @reason 컴포넌트에서 본문 표시
+  getTags: () => string[]; // @type {Function} - 태그 조회 함수
+  // @description 태그 배열 반환
+  // @reason 컴포넌트에서 태그 표시
+  getImageUrls: () => string[]; // @type {Function} - 이미지 URL 조회 함수
+  // @description 이미지 URL 배열 반환
+  // @reason 컴포넌트에서 이미지 표시
+  getCustom: () => { [key: string]: any }; // @type {Function} - 커스텀 데이터 조회 함수
+  // @description 커스텀 데이터 반환
+  // @reason 컴포넌트에서 커스텀 데이터 표시
+  getDraftId: () => string; // @type {Function} - 드래프트 ID 조회 함수
+  // @description 드래프트 ID 반환
+  // @reason 컴포넌트에서 드래프트 ID 표시
+  getCreatedAt: () => Date; // @type {Function} - 생성 시간 조회 함수
+  // @description 생성 시간 반환
+  // @reason 컴포넌트에서 생성 시간 표시
+  getUpdatedAt: () => Date; // @type {Function} - 수정 시간 조회 함수
+  // @description 수정 시간 반환
+  // @reason 컴포넌트에서 수정 시간 표시
+  getIsTemporary: () => boolean; // @type {Function} - 임시저장 여부 조회 함수
+  // @description 임시저장 여부 반환
+  // @reason 컴포넌트에서 임시저장 상태 표시
 }
 
-// 초기 상태 정의
-// @description 드래프트 데이터의 초기값을 설정
-// @reason 스토어 초기화 시 기본값 제공, 앱 시작 시 데이터 구조 보장
-// @analogy 도서관에서 새 대여 기록부를 비어있는 상태로 준비
-const initialDraftState: DraftState = {
-  postTitle: '', // @type {string} - 초기값: 빈 문자열
-  // @description 포스트 제목 초기화
-  // @reason 사용자 입력 전 기본값 설정
-  postDesc: '', // @type {string} - 초기값: 빈 문자열
-  // @description 포스트 설명 초기화
-  // @reason 사용자 입력 전 기본값 설정
-  postContent: '', // @type {string} - 초기값: 빈 문자열
-  // @description 포스트 본문 초기화
-  // @reason 사용자 입력 전 기본값 설정
-  tags: [], // @type {string[]} - 초기값: 빈 배열
-  // @description 포스트 태그 배열 초기화
-  // @reason 태그가 없을 경우 빈 배열로 시작
-  imageUrls: [], // @type {string[]} - 초기값: 빈 배열
-  // @description 이미지 URL 배열 초기화
-  // @reason 이미지가 없을 경우 빈 배열로 시작
-  custom: {}, // @type {Object} - 초기값: 빈 객체
-  // @description 사용자 정의 데이터 초기화
-  // @reason 사용자 커스텀 데이터가 없을 경우 빈 객체로 시작
-  draftId: '', // @type {string} - 초기값: 빈 문자열
-  // @description 드래프트 ID 초기화
-  // @reason 드래프트 생성 전 ID 없음
-  createdAt: new Date(), // @type {Date} - 초기값: 현재 시간
-  // @description 생성 시간 초기화
-  // @reason 드래프트 생성 시점 기록
-  updatedAt: new Date(), // @type {Date} - 초기값: 현재 시간
-  // @description 업데이트 시간 초기화
-  // @reason 드래프트 업데이트 시점 기록
-  isTemporary: false, // @type {boolean} - 초기값: false
-  // @description 임시저장 여부 초기화
-  // @reason 기본적으로 임시저장이 아님
-  updateDraft: (_draft: DraftState) => {}, // @type {Function} - 드래프트 업데이트 함수
-};
-
-// 초기 상태 내보내기
-// @description 초기 상태를 다른 파일에서 사용할 수 있도록 내보냄
-// @reason Zustand 스토어에서 초기 상태로 사용
-// @analogy 도서관에서 초기화된 대여 기록부를 공유
-export default initialDraftState;
-
 // **작동 매커니즘**
-// 1. `initialDraftState` 객체가 생성됨: DraftState 타입을 기반으로 초기값 설정.
-// 2. 각 속성에 대해 타입과 초기값을 명시하여 TypeScript 타입 안정성 보장.
-// 3. `export default`로 외부에서 사용할 수 있도록 내보냄.
-// 4. Zustand 스토어(`draftStore.ts`)에서 이 초기 상태를 가져와 스토어 초기화에 사용.
-// @reason 초기 상태를 별도로 분리하여 코드 재사용성과 유지보수성 향상.
-// @analogy 도서관에서 초기화된 대여 기록부를 다른 부서에서 재사용.
+// 1. `DraftState` 인터페이스 정의: 드래프트 상태 필드와 함수 타입 명시.
+// 2. 상태 필드 정의: `postTitle`, `draftId` 등 드래프트 데이터 구조 정의.
+// 3. 상태 변경 함수 정의: `updateDraft`, `resetDraft` 함수 타입 명시 (draftSetters.ts에서 구현).
+// 4. 상태 조회 함수 정의: `getPostTitle`, `getDraftId` 등 getter 함수 타입 명시 (draftGetters.ts에서 구현).
+// 5. `export`로 내보내기: 다른 파일에서 타입 사용 가능.
+// @reason 드래프트 상태 타입을 중앙에서 정의하여 타입 안정성과 재사용성 향상.
+// @analogy 도서관에서 대여 기록의 데이터 구조를 정의.

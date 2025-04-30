@@ -1,32 +1,121 @@
 /**
  * @file draftStore.ts
- * @description 드래프트 데이터를 관리하는 Zustand 스토어
- * @reason 드래프트 상태를 중앙에서 관리하여 단일 책임 원칙 준수
- * @analogy 도서관에서 대여 기록을 중앙에서 관리하는 시스템
+ * @description Zustand를 사용한 드래프트 상태 관리 스토어
  */
 
-import { create } from 'zustand'; // @type {Function} - Zustand 라이브러리
-import type { DraftState } from './initialDraftState'; // @type {Object} - 드래프트 상태 타입
+import { create } from 'zustand'; // @type {Function} - Zustand 스토어 생성 함수
+// @description Zustand의 create 함수 가져오기
+// @reason 스토어 생성 및 상태 관리
+// @analogy 도서관에서 장부 시스템 초기화
 
-// Zustand 스토어 생성
+import { persist, createJSONStorage } from 'zustand/middleware'; // @type {Function} - Zustand 퍼시스트 미들웨어
+// @description 상태를 로컬 스토리지에 저장
+// @reason 리프레시 후 상태 복원
+// @analogy 도서관에서 장부를 저장소에 백업
+
+import { draftSetters } from './draftSetters'; // @type {Object} - 드래프트 상태 변경 함수
+// @description 상태 변경 로직 가져오기
+// @reason 드래프트 상태 변경 로직 분리
+// @analogy 도서관에서 장부 업데이트 도구 가져오기
+
+import { draftGetters } from './draftGetters'; // @type {Object} - 드래프트 상태 조회 함수
+// @description 상태 조회 로직 가져오기
+// @reason 드래프트 상태 조회 로직 분리
+// @analogy 도서관에서 장부 조회 도구 가져오기
+
+import { createSelectors } from '../utils/useCreateSelectors';
+
+// 드래프트 상태 타입 정의 (draftGetters.ts, draftSetters.ts와 동일)
+// @type {Object} - 드래프트 상태 구조
+// @description Zustand 스토어의 상태 타입 정의
+// @reason 타입 안정성 보장
+interface DraftState {
+  postTitle: string; // @type {string} - 포스트 제목
+  postDesc: string; // @type {string} - 포스트 설명
+  postContent: string; // @type {string} - 포스트 본문
+  tags: string[]; // @type {string[]} - 태그 배열
+  imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
+  custom: { [key: string]: any }; // @type {Object} - 커스텀 데이터
+  draftId: string; // @type {string} - 드래프트 ID
+  createdAt: Date; // @type {Date} - 생성 시간
+  updatedAt: Date; // @type {Date} - 수정 시간
+  isTemporary: boolean; // @type {boolean} - 임시저장 여부
+  updateDraft: (draft: Partial<DraftState>) => void; // @type {Function} - 드래프트 업데이트 함수
+  resetDraft: () => void; // @type {Function} - 드래프트 초기화 함수
+  getPostTitle: () => string; // @type {Function} - 포스트 제목 조회 함수
+  getPostDesc: () => string; // @type {Function} - 포스트 설명 조회 함수
+  getPostContent: () => string; // @type {Function} - 포스트 본문 조회 함수
+  getTags: () => string[]; // @type {Function} - 태그 조회 함수
+  getImageUrls: () => string[]; // @type {Function} - 이미지 URL 조회 함수
+  getCustom: () => { [key: string]: any }; // @type {Function} - 커스텀 데이터 조회 함수
+  getDraftId: () => string; // @type {Function} - 드래프트 ID 조회 함수
+  getCreatedAt: () => Date; // @type {Function} - 생성 시간 조회 함수
+  getUpdatedAt: () => Date; // @type {Function} - 수정 시간 조회 함수
+  getIsTemporary: () => boolean; // @type {Function} - 임시저장 여부 조회 함수
+}
+
+// Zustand 스토어 생성 및 셀렉터로 래핑
 // @description 드래프트 데이터를 관리하는 스토어
 // @reason 드래프트 상태를 중앙에서 관리
 // @analogy 도서관에서 중앙 대여 기록 시스템
-const useDraftStore = create<DraftState>((set) => ({
-  postTitle: '', // @type {string} - 초기 제목
-  postDesc: '', // @type {string} - 초기 설명
-  postContent: '', // @type {string} - 초기 본문
-  tags: [], // @type {string[]} - 초기 태그 배열
-  imageUrls: [], // @type {string[]} - 초기 이미지 URL 배열
-  custom: {}, // @type {Object} - 초기 커스텀 데이터
-  draftId: '', // @type {string} - 초기 드래프트 ID
-  createdAt: new Date(), // @type {Date} - 초기 생성 시간
-  updatedAt: new Date(), // @type {Date} - 초기 수정 시간
-  isTemporary: false, // @type {boolean} - 초기 임시저장 여부
-  updateDraft: (draft: DraftState) => set((state) => ({ ...state, ...draft })), // @description 드래프트 데이터 업데이트
-  // @reason 새로운 드래프트 데이터로 상태 갱신
-  // @analogy 도서관에서 대여 기록을 새로운 정보로 갱신
-}));
+const useDraftStore = createSelectors(
+  create<DraftState>()(
+    persist(
+      (set, get) => ({
+        postTitle: '', // @type {string} - 초기 제목
+        // @description 초기 포스트 제목 설정
+        // @reason 초기 상태 제공
+        postDesc: '', // @type {string} - 초기 설명
+        // @description 초기 포스트 설명 설정
+        // @reason 초기 상태 제공
+        postContent: '', // @type {string} - 초기 본문
+        // @description 초기 포스트 본문 설정
+        // @reason 초기 상태 제공
+        tags: [], // @type {string[]} - 초기 태그 배열
+        // @description 초기 태그 배열 설정
+        // @reason 초기 상태 제공
+        imageUrls: [], // @type {string[]} - 초기 이미지 URL 배열
+        // @description 초기 이미지 URL 배열 설정
+        // @reason 초기 상태 제공
+        custom: {}, // @type {Object} - 초기 커스텀 데이터
+        // @description 초기 커스텀 데이터 설정
+        // @reason 초기 상태 제공
+        draftId: '', // @type {string} - 초기 드래프트 ID
+        // @description 초기 드래프트 ID 설정
+        // @reason 초기 상태 제공
+        createdAt: new Date(), // @type {Date} - 초기 생성 시간
+        // @description 초기 생성 시간 설정
+        // @reason 초기 상태 제공
+        updatedAt: new Date(), // @type {Date} - 초기 수정 시간
+        // @description 초기 수정 시간 설정
+        // @reason 초기 상태 제공
+        isTemporary: false, // @type {boolean} - 초기 임시저장 여부
+        // @description 초기 임시저장 여부 설정
+        // @reason 초기 상태 제공
+
+        // draftGetters에서 정의된 상태 조회 함수 병합
+        // @description 상태 조회 함수 추가
+        // @reason 상태 읽기 전용 접근 제공
+        ...draftGetters(get),
+
+        // draftSetters에서 정의된 상태 변경 함수 병합
+        // @description 상태 변경 함수 추가
+        // @reason 상태 업데이트 로직 제공
+        ...draftSetters(set, get),
+      }),
+      {
+        name: 'draft-storage', // @type {string} - 로컬 스토리지 키 이름
+        // @description 상태를 저장할 키 이름
+        // @reason 로컬 스토리지에 상태 저장
+        // @analogy 도서관에서 장부를 저장할 파일 이름
+        storage: createJSONStorage(() => localStorage), // @type {Function} - 스토리지 설정
+        // @description 로컬 스토리지를 사용
+        // @reason 리프레시 후 상태 복원
+        // @analogy 도서관에서 장부를 로컬 저장소에 저장
+      }
+    )
+  )
+);
 
 // 스토어 내보내기
 // @description 스토어를 다른 파일에서 사용할 수 있도록 내보냄
@@ -35,10 +124,11 @@ const useDraftStore = create<DraftState>((set) => ({
 export default useDraftStore;
 
 // **작동 매커니즘**
-// 1. `DraftState` 타입 정의: 드래프트 데이터와 `updateDraft` 함수 구조 명시.
-// 2. `create`로 Zustand 스토어 생성: 초기 상태와 `updateDraft` 함수 정의.
-// 3. `updateDraft` 함수 구현: 새로운 드래프트 데이터로 상태 갱신.
-// 4. `export default`로 외부에서 사용할 수 있도록 내보냄.
-// 5. 컴포넌트에서 `useDraftStore`를 사용하여 드래프트 상태 관리 및 업데이트.
-// @reason 드래프트 상태를 중앙에서 관리하여 코드 재사용성과 유지보수성 향상.
+// 1. `DraftState` 타입 정의: 드래프트 상태와 함수 구조 명시.
+// 2. `createSelectors` 유틸리티 정의: 상태에 셀렉터를 추가하여 접근 최적화.
+// 3. `create`와 `persist`로 스토어 생성: 초기 상태, `persist` 미들웨어로 로컬 스토리지 저장.
+// 4. `draftGetters`와 `draftSetters` 병합: 상태 조회 및 변경 함수 통합.
+// 5. `createSelectors`로 래핑: `useDraftStore.use.postTitle()` 같은 셀렉터 제공.
+// 6. `export default`로 스토어 내보내기: 컴포넌트에서 사용 가능.
+// @reason 드래프트 상태를 중앙에서 관리하고 셀렉터로 최적화하여 코드 재사용성과 유지보수성 향상.
 // @analogy 도서관에서 중앙 대여 기록 시스템.

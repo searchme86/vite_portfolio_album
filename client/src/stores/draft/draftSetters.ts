@@ -1,166 +1,132 @@
 /**
  * @file draftSetters.ts
- * @description 드래프트 데이터를 업데이트하는 Setter 함수를 정의하는 파일
- * @reason 데이터 업데이트 로직을 별도로 분리하여 단일 책임 원칙 준수
- * @analogy 도서관에서 대여 기록부를 업데이트하는 창구를 별도로 마련
+ * @description 드래프트 상태를 변경하는 Zustand 액션 함수
+ * @reason 드래프트 상태를 관리
+ * @analogy 도서관에서 대여 장부를 업데이트하는 함수
  */
 
-// 드래프트 상태 타입 정의 (initialDraftState.ts와 동일)
-// @type {Object} - 드래프트 데이터의 구조
-// @description 드래프트 데이터의 타입을 정의하여 TypeScript에서 타입 안정성 보장
-// @reason 타입 오류 방지 및 코드 가독성 향상
-// @analogy 도서관에서 대여 기록부의 형식을 미리 정의
-
-import { DraftState } from './initialDraftState';
-
-// Setter 함수 타입 정의
-// @type {Object} - Setter 함수들의 객체
-// @description Setter 함수들의 타입을 정의
-// @reason Setter 함수의 입력값과 반환값 타입 명시
-// @analogy 도서관에서 대여 기록 업데이트 요청의 형식을 정의
-interface DraftSetters {
-  setPostTitle: (title: string) => void;
-  setPostDesc: (desc: string) => void;
-  setPostContent: (content: string) => void;
-  setTags: (tags: string[]) => void;
-  setImageUrls: (urls: string[]) => void;
-  setCustom: (custom: { [key: string]: any }) => void;
-  setDraftId: (id: string) => void;
-  setCreatedAt: (date: Date) => void;
-  setUpdatedAt: (date: Date) => void;
-  setIsTemporary: (isTemp: boolean) => void;
-  setDraft: (draft: Partial<DraftState>) => void;
+// 드래프트 상태 타입 정의 (draftGetters.ts와 동일)
+// @type {Object} - 드래프트 상태 구조
+// @description Zustand 스토어의 상태 타입 정의
+// @reason 타입 안정성 보장
+interface DraftState {
+  postTitle: string; // @type {string} - 포스트 제목
+  postDesc: string; // @type {string} - 포스트 설명
+  postContent: string; // @type {string} - 포스트 본문
+  tags: string[]; // @type {string[]} - 태그 배열
+  imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
+  custom: { [key: string]: any }; // @type {Object} - 커스텀 데이터
+  draftId: string; // @type {string} - 드래프트 ID
+  createdAt: Date; // @type {Date} - 생성 시간
+  updatedAt: Date; // @type {Date} - 수정 시간
+  isTemporary: boolean; // @type {boolean} - 임시저장 여부
 }
 
-// Setter 함수 생성
-// @description 스토어 상태를 업데이트하는 Setter 함수 정의
-// @reason 상태 업데이트 로직을 캡슐화하여 코드 재사용성과 유지보수성 향상
-// @analogy 도서관에서 대여 기록 업데이트 창구를 통해 기록을 수정
-const createDraftSetters = (
-  set: (fn: (state: DraftState) => DraftState) => void
-): DraftSetters => ({
-  setPostTitle: (title) => {
-    const safeTitle = title || ''; // @type {string} - Fallback: 빈 문자열
-    // @description 포스트 제목 업데이트, 없으면 빈 문자열
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setPostTitle:', safeTitle); // @description 디버깅용 로그
-    set((state) => ({ ...state, postTitle: safeTitle, updatedAt: new Date() }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
+// 드래프트 상태를 변경하는 함수 정의
+// @description set과 get 함수를 사용하여 상태 변경 로직 정의
+// @reason 상태 변경 로직 캡슐화
+// @analogy 도서관에서 대여 장부를 업데이트
+export const draftSetters = (
+  set: (fn: (state: DraftState) => DraftState) => void,
+  get: () => DraftState
+) => ({
+  // updateDraft: 드래프트 데이터 업데이트
+  // @type {(draft: Partial<DraftState>) => void}
+  // @description 드래프트 데이터를 업데이트
+  // @reason 새로운 드래프트 데이터로 상태 갱신
+  // @analogy 도서관에서 대여 기록을 새로운 정보로 갱신
+  updateDraft: (draft: Partial<DraftState>): void => {
+    const currentState = get(); // @type {DraftState} - 현재 Zustand 스토어 상태
+    // @description 현재 Zustand 스토어 상태 가져오기
+    // @reason 상태 변경 전 현재 상태 확인
+    // @analogy 도서관에서 대여 장부 현재 상태 확인
+
+    // 업데이트된 상태 생성
+    // @description 새로운 드래프트 데이터와 기존 상태 병합
+    // @reason 새로운 데이터로 상태 갱신
+    const updatedState: DraftState = {
+      postTitle:
+        draft.postTitle !== undefined
+          ? draft.postTitle
+          : currentState.postTitle, // @type {string} - 새로운 제목
+      // @description 새로운 제목이 있으면 업데이트, 없으면 기존 값 유지
+      // @reason 상태 일부만 업데이트 가능
+      postDesc:
+        draft.postDesc !== undefined ? draft.postDesc : currentState.postDesc, // @type {string} - 새로운 설명
+      // @description 새로운 설명이 있으면 업데이트, 없으면 기존 값 유지
+      // @reason 상태 일부만 업데이트 가능
+      postContent:
+        draft.postContent !== undefined
+          ? draft.postContent
+          : currentState.postContent, // @type {string} - 새로운 본문
+      // @description 새로운 본문이 있으면 업데이트, 없으면 기존 값 유지
+      // @reason 상태 일부만 업데이트 가능
+      tags: draft.tags !== undefined ? draft.tags : currentState.tags, // @type {string[]} - 새로운 태그 배열
+      // @description 새로운 태그 배열이 있으면 업데이트, 없으면 기존 값 유지
+      // @reason 상태 일부만 업데이트 가능
+      imageUrls:
+        draft.imageUrls !== undefined
+          ? draft.imageUrls
+          : currentState.imageUrls, // @type {string[]} - 새로운 이미지 URL 배열
+      // @description 새로운 이미지 URL 배열이 있으면 업데이트, 없으면 기존 값 유지
+      // @reason 상태 일부만 업데이트 가능
+      custom: draft.custom !== undefined ? draft.custom : currentState.custom, // @type {Object} - 새로운 커스텀 데이터
+      // @description 새로운 커스텀 데이터가 있으면 업데이트, 없으면 기존 값 유지
+      // @reason 상태 일부만 업데이트 가능
+      draftId:
+        draft.draftId !== undefined ? draft.draftId : currentState.draftId, // @type {string} - 새로운 드래프트 ID
+      // @description 새로운 드래프트 ID가 있으면 업데이트, 없으면 기존 값 유지
+      // @reason 상태 일부만 업데이트 가능
+      createdAt:
+        draft.createdAt !== undefined
+          ? draft.createdAt
+          : currentState.createdAt, // @type {Date} - 새로운 생성 시간
+      // @description 새로운 생성 시간이 있으면 업데이트, 없으면 기존 값 유지
+      // @reason 상태 일부만 업데이트 가능
+      updatedAt: draft.updatedAt !== undefined ? draft.updatedAt : new Date(), // @type {Date} - 새로운 수정 시간
+      // @description 새로운 수정 시간이 있으면 업데이트, 없으면 현재 시간으로 설정
+      // @reason 상태 업데이트 시 수정 시간 갱신
+      isTemporary:
+        draft.isTemporary !== undefined
+          ? draft.isTemporary
+          : currentState.isTemporary, // @type {boolean} - 새로운 임시저장 여부
+      // @description 새로운 임시저장 여부가 있으면 업데이트, 없으면 기존 값 유지
+      // @reason 상태 일부만 업데이트 가능
+    };
+
+    set(() => updatedState); // @description Zustand 스토어 상태 업데이트
+    // @reason 새로운 드래프트 데이터로 상태 갱신
+    // @analogy 도서관에서 대여 장부 업데이트
   },
-  setPostDesc: (desc) => {
-    const safeDesc = desc || ''; // @type {string} - Fallback: 빈 문자열
-    // @description 포스트 설명 업데이트, 없으면 빈 문자열
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setPostDesc:', safeDesc); // @description 디버깅용 로그
-    set((state) => ({ ...state, postDesc: safeDesc, updatedAt: new Date() }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
-  },
-  setPostContent: (content) => {
-    const safeContent = content || ''; // @type {string} - Fallback: 빈 문자열
-    // @description 포스트 본문 업데이트, 없으면 빈 문자열
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setPostContent:', safeContent); // @description 디버깅용 로그
-    set((state) => ({
-      ...state,
-      postContent: safeContent,
-      updatedAt: new Date(),
-    }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
-  },
-  setTags: (tags) => {
-    const safeTags = tags || []; // @type {string[]} - Fallback: 빈 배열
-    // @description 포스트 태그 배열 업데이트, 없으면 빈 배열
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setTags:', safeTags); // @description 디버깅용 로그
-    set((state) => ({ ...state, tags: safeTags, updatedAt: new Date() }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
-  },
-  setImageUrls: (urls) => {
-    const safeUrls = urls || []; // @type {string[]} - Fallback: 빈 배열
-    // @description 이미지 URL 배열 업데이트, 없으면 빈 배열
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setImageUrls:', safeUrls); // @description 디버깅용 로그
-    set((state) => ({ ...state, imageUrls: safeUrls, updatedAt: new Date() }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
-  },
-  setCustom: (custom) => {
-    const safeCustom = custom || {}; // @type {Object} - Fallback: 빈 객체
-    // @description 사용자 정의 데이터 업데이트, 없으면 빈 객체
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setCustom:', safeCustom); // @description 디버깅용 로그
-    set((state) => ({ ...state, custom: safeCustom, updatedAt: new Date() }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
-  },
-  setDraftId: (id) => {
-    const safeId = id || ''; // @type {string} - Fallback: 빈 문자열
-    // @description 드래프트 ID 업데이트, 없으면 빈 문자열
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setDraftId:', safeId); // @description 디버깅용 로그
-    set((state) => ({ ...state, draftId: safeId, updatedAt: new Date() }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
-  },
-  setCreatedAt: (date) => {
-    const safeDate = date || new Date(); // @type {Date} - Fallback: 현재 시간
-    // @description 생성 시간 업데이트, 없으면 현재 시간
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setCreatedAt:', safeDate); // @description 디버깅용 로그
-    set((state) => ({ ...state, createdAt: safeDate, updatedAt: new Date() }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
-  },
-  setUpdatedAt: (date) => {
-    const safeDate = date || new Date(); // @type {Date} - Fallback: 현재 시간
-    // @description 업데이트 시간 업데이트, 없으면 현재 시간
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setUpdatedAt:', safeDate); // @description 디버깅용 로그
-    set((state) => ({ ...state, updatedAt: safeDate }));
-    // @description 상태를 업데이트
-    // @reason 최신 업데이트 시간 기록
-  },
-  setIsTemporary: (isTemp) => {
-    const safeIsTemp = isTemp || false; // @type {boolean} - Fallback: false
-    // @description 임시저장 여부 업데이트, 없으면 false
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setIsTemporary:', safeIsTemp); // @description 디버깅용 로그
-    set((state) => ({
-      ...state,
-      isTemporary: safeIsTemp,
-      updatedAt: new Date(),
-    }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
-  },
-  setDraft: (draft) => {
-    const safeDraft = draft || {}; // @type {Partial<DraftState>} - Fallback: 빈 객체
-    // @description 전체 드래프트 데이터 업데이트, 없으면 빈 객체
-    // @reason 입력값이 유효하지 않을 경우 애플리케이션 충돌 방지
-    console.log('setDraft:', safeDraft); // @description 디버깅용 로그
-    set((state) => ({ ...state, ...safeDraft, updatedAt: new Date() }));
-    // @description 상태를 업데이트하고 updatedAt 갱신
-    // @reason 최신 업데이트 시간 기록
+
+  // resetDraft: 드래프트 데이터 초기화
+  // @type {() => void}
+  // @description 드래프트 데이터를 초기 상태로 리셋
+  // @reason 드래프트 작업 초기화
+  // @analogy 도서관에서 대여 장부를 초기화
+  resetDraft: (): void => {
+    set(() => ({
+      postTitle: '', // @type {string} - 초기 제목
+      postDesc: '', // @type {string} - 초기 설명
+      postContent: '', // @type {string} - 초기 본문
+      tags: [], // @type {string[]} - 초기 태그 배열
+      imageUrls: [], // @type {string[]} - 초기 이미지 URL 배열
+      custom: {}, // @type {Object} - 초기 커스텀 데이터
+      draftId: '', // @type {string} - 초기 드래프트 ID
+      createdAt: new Date(), // @type {Date} - 초기 생성 시간
+      updatedAt: new Date(), // @type {Date} - 초기 수정 시간
+      isTemporary: false, // @type {boolean} - 초기 임시저장 여부
+    })); // @description 초기 상태로 리셋
+    // @reason 드래프트 데이터 초기화
+    // @analogy 도서관에서 장부 초기화
   },
 });
 
-// Setter 함수 내보내기
-// @description Setter 함수를 다른 파일에서 사용할 수 있도록 내보냄
-// @reason Zustand 스토어에서 Setter로 사용
-// @analogy 도서관에서 대여 기록 업데이트 창구를 공유
-export default createDraftSetters;
-
 // **작동 매커니즘**
-// 1. `DraftState` 타입 정의: 드래프트 데이터 구조 명시.
-// 2. `DraftSetters` 타입 정의: Setter 함수의 입력값과 반환값 타입 명시.
-// 3. `createDraftSetters` 함수가 Zustand의 `set` 함수를 받아 Setter 객체 생성.
-// 4. 각 Setter 함수는 입력값을 안전하게 처리(Fallback) 후 상태 업데이트, `updatedAt` 갱신.
-// 5. `console.log`로 디버깅 가능하도록 출력.
-// 6. `export default`로 외부에서 사용할 수 있도록 내보냄.
-// 7. Zustand 스토어(`draftStore.ts`)에서 이 Setter 함수를 통합하여 사용.
-// @reason 데이터 업데이트 로직을 별도로 분리하여 코드 재사용성과 유지보수성 향상.
-// @analogy 도서관에서 대여 기록 업데이트 창구를 통해 기록을 수정.
+// 1. `DraftState` 타입 정의: Zustand 스토어의 상태 구조 명시.
+// 2. `draftSetters` 함수 정의: `set`과 `get` 함수를 사용하여 상태 변경 로직 정의.
+// 3. `updateDraft` 함수 구현: 새로운 드래프트 데이터로 상태를 부분적으로 업데이트, `updatedAt`은 항상 갱신.
+// 4. `resetDraft` 함수 구현: 드래프트 데이터를 초기 상태로 리셋.
+// 5. `export`로 내보내기: `draftStore.ts`에서 사용 가능.
+// @reason 드래프트 상태 변경 로직을 캡슐화하여 재사용성 및 유지보수성 향상.
+// @analogy 도서관에서 대여 장부를 업데이트.
