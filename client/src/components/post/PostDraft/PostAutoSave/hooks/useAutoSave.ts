@@ -19,7 +19,7 @@ import { useAutoSaveLocalStorage } from './useAutoSaveLocalStorage'; // @type {F
 // @description localStorage 저장 로직
 // @reason 저장 분리
 
-import { useAutoSaveServerSync } from './useAutoSaveServerSync'; // @type {Function} - 서버 동기화 훅
+import useAutoSaveServerSync from './useAutoSaveServerSync'; // @type {Function} - 서버 동기화 훅
 // @description 서버 동기화 로직
 // @reason 동기화 분리
 

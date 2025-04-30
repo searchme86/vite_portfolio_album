@@ -1,168 +1,119 @@
 /**
  * @file useAutoSaveServerSync.ts
- * @description 드래프트 데이터를 서버에 동기화하는 훅
- * @location src/components/post/PostDraft/PostAutoSave/hooks/useAutoSaveServerSync.ts
+ * @description 드래프트 데이터를 주기적으로 서버에 동기화하는 커스텀 훅
+ * @location src/api/draft/sync/useAutoSaveServerSync.ts
+ * @reason 주기적 동기화 로직을 분리하여 단일 책임 원칙 준수
+ * @analogy 도서관에서 책을 정기적으로 저장하는 타이머
  */
-import { useState, useEffect, useRef } from 'react'; // @type {Function} - React 훅
-// @description 상태, 이펙트, 참조 관리
-// @reason 저장 상태, 동기화 관리, 중복 호출 방지
 
-import { v4 as uuidv4 } from 'uuid'; // @type {Function} - UUID 생성 함수
-// @description 고유 ID 생성
-// @reason draftId가 없을 경우 고유 ID 생성
+import { useEffect, useRef } from 'react'; // @type {Function} - React 훅
+// @description useEffect와 useRef 훅 가져오기
+// @reason 컴포넌트 생명주기 관리 및 참조 유지
+// @analogy 도서관에서 타이머와 메모장 준비
 
-import useAutoSaveMutation from '../../../../../api/draft/mutations/useAutoSaveMutation'; // @type {Function} - 자동저장 뮤테이션 훅
-// @description 서버에 드래프트 저장
-// @reason 서버 동기화
+import useAutoSaveMutation from '../../../../../api/draft/mutations/useAutoSaveMutation'; // @type {Function} - 자동저장 mutation 훅
+// @description 자동저장 mutation 훅 가져오기
+// @reason 서버로 데이터 저장
+// @analogy 도서관에서 책 저장 도구 가져오기
 
 import type { DraftState } from '../../../../../stores/draft/initialDraftState'; // @type {Object} - 드래프트 상태 타입
 // @description 드래프트 상태 타입 가져오기
 // @reason 타입 안정성 보장
+// @analogy 도서관에서 책의 형식 확인
 
-const SERVER_SYNC_INTERVAL = 10000; // @type {number} - 서버 동기화 주기 (10초)
-// @description 서버 동기화 주기 설정
-// @reason 서버와의 동기화 빈도 조절
+// 커스텀 훅 정의
+// @description 주기적으로 드래프트 데이터를 서버에 동기화
+// @reason 자동저장 기능 제공
+// @analogy 도서관에서 책을 정기적으로 저장
+export default function useAutoSaveServerSync(draftData: DraftState) {
+  const { autoSave, error } = useAutoSaveMutation(); // @type {Object} - 자동저장 함수와 에러 상태
+  // @description useAutoSaveMutation 훅으로 자동저장 함수와 에러 상태 가져오기
+  // @reason 서버 저장 및 에러 상태 확인
+  // @analogy 도서관에서 책 저장 도구와 실패 상태 확인
 
-export function useAutoSaveServerSync(draft: DraftState, isOnline: boolean) {
-  const [isSaving, setIsSaving] = useState<boolean>(false); // @type {boolean} - 저장 중 여부
-  // @description 서버 저장 중 여부 관리
-  // @reason UI에 저장 상태 표시
+  const intervalRef = useRef<NodeJS.Timeout | null>(null); // @type {RefObject<NodeJS.Timeout | null>} - setInterval 참조
+  // @description setInterval ID를 저장하기 위한 참조
+  // @reason interval 관리 및 정리
+  // @analogy 도서관에서 타이머 ID 메모
 
-  const [lastSaved, setLastSaved] = useState<Date | null>(null); // @type {Date | null} - 마지막 저장 시간
-  // @description 마지막 저장 시간 관리
-  // @reason 사용자에게 마지막 저장 시간 표시
+  // 서버에 저장하는 함수
+  const saveToServer = () => {
+    console.log(
+      'useAutoSaveServerSync - Attempting to save draft to server:',
+      draftData
+    ); // @description 저장 시도 로그
+    // @description 저장 시도 디버깅
+    // @reason 동기화 상태 확인
+    // @analogy 도서관에서 책 저장 시도 알림
 
-  const isSavingRef = useRef<boolean>(false); // @type {boolean} - 저장 중 여부 참조
-  // @description 저장 중 여부 참조로 중복 호출 방지
-  // @reason 동기화 중복 방지
-
-  const { autoSave: serverAutoSave, isLoading: isServerSaving } =
-    useAutoSaveMutation(); // @type {Object} - 서버 저장 뮤테이션
-  // @description 서버 저장 뮤테이션 훅 초기화
-  // @reason 서버에 드래프트 저장
-
-  const saveToServer = async (draftData: DraftState) => {
-    if (!isOnline) {
-      console.log('useAutoSaveServerSync - Skipping server save: Offline');
-      // @description 오프라인 상태 로그
-      // @reason 불필요한 저장 시도 방지
-      return;
-    }
-
-    // 이미 저장 중이면 중복 호출 방지
-    if (isSavingRef.current) {
-      console.log('useAutoSaveServerSync - Already saving, skipping');
-      // @description 저장 중 로그
-      // @reason 중복 호출 방지
-      return;
-    }
-
-    try {
-      isSavingRef.current = true; // @description 저장 중 플래그 설정
-      // @reason 중복 호출 방지
-      setIsSaving(true); // @description 저장 상태 활성화
-      // @reason UI 업데이트
-
-      const safeDraftId = draftData.draftId || uuidv4(); // @type {string} - 고유 드래프트 ID
-      // @description draftId가 없으면 UUID로 생성
-      // @reason 서버 저장 시 고유 ID 보장
-
-      const createdAtValue = draftData.createdAt
-        ? draftData.createdAt instanceof Date
-          ? draftData.createdAt.toISOString()
-          : new Date(draftData.createdAt).toISOString()
-        : new Date().toISOString(); // @type {string} - 생성 시간
-      // @description createdAt을 Date 객체로 변환하거나 기본값 설정
-      // @reason toISOString 호출 전 Date 객체 보장
-
-      const draftToSave = {
-        postTitle: draftData.postTitle || '', // @type {string} - 제목
-        postDesc: draftData.postDesc || '', // @type {string} - 설명
-        postContent: draftData.postContent || '', // @type {string} - 본문
-        tags: draftData.tags || [], // @type {string[]} - 태그
-        imageUrls: draftData.imageUrls || [], // @type {string[]} - 이미지 URL
-        custom: draftData.custom || {}, // @type {Record<string, any>} - 커스텀 데이터
-        draftId: safeDraftId, // @type {string} - 드래프트 ID
-        createdAt: createdAtValue, // @type {string} - 생성 시간
-        updatedAt: new Date().toISOString(), // @type {string} - 수정 시간
-        isTemporary: draftData.isTemporary || false, // @type {boolean} - 임시저장 여부
-      }; // @type {Object} - 서버에 저장할 드래프트 데이터
-      // @description 서버에 전송할 데이터 준비
-      // @reason 서버 API와의 호환
-
-      await serverAutoSave(draftToSave); // @description 서버 저장 실행
-      // @reason 서버 동기화
-      console.log('useAutoSaveServerSync - Saved to server:', draftToSave);
-      // @description 서버 저장 성공 로그
-      // @reason 저장 확인
-
-      const saveTime = new Date(); // @type {Date} - 현재 시간
-      // @description 현재 시간 저장
-      // @reason 저장 시간 기록
-      setLastSaved(saveTime); // @description 마지막 저장 시간 설정
-      // @reason UI 업데이트
-      console.log('useAutoSaveServerSync - Saved at:', saveTime);
-      // @description 저장 시점 로그
-      // @reason 저장 시점 확인
-    } catch (error) {
-      console.error('useAutoSaveServerSync - Server save failed:', error);
-      // @description 서버 저장 실패 로그
-      // @reason 디버깅 및 오류 추적
-      // Fallback: 서버 저장 실패 시 로그만 남김
-    } finally {
-      isSavingRef.current = false; // @description 저장 중 플래그 해제
-      // @reason 다음 저장 가능하도록 설정
-      setIsSaving(false); // @description 저장 상태 비활성화
-      // @reason UI 업데이트
-    }
+    autoSave(draftData); // @type {Function} - 자동저장 실행
+    // @description autoSave 함수로 서버에 데이터 저장
+    // @reason 서버 동기화
+    // @analogy 도서관에서 책 저장 요청
   };
 
   useEffect(() => {
-    if (!draft) {
-      console.warn('useAutoSaveServerSync - No draft data provided');
-      // @description 드래프트 데이터 없음 경고
-      // @reason 데이터 유효성 확인
-      return;
+    console.log('useAutoSaveServerSync - Setting up auto-save interval'); // @description interval 설정 로그
+    // @description interval 설정 디버깅
+    // @reason 동기화 설정 확인
+    // @analogy 도서관에서 타이머 설정 알림
+
+    // 30초마다 자동저장 실행
+    intervalRef.current = setInterval(() => {
+      saveToServer(); // @description 주기적 저장 실행
+      // @reason 30초마다 서버 동기화
+      // @analogy 도서관에서 30초마다 책 저장
+    }, 30000); // @type {number} - 30초 간격
+
+    //====여기부터 수정됨====
+    // 에러 발생 시 interval 중단
+    if (error) {
+      console.warn(
+        'useAutoSaveServerSync - Error occurred, stopping auto-save:',
+        error.message
+      ); // @description 에러로 interval 중단 로그
+      // @reason 반복 실패 방지
+      // @analogy 도서관에서 저장 실패 시 타이머 중단
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current); // @description interval 정리
+        // @reason 리소스 정리 및 반복 요청 중단
+        // @analogy 도서관에서 타이머 끄기
+        intervalRef.current = null; // @description 참조 초기화
+        // @reason 참조 정리
+      }
     }
+    //====여기까지 수정됨====
 
-    const isDraftValid = draft.postTitle || draft.postDesc || draft.postContent;
-    if (!isDraftValid) {
-      console.log('useAutoSaveServerSync - Draft is empty, skipping save');
-      // @description 드래프트 데이터 비어 있음 로그
-      // @reason 불필요한 저장 방지
-      return;
-    }
-
-    saveToServer(draft); // @description 초기 저장 실행
-    // @reason 초기 데이터 동기화
-
-    const serverSyncInterval = setInterval(() => {
-      saveToServer(draft); // @description 10초 간격으로 서버 동기화
-      // @reason 데이터 일관성 유지
-    }, SERVER_SYNC_INTERVAL);
-
+    // 컴포넌트 언마운트 시 interval 정리
     return () => {
-      clearInterval(serverSyncInterval); // @description 인터벌 정리
-      // @reason 컴포넌트 언마운트 시 리소스 정리
-      console.log('useAutoSaveServerSync - Cleanup completed');
-      // @description 정리 완료 로그
-      // @reason 정리 확인
+      if (intervalRef.current) {
+        console.log('useAutoSaveServerSync - Cleaning up auto-save interval'); // @description 정리 로그
+        // @description interval 정리 디버깅
+        // @reason 리소스 정리
+        // @analogy 도서관에서 타이머 정리 알림
+        clearInterval(intervalRef.current); // @description interval 정리
+        // @reason 리소스 정리
+        // @analogy 도서관에서 타이머 끄기
+      }
     };
-  }, [
-    draft.postTitle,
-    draft.postDesc,
-    draft.postContent,
-    draft.tags,
-    draft.imageUrls,
-    draft.custom,
-    draft.draftId,
-    draft.createdAt,
-    draft.updatedAt,
-    draft.isTemporary,
-    isOnline,
-  ]); // @description 드래프트 데이터 속성별 의존
-  // @reason 변경 감지
+  }, [draftData, error]); // @type {Array} - 의존성 배열
+  // @description draftData 또는 error 변경 시 useEffect 실행
+  // @reason 데이터 변경 시 동기화 및 에러 처리
+  // @analogy 도서관에서 책 내용이나 실패 상태 변경 시 동작
 
-  return { isSaving: isSaving || isServerSaving, lastSaved }; // @description 서버 저장 상태와 마지막 저장 시간 반환
-  // @reason 상위 훅에서 사용
+  return { saveToServer }; // @type {Object} - 저장 함수 반환
+  // @description 수동 저장 함수 반환
+  // @reason 수동 저장 가능하도록 제공
+  // @analogy 도서관에서 수동으로 책 저장 가능
 }
+
+// **작동 매커니즘**
+// 1. `useAutoSaveMutation` 훅 호출: 자동저장 mutation 함수와 에러 상태 가져옴.
+// 2. `useRef`로 interval 관리: `setInterval` ID를 저장.
+// 3. `saveToServer` 함수 정의: 서버에 드래프트 데이터 저장.
+// 4. `useEffect`로 주기적 저장 설정: 30초마다 `saveToServer` 실행.
+// 5. 에러 발생 시 interval 중단: 반복 실패 방지.
+// 6. 컴포넌트 언마운트 시 정리: 리소스 누수 방지.
+// 7. `saveToServer` 반환: 수동 저장 가능.
+// @reason 주기적 서버 동기화를 통해 데이터 손실 방지.
+// @analogy 도서관에서 책을 정기적으로 저장하는 타이머.

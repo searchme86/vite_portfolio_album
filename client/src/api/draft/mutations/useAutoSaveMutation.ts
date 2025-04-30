@@ -11,10 +11,10 @@ import { useMutation } from '@tanstack/react-query'; // @type {Function} - React
 // @reason 비동기 mutation 처리 (자동저장 요청 관리)
 // @analogy 도서관에서 책 저장 요청을 처리하는 도구
 
-import axios from 'axios'; // @type {Function} - HTTP 요청 라이브러리
-// @description axios로 HTTP 요청 처리
-// @reason 서버로 자동저장 요청 전송
-// @analogy 도서관에서 책 저장 요청을 보내는 우체부
+import { axiosBase } from '../../base/axiosBase'; // @type {Object} - 커스텀 axios 인스턴스
+// @description 커스텀 axios 인스턴스 가져오기
+// @reason 서버로 자동저장 요청 전송 (기본 URL 포함)
+// @analogy 도서관에서 미리 설정된 우체부 사용
 
 import { useAuth } from '@clerk/clerk-react'; // @type {Function} - Clerk의 인증 훅
 // @description Clerk 인증 상태와 토큰 가져오기
@@ -122,6 +122,29 @@ export default function useAutoSaveMutation() {
         // @analogy 도서관에서 책 번호 없음 경고 (이미 확인됨)
       }
 
+      //====여기부터 수정됨====
+      // 데이터 검증: postTitle과 postDesc가 비어 있지 않은지 확인
+      if (!draftData.postTitle || draftData.postTitle.trim() === '') {
+        console.warn('useAutoSaveMutation - postTitle is empty, skipping save');
+        // @description postTitle 빈 값 로그
+        // @reason 필수 필드 확인
+        // @analogy 도서관에서 책 제목 없음 알림
+        throw new Error('postTitle is required and cannot be empty'); // @description postTitle 누락 에러
+        // @reason 요청 중단 및 에러 전달
+        // @analogy 도서관에서 책 제목 없으면 저장 불가
+      }
+
+      if (!draftData.postDesc || draftData.postDesc.trim() === '') {
+        console.warn('useAutoSaveMutation - postDesc is empty, skipping save');
+        // @description postDesc 빈 값 로그
+        // @reason 필수 필드 확인
+        // @analogy 도서관에서 책 설명 없음 알림
+        throw new Error('postDesc is required and cannot be empty'); // @description postDesc 누락 에러
+        // @reason 요청 중단 및 에러 전달
+        // @analogy 도서관에서 책 설명 없으면 저장 불가
+      }
+      //====여기까지 수정됨====
+
       // 요청 취소 컨트롤러 생성
       const controller = new AbortController(); // @type {AbortController} - 요청 취소 컨트롤러
       // @description 요청 취소를 위한 컨트롤러 생성
@@ -132,7 +155,7 @@ export default function useAutoSaveMutation() {
       const timeoutId = setTimeout(() => {
         controller.abort(); // @description 타임아웃 시 요청 취소
         // @reason 요청이 너무 오래 걸리면 중단
-        // @analogy 도서관에서 우체부에게 10분 안에 안 오면 돌아오라고 명령
+        // @analogy 도서관에서 우체부에게 10초 안에 안 오면 돌아오라고 명령
         console.warn(
           'useAutoSaveMutation - Request timed out after 10 seconds'
         );
@@ -142,7 +165,7 @@ export default function useAutoSaveMutation() {
 
       try {
         // axios로 자동저장 요청
-        const response = await axios.post<AutoSaveResponse>(
+        const response = await axiosBase.post<AutoSaveResponse>(
           draftApiPaths.autoSave, // @type {string} - 자동저장 API 경로
           // @description draftApiPaths에서 자동저장 경로 사용
           // @reason 중앙에서 관리된 경로 사용
@@ -157,10 +180,6 @@ export default function useAutoSaveMutation() {
               // @description 토큰을 헤더에 추가
               // @reason 인증된 요청
               // @analogy 도서관에서 회원증 제시
-              'Content-Type': 'application/json', // @type {string} - 요청 형식
-              // @description JSON 형식으로 요청
-              // @reason 데이터 형식 지정
-              // @analogy 도서관에서 책 형식 지정
             },
             signal: controller.signal, // @type {AbortSignal} - 요청 취소 신호
             // @description 요청 취소 신호 추가
@@ -168,7 +187,7 @@ export default function useAutoSaveMutation() {
             // @analogy 도서관에서 우체부에게 중단 신호 연결
           }
         ); // @type {AxiosResponse<AutoSaveResponse>} - axios 응답
-        // @description axios로 POST 요청 전송
+        // @description axiosBase로 POST 요청 전송
         // @reason 서버에 드래프트 데이터 저장
         // @analogy 도서관에서 책 저장 요청 보내기
 
@@ -181,7 +200,7 @@ export default function useAutoSaveMutation() {
         // @reason 상위 함수에서 응답 사용
         // @analogy 도서관에서 저장 확인 메시지 반환
       } catch (error) {
-        if (axios.isCancel(error)) {
+        if (axiosBase.isCancel(error)) {
           console.warn(
             'useAutoSaveMutation - Request was canceled:',
             error.message
@@ -192,11 +211,25 @@ export default function useAutoSaveMutation() {
           throw new Error('Request was canceled due to timeout'); // @description 취소 에러
           // @reason 상위로 에러 전달
         }
-        console.error('useAutoSaveMutation - Request failed:', error); // @description 요청 실패 로그
-        // @reason 디버깅
-        // @analogy 도서관에서 책 저장 실패 알림
-        throw error; // @description 에러 전달
-        // @reason 상위로 에러 전달
+
+        //====여기부터 수정됨====
+        // 에러 메시지 개선
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          'Unknown error occurred';
+        console.error('useAutoSaveMutation - Request failed:', {
+          message: errorMessage,
+          status: error.response?.status,
+          data: error.response?.data,
+        }); // @description 요청 실패 로그
+        // @reason 디버깅 및 에러 상세 정보 기록
+        // @analogy 도서관에서 책 저장 실패 이유 자세히 알림
+
+        throw new Error(errorMessage); // @description 개선된 에러 메시지 전달
+        // @reason 상위로 구체적인 에러 전달
+        // @analogy 도서관에서 실패 이유를 사용자에게 전달
+        //====여기까지 수정됨====
       } finally {
         clearTimeout(timeoutId); // @description 타임아웃 정리
         // @reason 리소스 정리
@@ -210,6 +243,7 @@ export default function useAutoSaveMutation() {
       // @analogy 도서관에서 책 저장 성공 알림
     },
     onError: (error) => {
+      //====여기부터 수정됨====
       console.error('useAutoSaveMutation - Auto-save failed:', {
         message: error.message,
         stack: error.stack,
@@ -217,6 +251,13 @@ export default function useAutoSaveMutation() {
       // @description 실패 상태 디버깅
       // @reason 문제 해결 지원
       // @analogy 도서관에서 책 저장 실패 알림
+
+      // 사용자에게 에러 메시지 전달 (예: toast 알림 또는 UI 업데이트)
+      // 이 부분은 실제 UI 라이브러리(toast, alert 등)에 따라 구현 필요
+      console.log('useAutoSaveMutation - Notify user:', error.message); // @description 사용자 알림
+      // @reason 사용자 피드백 제공
+      // @analogy 도서관에서 사용자에게 저장 실패 이유 알림
+      //====여기까지 수정됨====
     },
     onSettled: () => {
       console.log('useAutoSaveMutation - Mutation settled'); // @description 완료 로그
@@ -263,12 +304,14 @@ export default function useAutoSaveMutation() {
 // 2. `DraftState` 타입 사용: `initialDraftState`에서 가져온 드래프트 데이터 타입 사용.
 // 3. `AutoSaveResponse` 타입 정의: 서버 응답 데이터 구조 정의.
 // 4. `useMutation` 훅 호출: React Query로 자동저장 mutation 정의.
-// 5. `getToken`으로 토큰 가져오기: 인증된 요청을 위해 토큰 동적으로 획득.
-// 6. `isSignedIn` 및 토큰 검증: 인증되지 않거나 토큰 없으면 에러 발생.
-// 7. `AbortController`로 요청 관리: 요청 취소 가능하도록 설정.
-// 8. `axios.post`로 요청: 타임아웃과 함께 `draftApiPaths.autoSave` 경로로 데이터 전송.
-// 9. `onSuccess`, `onError`, `onSettled` 콜백 정의: mutation 상태 디버깅.
-// 10. `handleAutoSave` 함수 정의: mutation 실행.
-// 11. `autoSave`, `isLoading`, `error`, `data` 반환: 컴포넌트에서 상태와 함수 사용 가능.
+// 5. 데이터 검증: `postTitle`과 `postDesc`가 비어 있는지 확인 후 요청 중단.
+// 6. `getToken`으로 토큰 가져오기: 인증된 요청을 위해 토큰 동적으로 획득.
+// 7. `isSignedIn` 및 토큰 검증: 인증되지 않거나 토큰 없으면 에러 발생.
+// 8. `AbortController`로 요청 관리: 요청 취소 가능하도록 설정.
+// 9. `axiosBase.post`로 요청: `http://localhost:3000/draft/auto-save`로 데이터 전송.
+// 10. `axiosBase.isCancel`로 취소 확인: 요청 취소 여부 판단.
+// 11. `onSuccess`, `onError`, `onSettled` 콜백 정의: mutation 상태 디버깅 및 사용자 피드백.
+// 12. `handleAutoSave` 함수 정의: mutation 실행.
+// 13. `autoSave`, `isLoading`, `error`, `data` 반환: 컴포넌트에서 상태와 함수 사용 가능.
 // @reason 자동저장 mutation 로직을 캡슐화하여 코드 재사용성과 유지보수성 향상.
 // @analogy 도서관에서 책을 주기적으로 저장하는 시스템.
