@@ -15,9 +15,14 @@ import type { DraftState } from '../../../../../stores/draft/initialDraftState';
 // @description 드래프트 상태 타입 가져오기
 // @reason 타입 안정성 보장
 
-const AUTO_SAVE_INTERVAL = 5000; // @type {number} - localStorage 저장 주기 (5초)
+// 디버깅 모드 설정
+const isDebugMode = process.env.NODE_ENV === 'development'; // @type {boolean} - 디버깅 모드 여부
+// @description 개발 환경에서만 로그 출력
+// @reason 로그 과다 출력 방지
+
+const AUTO_SAVE_INTERVAL = 10000; // @type {number} - localStorage 저장 주기 (10초로 변경)
 // @description localStorage 저장 주기 설정
-// @reason 주기적 저장으로 데이터 손실 방지
+// @reason 주기적 저장으로 데이터 손실 방지, 10초로 늘려 빈도 감소
 
 export function useAutoSaveLocalStorage(draft: DraftState) {
   const [isSaving, setIsSaving] = useState<boolean>(false); // @type {boolean} - 저장 중 여부
@@ -27,8 +32,7 @@ export function useAutoSaveLocalStorage(draft: DraftState) {
   // localStorage에 저장하는 함수
   const saveToLocalStorage = (draftData: DraftState) => {
     try {
-      setIsSaving(true); // 저장 상태 활성화
-      // @description 저장 시작 시 상태 업데이트
+      setIsSaving(true); // @description 저장 상태 활성화
       // @reason 저장 중임을 표시
 
       // draftId가 없으면 고유 ID 생성
@@ -39,6 +43,33 @@ export function useAutoSaveLocalStorage(draft: DraftState) {
       const draftKey = `draft_${safeDraftId}`; // @type {string} - localStorage 키
       // @description 드래프트 데이터 저장 키 생성
       // @reason 고유한 키로 데이터 저장
+
+      // 이전 데이터와 비교
+      const previousDraft = localStorage.getItem(draftKey); // @type {string | null} - 이전 데이터
+      const currentDraft = JSON.stringify({
+        postTitle: draftData.postTitle || '',
+        postDesc: draftData.postDesc || '',
+        postContent: draftData.postContent || '',
+        tags: draftData.tags || [],
+        imageUrls: draftData.imageUrls || [],
+        custom: draftData.custom || {},
+        draftId: safeDraftId,
+        createdAt: draftData.createdAt
+          ? draftData.createdAt instanceof Date
+            ? draftData.createdAt.toISOString()
+            : new Date(draftData.createdAt).toISOString()
+          : new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isTemporary: draftData.isTemporary || false,
+      }); // @type {string} - 현재 데이터 직렬화
+
+      if (previousDraft === currentDraft) {
+        if (isDebugMode) {
+          console.log('useAutoSaveLocalStorage - No changes, skipping save');
+        }
+        setIsSaving(false);
+        return; // @description 변경 없으면 저장 건너뛰기
+      }
 
       // createdAt을 Date 객체로 변환하거나 기본값 제공
       const createdAtValue = draftData.createdAt
@@ -64,60 +95,58 @@ export function useAutoSaveLocalStorage(draft: DraftState) {
       // @description localStorage에 저장할 데이터 준비
       // @reason 데이터 직렬화 준비
 
-      localStorage.setItem(draftKey, JSON.stringify(draftToSave)); // localStorage에 저장
-      // @description localStorage에 데이터 저장
+      localStorage.setItem(draftKey, JSON.stringify(draftToSave)); // @description localStorage에 저장
       // @reason 데이터 지속성 보장
-      console.log('useAutoSaveLocalStorage - Saved to localStorage:', draftKey);
-      // @description 저장 성공 로그
-      // @reason 저장 확인
+
+      if (isDebugMode) {
+        console.log(
+          'useAutoSaveLocalStorage - Saved to localStorage:',
+          draftKey
+        );
+      }
     } catch (error) {
       console.error(
         'useAutoSaveLocalStorage - Failed to save to localStorage:',
         error
-      );
-      // @description 저장 실패 로그
+      ); // @description 저장 실패 로그
       // @reason 디버깅 및 오류 추적
       // Fallback: 저장 실패 시 로그만 남김
     } finally {
-      setIsSaving(false); // 저장 상태 비활성화
-      // @description 저장 완료 후 상태 업데이트
+      setIsSaving(false); // @description 저장 상태 비활성화
       // @reason 저장 완료 표시
     }
   };
 
   useEffect(() => {
     if (!draft) {
-      console.warn('useAutoSaveLocalStorage - No draft data provided');
-      // @description 드래프트 데이터 없음 경고
-      // @reason 데이터 유효성 확인
-      return; // 드래프트 데이터 없으면 실행 중지
+      if (isDebugMode) {
+        console.warn('useAutoSaveLocalStorage - No draft data provided');
+      }
+      return; // @description 드래프트 데이터 없으면 실행 중지
     }
 
     const isDraftValid = draft.postTitle || draft.postDesc || draft.postContent;
     if (!isDraftValid) {
-      console.log('useAutoSaveLocalStorage - Draft is empty, skipping save');
-      // @description 드래프트 데이터 비어 있음 로그
-      // @reason 불필요한 저장 방지
-      return; // 드래프트 데이터가 비어 있으면 저장 건너뛰기
+      if (isDebugMode) {
+        console.log('useAutoSaveLocalStorage - Draft is empty, skipping save');
+      }
+      return; // @description 드래프트 데이터가 비어 있으면 저장 건너뛰기
     }
 
-    saveToLocalStorage(draft); // 최초 localStorage 저장
-    // @description 초기 저장 실행
+    saveToLocalStorage(draft); // @description 최초 localStorage 저장
     // @reason 초기 데이터 보존
 
     const localStorageInterval = setInterval(() => {
-      saveToLocalStorage(draft); // 주기적으로 localStorage에 저장
-      // @description 5초 간격으로 localStorage 저장
+      saveToLocalStorage(draft); // @description 10초 간격으로 localStorage 저장
       // @reason 데이터 손실 방지
     }, AUTO_SAVE_INTERVAL);
 
     return () => {
-      clearInterval(localStorageInterval); // 인터벌 정리
-      // @description 인터벌 정리
+      clearInterval(localStorageInterval); // @description 인터벌 정리
       // @reason 컴포넌트 언마운트 시 리소스 정리
-      console.log('useAutoSaveLocalStorage - Cleanup completed');
-      // @description 정리 완료 로그
-      // @reason 정리 확인
+      if (isDebugMode) {
+        console.log('useAutoSaveLocalStorage - Cleanup completed');
+      }
     };
   }, [
     draft.postTitle,
@@ -133,7 +162,14 @@ export function useAutoSaveLocalStorage(draft: DraftState) {
   ]); // @description 드래프트 데이터 속성별 의존
   // @reason 변경 감지
 
-  return { isSaving }; // 저장 상태 반환
-  // @description localStorage 저장 상태 반환
+  return { isSaving }; // @description 저장 상태 반환
   // @reason 상위 훅에서 사용
 }
+
+// **작동 매커니즘**
+// 1. `useState`로 isSaving 상태 관리.
+// 2. `saveToLocalStorage` 함수 정의: localStorage에 데이터 저장.
+// 3. 이전 데이터와 비교하여 변경 없으면 저장 건너뛰기.
+// 4. `useEffect`로 주기적 저장 설정: 10초마다 저장.
+// 5. 컴포넌트 언마운트 시 인터벌 정리.
+// 6. `isSaving` 반환.

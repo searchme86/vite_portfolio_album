@@ -5,10 +5,9 @@
  * @reason 자동저장 로직을 캡슐화하여 재사용성과 유지보수성 향상
  * @analogy 도서관에서 책을 로컬과 서버에 저장하는 시스템
  */
-
-import { useRef } from 'react'; // @type {Function} - React 훅
-// @description useRef 훅 가져오기
-// @reason 이전 드래프트 데이터 저장
+import { useRef, useEffect } from 'react'; // @type {Function} - React 훅
+// @description useRef, useEffect 훅 가져오기
+// @reason 이전 드래프트 데이터 저장 및 변경 감지
 // @analogy 도서관에서 이전 책 정보를 저장하는 메모장
 
 import type { DraftState } from '../../../../../stores/draft/initialDraftState'; // @type {Object} - 드래프트 상태 타입
@@ -31,11 +30,12 @@ import { useAutoSaveNetworkStatus } from './useAutoSaveNetworkStatus'; // @type 
 // @reason 네트워크 상태 관리
 // @analogy 도서관에서 인터넷 연결 상태 확인
 
+// 디버깅 모드 설정
+const isDebugMode = process.env.NODE_ENV === 'development'; // @type {boolean} - 디버깅 모드 여부
+// @description 개발 환경에서만 로그 출력
+// @reason 로그 과다 출력 방지
+
 // 반환 타입 정의
-// @type {Object} - 훅 반환 타입
-// @description 훅이 반환하는 객체의 타입 정의
-// @reason 타입 안정성 보장
-// @analogy 도서관에서 반환할 정보의 형식
 interface AutoSaveResult {
   isSaving: boolean; // @type {boolean} - 저장 중 여부
   // @description 로컬 또는 서버 저장 진행 상태
@@ -46,13 +46,16 @@ interface AutoSaveResult {
 }
 
 // 커스텀 훅 정의
-// @description 드래프트 데이터를 localStorage와 서버에 자동저장
-// @reason 데이터 손실 방지 및 사용자 경험 개선
-// @analogy 도서관에서 책을 로컬과 서버에 저장
 export function useAutoSave(
-  draft: DraftState // @type {Object} - 드래프트 데이터
+  draft: DraftState, // @type {Object} - 드래프트 데이터
   // @description 자동저장할 드래프트 데이터
   // @reason 저장할 데이터 전달
+  isSignedIn?: boolean, // @type {boolean | undefined} - 로그인 상태 (추가된 인자)
+  // @description 로그인 상태 확인
+  // @reason 서버 저장 시 인증 필요
+  getToken?: () => string | null // @type {Function | undefined} - 토큰 가져오기 함수 (추가된 인자)
+  // @description 토큰 가져오기
+  // @reason 서버 요청 시 토큰 필요
 ): AutoSaveResult {
   const previousDraftRef = useRef<DraftState | null>(null); // @type {Object | null} - 이전 드래프트 데이터
   // @description 이전 드래프트 데이터 저장
@@ -70,46 +73,50 @@ export function useAutoSave(
   // @analogy 도서관에서 책을 로컬 서랍에 저장
 
   const { isSaving: isServerSaving, lastSaved } = useAutoSaveServerSync(
-    draft, // @type {Object} - 드래프트 데이터
-    // @description 서버에 저장할 드래프트 데이터
-    // @reason 서버 동기화
-    isOnline // @type {boolean} - 네트워크 상태
-    // @description 네트워크 상태 전달
-    // @reason 서버 저장 제어
+    draft, // @description 서버에 저장할 드래프트 데이터
+    isOnline, // @description 네트워크 상태 전달
+    isSignedIn, // @description 로그인 상태 전달
+    getToken // @description 토큰 가져오기 함수 전달
   ); // @type {Object} - 서버 동기화 상태
   // @description 서버 동기화 실행 및 상태 가져오기
   // @reason 서버 저장 관리
   // @analogy 도서관에서 책을 서버에 저장
 
   // 데이터 변경 감지
-  const hasChanged =
-    JSON.stringify(previousDraftRef.current) !== JSON.stringify(draft); // @type {boolean} - 변경 여부
-  // @description 이전 데이터와 현재 데이터 비교
-  // @reason 변경 여부 확인
-  // @analogy 도서관에서 이전 책과 현재 책 비교
-  if (hasChanged) {
-    console.log('useAutoSave - Changes detected:', {
-      previous: previousDraftRef.current,
-      current: draft,
-    }); // @description 변경 감지 로그
-    // @description 변경 감지 디버깅
-    // @reason 변경 상태 확인
-    // @analogy 도서관에서 책 변경 확인 로그
-    previousDraftRef.current = draft; // @type {Object} - 이전 데이터 업데이트
-    // @description 현재 드래프트 데이터를 이전 데이터로 저장
-    // @reason 다음 변경 감지 준비
-    // @analogy 도서관에서 현재 책을 메모장에 저장
-  }
+  const hasChanged = () => {
+    if (!previousDraftRef.current) return true; // @description 처음 호출 시 true 반환
+    // @reason 초기 저장 보장
+    const prev = JSON.stringify(previousDraftRef.current); // @type {string} - 이전 데이터 직렬화
+    const curr = JSON.stringify(draft); // @type {string} - 현재 데이터 직렬화
+    return prev !== curr; // @type {boolean} - 변경 여부 반환
+    // @description 이전 데이터와 현재 데이터 비교
+    // @reason 변경 여부 확인
+  };
 
-  // 디버깅: draft 데이터 확인
-  console.log('useAutoSave - Draft data:', {
-    postTitle: draft.postTitle,
-    postDesc: draft.postDesc,
-    postContent: draft.postContent,
-  }); // @description 드래프트 데이터 로그
-  // @description 드래프트 데이터 디버깅
-  // @reason 데이터 상태 확인
-  // @analogy 도서관에서 책 내용 확인 로그
+  useEffect(() => {
+    if (hasChanged()) {
+      // 디버깅 로그: 변경 감지 (디버깅 모드에서만 출력)
+      if (isDebugMode) {
+        console.log('useAutoSave - Changes detected:', {
+          previous: previousDraftRef.current,
+          current: draft,
+        });
+      }
+
+      // 디버깅 로그: draft 데이터 확인 (디버깅 모드에서만 출력)
+      if (isDebugMode) {
+        console.log('useAutoSave - Draft data:', {
+          postTitle: draft.postTitle,
+          postDesc: draft.postDesc,
+          postContent: draft.postContent,
+        });
+      }
+
+      previousDraftRef.current = draft; // @description 이전 데이터 업데이트
+      // @reason 다음 변경 감지 준비
+    }
+  }, [draft]); // @description draft 변경 시 실행
+  // @reason 변경 감지 및 저장 트리거
 
   // isSaving이 항상 정의되도록 보장
   const finalIsSaving = isLocalSaving || isServerSaving || false; // @type {boolean} - 최종 저장 상태
@@ -128,8 +135,7 @@ export function useAutoSave(
 // 2. `useAutoSaveNetworkStatus` 호출: 네트워크 상태 확인.
 // 3. `useAutoSaveLocalStorage` 호출: 로컬 저장 실행 및 상태 가져오기.
 // 4. `useAutoSaveServerSync` 호출: 서버 동기화 실행 및 상태 가져오기.
-// 5. 데이터 변경 감지: 이전 데이터와 현재 데이터 비교.
-// 6. `finalIsSaving` 계산: 로컬 또는 서버 저장 중 여부 확인.
-// 7. `isSaving`과 `lastSaved` 반환: 컴포넌트에서 상태 사용.
-// @reason 드래프트 데이터를 로컬과 서버에 자동저장하여 데이터 손실 방지.
-// @analogy 도서관에서 책을 로컬 서랍과 서버에 저장하는 시스템.
+// 5. `hasChanged`로 데이터 변경 감지: 이전 데이터와 현재 데이터 비교.
+// 6. `useEffect`로 변경 감지 및 로그 출력.
+// 7. `finalIsSaving` 계산: 로컬 또는 서버 저장 중 여부 확인.
+// 8. `isSaving`과 `lastSaved` 반환: 컴포넌트에서 상태 사용.

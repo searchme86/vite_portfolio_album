@@ -22,131 +22,161 @@ import useDraftStore from '../../../../stores/draft/draftStore'; // @type {Funct
 // @description 드래프트 스토어 접근
 // @reason 상태 업데이트 및 가져오기
 
+// 디버깅 모드 설정
+const isDebugMode = process.env.NODE_ENV === 'development'; // @type {boolean} - 디버깅 모드 여부
+// @description 개발 환경에서만 로그 출력
+// @reason 로그 과다 출력 방지
+
 export function usePostWriteFormSetup() {
   const [imageUrls, setImageUrls] = useState<string[]>([]); // @type {string[]} - 이미지 URL 상태
   // @description 이미지 URL 관리
   // @reason 이미지 업로드 상태 관리
+  // @analogy 도서관에서 책 이미지 목록 관리
 
   // Zustand 셀렉터로 직접 값 가져오기
-  const postTitle = useDraftStore().postTitle; // @type {string} - 포스트 제목
+  const postTitle = useDraftStore((state) => state.postTitle || ''); // @type {string} - 포스트 제목
   // @description 제목 가져오기
   // @reason 초기값 설정
-  const postDesc = useDraftStore().postDesc; // @type {string} - 포스트 설명
+  const postDesc = useDraftStore((state) => state.postDesc || ''); // @type {string} - 포스트 설명
   // @description 설명 가져오기
   // @reason 초기값 설정
-  const postContent = useDraftStore().postContent; // @type {string} - 포스트 본문
+  const postContent = useDraftStore((state) => state.postContent || ''); // @type {string} - 포스트 본문
   // @description 본문 가져오기
   // @reason 초기값 설정
-  const tags = useDraftStore().tags; // @type {string[]} - 포스트 태그
+  const tags = useDraftStore((state) => state.tags || []); // @type {string[]} - 포스트 태그
   // @description 태그 가져오기
   // @reason 초기값 설정
-  const draftImageUrls = useDraftStore().imageUrls; // @type {string[]} - 이미지 URL
+  const draftImageUrls = useDraftStore((state) => state.imageUrls || []); // @type {string[]} - 이미지 URL
   // @description 이미지 URL 가져오기
   // @reason 초기값 설정
-  const custom = useDraftStore().custom; // @type {Record<string, any>} - 커스텀 데이터
+  const custom = useDraftStore((state) => state.custom || {}); // @type {Record<string, any>} - 커스텀 데이터
   // @description 커스텀 데이터 가져오기
   // @reason 초기값 설정
-  const draftId = useDraftStore().draftId; // @type {string} - 드래프트 ID
+  const draftId = useDraftStore((state) => state.draftId || ''); // @type {string} - 드래프트 ID
   // @description 드래프트 ID 가져오기
   // @reason 초기값 설정
-  const createdAt = useDraftStore().createdAt; // @type {Date} - 생성 시간
+  const createdAt = useDraftStore((state) => state.createdAt || new Date()); // @type {Date} - 생성 시간
   // @description 생성 시간 가져오기
   // @reason 초기값 설정
-  const isTemporary = useDraftStore().isTemporary; // @type {boolean} - 임시저장 여부
+  const isTemporary = useDraftStore((state) => state.isTemporary || false); // @type {boolean} - 임시저장 여부
   // @description 임시저장 여부 가져오기
   // @reason 초기값 설정
 
-  // **디버깅 로그 추가**: Zustand 스토어에서 가져온 초기 데이터 확인
-  console.log('usePostWriteFormSetup - Zustand 스토어 데이터:', {
-    postTitle, // @type {string} - 제목 확인
-    postDesc, // @type {string} - 설명 확인
-    postContent, // @type {string} - 본문 확인
-    tags, // @type {string[]} - 태그 확인
-    draftImageUrls, // @type {string[]} - 이미지 URL 확인
-    custom, // @type {Record<string, any>} - 커스텀 데이터 확인
-    draftId, // @type {string} - 드래프트 ID 확인
-    createdAt, // @type {Date} - 생성 시간 확인
-    isTemporary, // @type {boolean} - 임시저장 여부 확인
-  });
-  // @description Zustand 스토어에서 가져온 데이터 출력
-  // @reason 초기 데이터가 제대로 설정되었는지 확인
-  // @analogy 도서관에서 책 정보를 가져오는 과정 확인
+  // 디버깅 로그: Zustand 스토어에서 가져온 초기 데이터 확인 (디버깅 모드에서만 출력)
+  if (isDebugMode) {
+    console.log('usePostWriteFormSetup - Zustand 스토어 데이터:', {
+      postTitle,
+      postDesc,
+      postContent,
+      tags,
+      draftImageUrls,
+      custom,
+      draftId,
+      createdAt,
+      isTemporary,
+    });
+  }
 
-  // **디버깅 로그 추가**: postWriteFormDefaultValues 확인
-  console.log(
-    'usePostWriteFormSetup - postWriteFormDefaultValues:',
-    postWriteFormDefaultValues
-  );
-  // @description 폼 기본값 출력
-  // @reason 기본값이 올바른지 확인
-  // @analogy 도서관에서 책의 기본 정보 템플릿 확인
+  // 디버깅 로그: postWriteFormDefaultValues 확인 (디버깅 모드에서만 출력)
+  if (isDebugMode) {
+    console.log(
+      'usePostWriteFormSetup - postWriteFormDefaultValues:',
+      postWriteFormDefaultValues
+    );
+  }
 
   const form = useForm<PostWriteFormData>({
     mode: 'onChange', // @type {string} - 폼 변경 시 유효성 검사
     // @description 폼 변경 시 즉시 유효성 검사
     // @reason 실시간 유효성 검사
     defaultValues: {
-      ...postWriteFormDefaultValues, // 기본값 병합
-      postTitle: postTitle || '', // 초기 제목 설정
-      postDesc: postDesc || '', // 초기 설명 설정
-      postContent: postContent || '', // 초기 본문 설정
-      tags: tags || [], // 초기 태그 설정
-    }, // @description 폼 초기값 설정
-    // @reason 초기 로드 시 드래프트 데이터 반영
+      ...postWriteFormDefaultValues, // @description 기본값 병합
+      postTitle, // @description 초기 제목 설정
+      postDesc, // @description 초기 설명 설정
+      postContent, // @description 초기 본문 설정
+      tags, // @description 초기 태그 설정
+    },
   });
 
-  const { reset } = form; // 폼 리셋 메서드
+  const { reset } = form; // @type {Function} - 폼 리셋 메서드
   // @description 폼 리셋 메서드
   // @reason 초기화 제어
 
+  // 폼 초기화 및 동기화
   useEffect(() => {
-    // 초기 로드 시 드래프트 데이터로 폼 초기화
     const initialFormValues = {
-      ...postWriteFormDefaultValues, // 기본값 병합
-      postTitle: postTitle || '', // 드래프트 제목 초기값
-      postDesc: postDesc || '', // 드래프트 설명 초기값
-      postContent: postContent || '', // 드래프트 본문 초기값
-      tags: tags || [], // 드래프트 태그 초기값
+      ...postWriteFormDefaultValues, // @description 기본값 병합
+      postTitle, // @description 드래프트 제목 초기값
+      postDesc, // @description 드래프트 설명 초기값
+      postContent, // @description 드래프트 본문 초기값
+      tags, // @description 드래프트 태그 초기값
     };
-    reset(initialFormValues); // 폼 초기값 리셋
-    // @description 폼 초기값 설정
+    reset(initialFormValues); // @description 폼 초기값 리셋
     // @reason 초기 로드 시 드래프트 데이터 반영
 
-    // **디버깅 로그 추가**: 폼 초기화 데이터 확인
-    console.log(
-      'usePostWriteFormSetup - Form reset with data:',
-      initialFormValues
-    );
-    // @description 초기화된 폼 데이터 출력
-    // @reason 초기화가 제대로 이루어졌는지 확인
-    // @analogy 도서관에서 책 정보를 초기화하는 과정 확인
-  }, []); // @description 의존성 배열에 초기값 포함
+    // 디버깅 로그: 폼 초기화 데이터 확인 (디버깅 모드에서만 출력)
+    if (isDebugMode) {
+      console.log(
+        'usePostWriteFormSetup - Form reset with data:',
+        initialFormValues
+      );
+    }
+  }, [postTitle, postDesc, postContent, tags, reset]); // @description 의존성 배열에 초기값 포함
   // @reason 초기 데이터 변경 시 폼 리셋
   // @why 의존성 배열에 초기값을 추가하여 데이터 변경 시 폼이 업데이트되도록 함
   // @mechanism
   // 1. Zustand 스토어에서 데이터 변경 시 의존성 배열 감지.
   // 2. `reset` 호출로 폼 초기값 업데이트.
 
-  // **디버깅 로그 추가**: 반환 데이터 확인
-  const draftData = {
-    postTitle, // 드래프트 제목
-    postDesc, // 드래프트 설명
-    postContent, // 드래프트 본문
-    tags, // 드래프트 태그
-    imageUrls: draftImageUrls, // 드래프트 이미지 URL
-    custom, // 드래프트 커스텀 데이터
-    draftId, // 드래프트 ID
-    createdAt, // 드래프트 생성 시간
-    isTemporary, // 드래프트 임시저장 여부
-  };
-  console.log('usePostWriteFormSetup - Returned draftData:', draftData);
-  // @description 반환된 드래프트 데이터 출력
-  // @reason 반환 데이터가 올바른지 확인
+  // 반환 데이터 메모이제이션
+  const draftData = useMemo(
+    () => ({
+      postTitle, // @description 드래프트 제목
+      postDesc, // @description 드래프트 설명
+      postContent, // @description 드래프트 본문
+      tags, // @description 드래프트 태그
+      imageUrls: draftImageUrls, // @description 드래프트 이미지 URL
+      custom, // @description 드래프트 커스텀 데이터
+      draftId, // @description 드래프트 ID
+      createdAt, // @description 드래프트 생성 시간
+      isTemporary, // @description 드래프트 임시저장 여부
+    }),
+    [
+      postTitle,
+      postDesc,
+      postContent,
+      tags,
+      draftImageUrls,
+      custom,
+      draftId,
+      createdAt,
+      isTemporary,
+    ]
+  ); // @type {Object} - 드래프트 데이터
+  // @description 반환 데이터 메모이제이션
+  // @reason 불필요한 객체 생성 방지
+  // @why useMemo를 사용하여 동일한 값일 경우 객체 재생성 방지
+  // @mechanism
+  // 1. `draftData` 객체 생성.
+  // 2. `useMemo`로 동일한 값일 경우 객체 재생성 방지.
+
+  // 디버깅 로그: 반환 데이터 확인 (디버깅 모드에서만 출력)
+  if (isDebugMode) {
+    console.log('usePostWriteFormSetup - Returned draftData:', draftData);
+  }
 
   return {
-    form, // 폼 상태 및 메서드
-    imageUrls, // 이미지 URL 상태
-    setImageUrls, // 이미지 URL 설정 함수
-    draftData, // 드래프트 데이터
+    form, // @description 폼 상태 및 메서드
+    imageUrls, // @description 이미지 URL 상태
+    setImageUrls, // @description 이미지 URL 설정 함수
+    draftData, // @description 드래프트 데이터
   };
 }
+
+// **작동 매커니즘**
+// 1. `useState`로 imageUrls 상태 관리.
+// 2. `useDraftStore`로 Zustand 스토어에서 데이터 가져오기.
+// 3. `useForm`으로 폼 초기화, 기본값 설정.
+// 4. `useEffect`로 폼 초기화 및 동기화.
+// 5. `useMemo`로 draftData 메모이제이션.
+// 6. `form`, `imageUrls`, `setImageUrls`, `draftData` 반환.
