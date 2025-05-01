@@ -56,6 +56,31 @@ export function usePostWriteFormSetup() {
   // @description 임시저장 여부 가져오기
   // @reason 초기값 설정
 
+  // **디버깅 로그 추가**: Zustand 스토어에서 가져온 초기 데이터 확인
+  console.log('usePostWriteFormSetup - Zustand 스토어 데이터:', {
+    postTitle, // @type {string} - 제목 확인
+    postDesc, // @type {string} - 설명 확인
+    postContent, // @type {string} - 본문 확인
+    tags, // @type {string[]} - 태그 확인
+    draftImageUrls, // @type {string[]} - 이미지 URL 확인
+    custom, // @type {Record<string, any>} - 커스텀 데이터 확인
+    draftId, // @type {string} - 드래프트 ID 확인
+    createdAt, // @type {Date} - 생성 시간 확인
+    isTemporary, // @type {boolean} - 임시저장 여부 확인
+  });
+  // @description Zustand 스토어에서 가져온 데이터 출력
+  // @reason 초기 데이터가 제대로 설정되었는지 확인
+  // @analogy 도서관에서 책 정보를 가져오는 과정 확인
+
+  // **디버깅 로그 추가**: postWriteFormDefaultValues 확인
+  console.log(
+    'usePostWriteFormSetup - postWriteFormDefaultValues:',
+    postWriteFormDefaultValues
+  );
+  // @description 폼 기본값 출력
+  // @reason 기본값이 올바른지 확인
+  // @analogy 도서관에서 책의 기본 정보 템플릿 확인
+
   const form = useForm<PostWriteFormData>({
     mode: 'onChange', // @type {string} - 폼 변경 시 유효성 검사
     // @description 폼 변경 시 즉시 유효성 검사
@@ -76,35 +101,52 @@ export function usePostWriteFormSetup() {
 
   // 초기 로드 시 드래프트 데이터로 폼 초기화
   useEffect(() => {
-    reset({
+    const initialFormValues = {
       ...postWriteFormDefaultValues, // 기본값 병합
       postTitle: postTitle || '', // 드래프트 제목 초기값
       postDesc: postDesc || '', // 드래프트 설명 초기값
       postContent: postContent || '', // 드래프트 본문 초기값
       tags: tags || [], // 드래프트 태그 초기값
-    }); // 폼 초기값 리셋
+    };
+    reset(initialFormValues); // 폼 초기값 리셋
     // @description 폼 초기값 설정
     // @reason 초기 로드 시 드래프트 데이터 반영
-    console.log('usePostWriteFormSetup - Form reset with draft data');
-    // @description 초기화 로그
-    // @reason 초기화 확인
-  }, [reset]); // @description reset 함수만 의존
-  // @reason 무한 렌더링 방지
+
+    // **디버깅 로그 추가**: 폼 초기화 데이터 확인
+    console.log(
+      'usePostWriteFormSetup - Form reset with data:',
+      initialFormValues
+    );
+    // @description 초기화된 폼 데이터 출력
+    // @reason 초기화가 제대로 이루어졌는지 확인
+    // @analogy 도서관에서 책 정보를 초기화하는 과정 확인
+  }, [reset, postTitle, postDesc, postContent, tags]); // @description 의존성 배열에 초기값 포함
+  // @reason 초기 데이터 변경 시 폼 리셋
+  // @why 의존성 배열에 초기값을 추가하여 데이터 변경 시 폼이 업데이트되도록 함
+  // @mechanism
+  // 1. Zustand 스토어에서 데이터 변경 시 의존성 배열 감지.
+  // 2. `reset` 호출로 폼 초기값 업데이트.
+
+  // **디버깅 로그 추가**: 반환 데이터 확인
+  const draftData = {
+    postTitle, // 드래프트 제목
+    postDesc, // 드래프트 설명
+    postContent, // 드래프트 본문
+    tags, // 드래프트 태그
+    imageUrls: draftImageUrls, // 드래프트 이미지 URL
+    custom, // 드래프트 커스텀 데이터
+    draftId, // 드래프트 ID
+    createdAt, // 드래프트 생성 시간
+    isTemporary, // 드래프트 임시저장 여부
+  };
+  console.log('usePostWriteFormSetup - Returned draftData:', draftData);
+  // @description 반환된 드래프트 데이터 출력
+  // @reason 반환 데이터가 올바른지 확인
 
   return {
     form, // 폼 상태 및 메서드
     imageUrls, // 이미지 URL 상태
     setImageUrls, // 이미지 URL 설정 함수
-    draftData: {
-      postTitle, // 드래프트 제목
-      postDesc, // 드래프트 설명
-      postContent, // 드래프트 본문
-      tags, // 드래프트 태그
-      imageUrls: draftImageUrls, // 드래프트 이미지 URL
-      custom, // 드래프트 커스텀 데이터
-      draftId, // 드래프트 ID
-      createdAt, // 드래프트 생성 시간
-      isTemporary, // 드래프트 임시저장 여부
-    }, // 드래프트 데이터
+    draftData, // 드래프트 데이터
   };
 }

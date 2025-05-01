@@ -70,6 +70,24 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
   // @description 폼 제출 핸들러, 상태, 감시 메서드
   // @reason 폼 제어 및 상태 관리
 
+  // **디버깅 로그 추가**: watch로 감지된 폼 데이터 확인
+  const formData = watch(); // @type {PostWriteFormData} - 감지된 폼 데이터
+  // @description 모든 폼 필드 값을 실시간으로 감지
+  // @reason 입력 값이 제대로 감지되는지 확인
+  console.log('PostWriteForm - Watched formData:', formData);
+  // @description 감지된 폼 데이터 출력
+  // @reason 폼 값이 제대로 감지되는지 확인
+  // @analogy 도서관에서 책 정보를 실시간으로 기록하는 과정 확인
+
+  // **디버깅 로그 추가**: PostAutoSave로 전달되는 데이터 확인
+  console.log('PostWriteForm - Data passed to PostAutoSave:', {
+    formData,
+    imageUrls,
+  });
+  // @description PostAutoSave로 전달된 데이터 출력
+  // @reason 데이터가 제대로 전달되는지 확인
+  // @analogy 도서관에서 대여 기록을 다른 부서로 전달하는 과정 확인
+
   usePostWriteDraftSync(form, imageUrls, draftData); // 드래프트 동기화
   // @description 폼 값과 드래프트 동기화
   // @reason Zustand 스토어와 동기화
@@ -121,9 +139,10 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
       <div className="max-w-4xl p-4 mx-auto">
         <div className="mb-8">
           <h1 className="mb-4 text-2xl font-bold">Create a New Post</h1>
-          <PostAutoSave /> {/* PostAutoSave 컴포넌트 */}
-          {/* @description 자동저장 컴포넌트 렌더링 */}
-          {/* @reason 드래프트 주기적 저장 */}
+          <PostAutoSave formData={formData} imageUrls={imageUrls} />{' '}
+          {/* PostAutoSave 컴포넌트 */}
+          {/* @description formData와 imageUrls를 PostAutoSave에 전달 */}
+          {/* @reason 자동저장 로직에서 폼 데이터 사용 */}
           <PostWriteImageUploader
             initialImageUrls={initialImageUrls}
             onImageUrlsChange={setImageUrls}
