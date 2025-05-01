@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file usePostWriteDraftSync.ts
  * @description 폼 데이터와 드래프트 데이터를 동기화하는 커스텀 훅
@@ -101,4 +102,105 @@ export function usePostWriteDraftSync(
   }, [watch, imageUrls, draftData, setDraftData]); // @type {Array} - 의존성 배열
   // @description watch, imageUrls, draftData 변경 시 실행
   // @reason 데이터 변경 감지 및 동기화
+=======
+import { useEffect, useCallback } from 'react';
+import { UseFormReturn } from 'react-hook-form';
+import useDraftStore from '../../../../stores/draft/draftStore';
+import debounce from 'lodash/debounce';
+
+interface PostWriteFormData {
+  postTitle: string;
+  postDesc: string;
+  postContent: string;
+  tags: string[];
+}
+
+interface DraftData {
+  postTitle: string;
+  postDesc: string;
+  postContent: string;
+  tags: string[];
+  imageUrls: string[];
+  draftId: string;
+  createdAt: Date | undefined;
+  updatedAt?: Date;
+  isTemporary: boolean;
+}
+
+export function usePostWriteDraftSync(
+  form: UseFormReturn<PostWriteFormData>,
+  imageUrls: string[],
+  draftData: DraftData
+) {
+  const { updateDraft, resetDraft } = useDraftStore();
+  const { watch } = form;
+
+  const postTitle = watch('postTitle') || '';
+  const postDesc = watch('postDesc') || '';
+  const postContent = watch('postContent') || '';
+  const tags = watch('tags') || [];
+
+  console.log('usePostWriteDraftSync - Watched formData:', {
+    postTitle,
+    postDesc,
+    postContent,
+    tags,
+  });
+
+  const debouncedUpdateDraft = useCallback(
+    debounce((draft: Partial<DraftData>) => {
+      updateDraft(draft);
+      console.log(
+        'usePostWriteDraftSync - Draft updated with form data and image URLs'
+      );
+    }, 300),
+    [updateDraft]
+  );
+
+  useEffect(() => {
+    const draftUpdate = {
+      postTitle: postTitle || draftData.postTitle || '',
+      postDesc: postDesc || draftData.postDesc || '',
+      postContent: postContent || draftData.postContent || '',
+      tags: tags || draftData.tags || [],
+      imageUrls: imageUrls || draftData.imageUrls || [],
+      draftId: draftData.draftId || '',
+      createdAt: draftData.createdAt || new Date(),
+      updatedAt: new Date(),
+      isTemporary: draftData.isTemporary || false,
+    };
+
+    debouncedUpdateDraft(draftUpdate);
+
+    console.log(
+      'usePostWriteDraftSync - Image URLs updated in draft:',
+      imageUrls
+    );
+
+    return () => {
+      debouncedUpdateDraft.cancel();
+    };
+  }, [
+    postTitle,
+    postDesc,
+    postContent,
+    tags,
+    imageUrls,
+    draftData.postTitle,
+    draftData.postDesc,
+    draftData.postContent,
+    draftData.tags,
+    draftData.imageUrls,
+    draftData.draftId,
+    draftData.createdAt,
+    draftData.isTemporary,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      resetDraft();
+      console.log('usePostWriteDraftSync - Cleanup completed');
+    };
+  }, [resetDraft]);
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
 }

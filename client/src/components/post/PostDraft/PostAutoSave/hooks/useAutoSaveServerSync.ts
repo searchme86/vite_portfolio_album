@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file useAutoSaveServerSync.ts
  * @description 드래프트 데이터를 주기적으로 서버에 동기화하는 커스텀 훅
@@ -55,12 +56,28 @@ export default function useAutoSaveServerSync(
   // @description 비동기적으로 토큰 가져오기
   // @reason 서버 요청 시 토큰 필요
   // @why Promise를 반환하는 함수로 변경하여 getToken의 비동기 특성 반영
-): AutoSaveServerSyncResult {
-  const { autoSave, isPending, error, data } = useAutoSaveMutation(); // @type {Object} - 자동저장 함수, 상태
-  // @description useAutoSaveMutation 훅으로 자동저장 함수와 상태 가져오기
-  // @reason 서버 저장, 대기 상태, 에러 상태, 응답 데이터 확인
-  // @analogy 도서관에서 책 저장 도구, 진행 상태, 실패 상태, 저장 결과 확인
+=======
+import { useEffect, useRef, useState } from 'react';
+import useAutoSaveMutation from '../../../../../api/draft/mutations/useAutoSaveMutation';
+import type { DraftState } from '../../../../../stores/draft/initialDraftState';
 
+interface AutoSaveServerSyncResult {
+  isSaving: boolean;
+  lastSaved: Date | null;
+}
+
+export default function useAutoSaveServerSync(
+  draftData: DraftState,
+  isOnline: boolean,
+  isSignedIn: boolean | undefined,
+  getToken: () => Promise<string | null>
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
+): AutoSaveServerSyncResult {
+  const { autoSave, isPending, error, data } = useAutoSaveMutation();
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+<<<<<<< HEAD
   const [lastSaved, setLastSaved] = useState<Date | null>(null); // @type {Date | null} - 마지막 저장 시간 상태 (수정됨)
   // @description 마지막 저장 시간을 저장하는 상태
   // @reason 사용자에게 마지막 저장 시간 표시
@@ -142,11 +159,38 @@ export default function useAutoSaveServerSync(
     // @description 현재 드래프트 데이터를 이전 데이터로 저장
     // @reason 다음 변경 감지 준비
     // @analogy 도서관에서 현재 책 정보를 메모장에 저장
+=======
+  const saveToServer = async () => {
+    if (!isOnline) {
+      console.log('useAutoSaveServerSync - Offline, skipping server save');
+      return;
+    }
+
+    if (isSignedIn !== true) {
+      console.log(
+        'useAutoSaveServerSync - Not signed in, skipping server save'
+      );
+      return;
+    }
+
+    const token = await getToken();
+    if (!token) {
+      console.log('useAutoSaveServerSync - No token, skipping server save');
+      return;
+    }
+
+    console.log(
+      'useAutoSaveServerSync - Attempting to save draft to server:',
+      draftData
+    );
+
+    autoSave(draftData);
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
   };
 
-  // 저장 성공 시 lastSaved 업데이트
   useEffect(() => {
     if (data?.success) {
+<<<<<<< HEAD
       const now = new Date(); // @type {Date} - 현재 시간 (수정됨)
       // @description 현재 시간을 Date 객체로 가져오기
       // @reason 마지막 저장 시간 기록
@@ -183,9 +227,23 @@ export default function useAutoSaveServerSync(
       // @why async/await으로 비동기 처리
       // @analogy 도서관에서 1분마다 책 저장
     }, 60000); // @type {number} - 1분 간격 (60000ms)
+=======
+      const now = new Date();
+      setLastSaved(now);
+      console.log('useAutoSaveServerSync - Last saved updated:', now);
+    }
+  }, [data]);
 
-    // 에러 발생 시에도 interval 중단하지 않음
+  useEffect(() => {
+    console.log('useAutoSaveServerSync - Setting up auto-save interval');
+
+    intervalRef.current = setInterval(async () => {
+      await saveToServer();
+    }, 30000);
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
+
     if (error) {
+<<<<<<< HEAD
       if (isDebugMode) {
         console.log(
           'useAutoSaveServerSync - Error occurred, but continuing auto-save:',
@@ -194,11 +252,17 @@ export default function useAutoSaveServerSync(
         // @reason postTitle 등이 비어 있는 것은 정상 상태이므로 interval 중단 불필요
         // @analogy 도서관에서 저장 실패해도 타이머 계속 돌림
       }
+=======
+      console.log(
+        'useAutoSaveServerSync - Error occurred, but continuing auto-save:',
+        error.message
+      );
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
     }
 
-    // 컴포넌트 언마운트 시 interval 정리
     return () => {
       if (intervalRef.current) {
+<<<<<<< HEAD
         if (isDebugMode) {
           console.log('useAutoSaveServerSync - Cleaning up auto-save interval'); // @description 정리 로그
           // @reason 리소스 정리
@@ -244,3 +308,16 @@ export default function useAutoSaveServerSync(
 // 10. `isSaving`, `lastSaved` 반환: 자동저장 상태 제공.
 // @reason 주기적 서버 동기화를 통해 데이터 손실 방지
 // @analogy 도서관에서 책을 정기적으로 저장하는 타이머
+=======
+        console.log('useAutoSaveServerSync - Cleaning up auto-save interval');
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [draftData, error, isOnline, isSignedIn]);
+
+  return {
+    isSaving: isPending,
+    lastSaved,
+  };
+}
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)

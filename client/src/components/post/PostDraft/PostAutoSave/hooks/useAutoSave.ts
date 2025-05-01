@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file useAutoSave.ts
  * @description 드래프트 데이터를 localStorage와 서버에 자동저장하는 커스텀 훅
@@ -62,23 +63,29 @@ export function useAutoSave(
   // @description 비동기적으로 토큰 가져오기
   // @reason 서버 요청 시 토큰 필요
   // @why Promise를 반환하는 함수로 변경하여 getToken의 비동기 특성 반영
+=======
+import { useRef } from 'react';
+import type { DraftState } from '../../../../../stores/draft/initialDraftState';
+import { useAutoSaveLocalStorage } from './useAutoSaveLocalStorage';
+import useAutoSaveServerSync from './useAutoSaveServerSync';
+import { useAutoSaveNetworkStatus } from './useAutoSaveNetworkStatus';
+
+interface AutoSaveResult {
+  isSaving: boolean;
+  lastSaved: Date | null;
+}
+
+export function useAutoSave(
+  draft: DraftState,
+  isSignedIn: boolean | undefined,
+  getToken: () => Promise<string | null>
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
 ): AutoSaveResult {
-  const previousDraftRef = useRef<DraftState | null>(null); // @type {Object | null} - 이전 드래프트 데이터
-  // @description 이전 드래프트 데이터 저장
-  // @reason 변경 감지
-  // @analogy 도서관에서 이전 책 정보를 저장하는 메모장
-
-  const isOnline = useAutoSaveNetworkStatus(); // @type {boolean} - 네트워크 상태
-  // @description 네트워크 상태 가져오기
-  // @reason 서버 저장 제어
-  // @analogy 도서관에서 인터넷 연결 상태 확인
-
-  const { isSaving: isLocalSaving } = useAutoSaveLocalStorage(draft); // @type {Object} - localStorage 저장 상태
-  // @description localStorage 저장 실행 및 상태 가져오기
-  // @reason 로컬 저장 관리
-  // @analogy 도서관에서 책을 로컬 서랍에 저장
-
+  const previousDraftRef = useRef<DraftState | null>(null);
+  const isOnline = useAutoSaveNetworkStatus();
+  const { isSaving: isLocalSaving } = useAutoSaveLocalStorage(draft);
   const { isSaving: isServerSaving, lastSaved } = useAutoSaveServerSync(
+<<<<<<< HEAD
     draft, // @description 서버에 저장할 드래프트 데이터
     isOnline, // @description 네트워크 상태 전달
     isSignedIn, // @description 로그인 상태 전달
@@ -146,12 +153,35 @@ export function useAutoSave(
   // @reason isSaving이 undefined가 되지 않도록 보장
   // @why undefined 상태를 방지하여 안정적인 상태 반환
   // @analogy 도서관에서 저장 중 상태를 항상 명확히 확인
+=======
+    draft,
+    isOnline,
+    isSignedIn,
+    getToken
+  );
 
-  return { isSaving: finalIsSaving, lastSaved }; // @type {AutoSaveResult} - 저장 상태와 마지막 저장 시간 반환
-  // @description 저장 상태와 마지막 저장 시간 반환
-  // @reason 컴포넌트에서 사용
-  // @analogy 도서관에서 저장 진행 상태와 마지막 저장 시간 반환
+  const hasChanged =
+    JSON.stringify(previousDraftRef.current) !== JSON.stringify(draft);
+  if (hasChanged) {
+    console.log('useAutoSave - Changes detected:', {
+      previous: previousDraftRef.current,
+      current: draft,
+    });
+    previousDraftRef.current = draft;
+  }
+
+  console.log('useAutoSave - Draft data:', {
+    postTitle: draft.postTitle,
+    postDesc: draft.postDesc,
+    postContent: draft.postContent,
+  });
+
+  const finalIsSaving = isLocalSaving || isServerSaving || false;
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
+
+  return { isSaving: finalIsSaving, lastSaved };
 }
+<<<<<<< HEAD
 
 // **작동 매커니즘**
 // 1. `useRef`로 previousDraftRef 생성: 이전 드래프트 데이터를 저장.
@@ -164,3 +194,5 @@ export function useAutoSave(
 // 8. `isSaving`과 `lastSaved` 반환: 컴포넌트에서 상태 사용.
 // @reason 드래프트 데이터를 로컬과 서버에 자동저장하여 데이터 손실 방지
 // @analogy 도서관에서 책을 로컬 서랍과 서버에 저장하는 시스템
+=======
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)

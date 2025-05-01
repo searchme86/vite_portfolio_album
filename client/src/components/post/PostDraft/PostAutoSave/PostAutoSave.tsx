@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file PostAutoSave.tsx
  * @description 드래프트 데이터를 주기적으로 자동저장하고 알림 UI를 표시하는 컴포넌트
@@ -172,3 +173,41 @@ export default memo(PostAutoSave); // @description memo로 감싸 리렌더링 �
 // 5. `memo`로 불필요한 리렌더링 방지.
 // @reason 드래프트 데이터를 주기적으로 저장하고 사용자에게 상태를 알림
 // @analogy 도서관에서 책 정보를 저장하고 사서에게 상태를 알리는 시스템
+=======
+import { useAutoSave } from './hooks/useAutoSave';
+import AutoSaveNotification from './parts/AutoSaveNotification';
+import useGetDraftState from '@/stores/draft/useGetDraftState';
+import { useCheckAuthToken } from '@/hooks/useCheckUserAuthToken';
+
+interface PostAutoSaveProps {
+  formData: {
+    postTitle: string;
+    postDesc: string;
+    postContent: string;
+    tags: string[];
+  };
+  imageUrls: string[];
+}
+
+function PostAutoSave({ formData, imageUrls }: PostAutoSaveProps) {
+  const { isSignedIn, getToken } = useCheckAuthToken();
+  const draftFromStore = useGetDraftState();
+
+  const draft = {
+    ...draftFromStore,
+    postTitle: formData.postTitle || draftFromStore.postTitle,
+    postDesc: formData.postDesc || draftFromStore.postDesc,
+    postContent: formData.postContent || draftFromStore.postContent,
+    tags: formData.tags || draftFromStore.tags,
+    imageUrls: imageUrls || draftFromStore.imageUrls,
+  };
+
+  const { isSaving, lastSaved } = useAutoSave(draft, isSignedIn, getToken);
+
+  console.log('PostAutoSave - draft:', draft);
+
+  return <AutoSaveNotification isSaving={isSaving} lastSaved={lastSaved} />;
+}
+
+export default PostAutoSave;
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @file PostWriteForm.tsx
  * @description 포스트 작성 폼 컴포넌트
@@ -86,10 +87,28 @@ interface PostWriteFormProps {
   // @description 초기 이미지 URL 설정
   // @reason 이미지 업로드 초기값
   // @analogy 도서관에서 초기 책 이미지 설정
+=======
+import { Form } from '@/components/ui/form';
+import PostWriteTitleInput from './parts/PostWriteTitleInput';
+import PostWriteDescriptionTextarea from './parts/PostWriteDescriptionTextarea';
+import PostWriteContentEditor from './parts/PostWriteContentEditor';
+import PostWriteTagManager from './parts/PostWriteTagManager';
+import PostWriteSubmitButton from './parts/PostWriteSubmitButton';
+import PostWriteImageUploader from './parts/PostWriteImageUploader';
+import PostAutoSave from '@/components/post/PostDraft/PostAutoSave/PostAutoSave';
+import { useCheckAuthToken } from '../../../hooks/useCheckUserAuthToken';
+import { usePostWriteFormSetup } from './hooks/usePostWriteFormSetup';
+import { usePostWriteDraftSync } from './hooks/usePostWriteDraftSync';
+import { usePostWriteSubmit } from './hooks/usePostWriteSubmit';
+
+interface PostWriteFormProps {
+  initialImageUrls?: string[];
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
 }
 
 // 컴포넌트 정의
 function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
+<<<<<<< HEAD
   const authState = useCheckAuthToken(); // @type {Object} - 인증 상태와 토큰 가져오기
   // @description useCheckAuthToken으로 인증 상태와 토큰 가져오기
   // @reason 포스트 생성 및 자동저장에 필요
@@ -194,6 +213,32 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
   let content: JSX.Element; // @type {JSX.Element} - 렌더링할 UI
   // @description 인증 상태에 따라 다른 UI를 저장
   // @reason 조건부 렌더링
+=======
+  const authState = useCheckAuthToken();
+  const { form, imageUrls, setImageUrls, draftData } = usePostWriteFormSetup();
+  const { handleSubmit, formState, watch } = form;
+
+  const formData = watch();
+  console.log('PostWriteForm - Watched formData:', formData);
+
+  console.log('PostWriteForm - Data passed to PostAutoSave:', {
+    formData,
+    imageUrls,
+  });
+
+  usePostWriteDraftSync(form, imageUrls, draftData);
+
+  const { postFormSubmitHandler, isLoading, error } = usePostWriteSubmit(
+    watch('postTitle'),
+    watch('postDesc'),
+    watch('postContent'),
+    imageUrls,
+    watch('tags'),
+    authState.getToken
+  );
+
+  let content: JSX.Element;
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
   if (authState.isAuthFetchingLoadingStatus) {
     content = (
       <div className="flex items-center justify-center h-screen">
@@ -202,10 +247,14 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
           {/* @reason 사용자 대기 상태 표시 */}
         </div>
       </div>
+<<<<<<< HEAD
     ); // @type {JSX.Element} - 인증 로딩 중 UI
     // @description 인증 로딩 중일 때 표시할 UI
     // @reason 사용자에게 로딩 상태 알림
     // @analogy 도서관에서 사서가 인증 확인 중임을 알림
+=======
+    );
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
   } else if (authState.isSignedIn === false) {
     content = (
       <div className="mt-8 text-center text-red-500">
@@ -219,10 +268,14 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
           </a>
         </div>
       </div>
+<<<<<<< HEAD
     ); // @type {JSX.Element} - 로그인 필요 UI
     // @description 로그인 필요 시 표시할 UI
     // @reason 사용자 인증 요구
     // @analogy 도서관에서 로그인하지 않은 사용자에게 알림
+=======
+    );
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
   } else if (authState.isSignedIn === undefined) {
     content = (
       <div className="mt-8 text-center text-red-500">
@@ -230,14 +283,19 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
         {/* @description 인증 상태 불명 메시지 */}
         {/* @reason 사용자에게 인증 오류 알림 */}
       </div>
+<<<<<<< HEAD
     ); // @type {JSX.Element} - 인증 상태 불명 UI
     // @description 인증 상태 불명 시 표시할 UI
     // @reason 사용자 알림
     // @analogy 도서관에서 인증 상태를 알 수 없을 때 알림
+=======
+    );
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
   } else {
     content = (
       <div className="max-w-4xl p-4 mx-auto">
         <div className="mb-8">
+<<<<<<< HEAD
           <h1 className="mb-4 text-2xl font-bold">
             Create a New Post {/* @description 폼 제목 */}
             {/* @reason 사용자에게 폼 목적 표시 */}
@@ -300,11 +358,37 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
                 {/* @type {string} - 에러 메시지 */}
                 {/* @description 제출 에러 메시지 표시 */}
                 {/* @reason 사용자에게 에러 알림 */}
+=======
+          <h1 className="mb-4 text-2xl font-bold">Create a New Post</h1>
+          <PostAutoSave formData={formData} imageUrls={imageUrls} />
+          <PostWriteImageUploader
+            initialImageUrls={initialImageUrls}
+            onImageUrlsChange={setImageUrls}
+          />
+        </div>
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(postFormSubmitHandler)}
+            className="flex flex-col gap-4"
+          >
+            <PostWriteTitleInput />
+            <PostWriteDescriptionTextarea />
+            <PostWriteContentEditor />
+            <PostWriteTagManager />
+            <PostWriteSubmitButton
+              isLoading={isLoading}
+              isDisabled={!formState.isValid || formState.isSubmitting}
+            />
+            {error && (
+              <div className="text-red-500">
+                {error.message || 'An error occurred while submitting the form'}
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
               </div>
             )}
           </form>
         </Form>
       </div>
+<<<<<<< HEAD
     ); // @type {JSX.Element} - 인증 완료 시 폼 UI
     // @description 인증 완료 시 표시할 폼 UI
     // @reason 사용자 입력 UI 제공
@@ -319,6 +403,12 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
   // 1. `authState`를 기반으로 조건 분기.
   // 2. 각 조건에 따라 다른 JSX 반환.
   // @analogy 도서관에서 사용자 상태에 따라 다른 안내 제공
+=======
+    );
+  }
+
+  return content;
+>>>>>>> 628107a (🐛 [최신수정] 이전 커밋으로 이동하여 타입 및 인자수 에러를 수정하고 최신으로 커밋함)
 }
 
 export default memo(PostWriteForm); // @type {Function} - memo로 감싸 리렌더링 최적화
