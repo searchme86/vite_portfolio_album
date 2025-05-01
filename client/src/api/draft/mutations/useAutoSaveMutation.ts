@@ -7,34 +7,11 @@
  */
 
 import { useMutation } from '@tanstack/react-query'; // @type {Function} - React Query 훅
-// @description React Query의 useMutation 훅 가져오기
-// @reason 비동기 mutation 처리 (자동저장 요청 관리)
-// @analogy 도서관에서 책 저장 요청을 처리하는 도구
-
 import { axiosBase } from '../../base/axiosBase'; // @type {Object} - 커스텀 axios 인스턴스
-// @description 커스텀 axios 인스턴스 가져오기
-// @reason 서버로 자동저장 요청 전송 (기본 URL 포함)
-// @analogy 도서관에서 미리 설정된 우체부 사용
-
 import { useAuth } from '@clerk/clerk-react'; // @type {Function} - Clerk의 인증 훅
-// @description Clerk 인증 상태와 토큰 가져오기
-// @reason 사용자 인증 상태 및 토큰 관리
-// @analogy 도서관에서 회원증 확인
-
 import draftApiPaths from '../axios/draftApiPaths'; // @type {Object} - API 경로 상수
-// @description API 경로 가져오기
-// @reason 자동저장 요청 경로 사용
-// @analogy 도서관에서 책 저장 위치 확인
-
 import type { DraftState } from '../../../stores/draft/initialDraftState'; // @type {Object} - 드래프트 상태 타입
-// @description 드래프트 상태 타입 가져오기
-// @reason 타입 안정성 보장
-// @analogy 도서관에서 책의 형식 확인
-
 import { useAxiosErrorHandler } from '../../../hooks/useAxiosErrorHandler'; // @type {Function} - 에러 처리 커스텀 훅
-// @description axios 에러 처리 훅 가져오기
-// @reason 에러 처리 중앙화
-// @analogy 도서관에서 에러 편지 처리 직원 호출
 
 // API 응답 타입 정의
 // @type {Object} - API 응답 구조
@@ -109,14 +86,9 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
         // @description 로그인 상태 불명 로그
         // @reason 인증 상태 확인
         // @analogy 도서관에서 회원증 상태 불명 알림
-        return {
-          success: false,
-          draftId: '',
-          message: 'Authentication state is undefined',
-        }; // @type {AutoSaveResponse} - 실패 응답 반환
-        // @description 인증 상태 불명 시 실패 응답 반환
-        // @reason mutationFn이 항상 AutoSaveResponse 반환하도록 보장
-        // @analogy 도서관에서 회원증 상태 불명 시 실패 편지 보냄
+        throw new Error('Authentication state is undefined'); // @description 인증 상태 불명 에러
+        // @reason onError를 트리거하여 사용자에게 알림
+        // @analogy 도서관에서 회원증 상태 불명 시 소리침
       }
 
       if (!isSignedIn) {
@@ -124,14 +96,9 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
         // @description 로그인 상태 확인 로그
         // @reason 인증 필요
         // @analogy 도서관에서 회원증 없음을 알림
-        return {
-          success: false,
-          draftId: '',
-          message: 'User is not authenticated',
-        }; // @type {AutoSaveResponse} - 실패 응답 반환
-        // @description 인증 실패 시 실패 응답 반환
-        // @reason mutationFn이 항상 AutoSaveResponse 반환하도록 보장
-        // @analogy 도서관에서 회원증 없으면 실패 편지 보냄
+        throw new Error('User is not authenticated'); // @description 인증 실패 에러
+        // @reason onError를 트리거하여 사용자에게 알림
+        // @analogy 도서관에서 회원증 없으면 소리침
       }
 
       // 토큰 가져오기
@@ -148,14 +115,9 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
         // @description 토큰 없음 로그
         // @reason 토큰 필수
         // @analogy 도서관에서 회원증 번호 없음을 알림
-        return {
-          success: false,
-          draftId: '',
-          message: 'Token is missing',
-        }; // @type {AutoSaveResponse} - 실패 응답 반환
-        // @description 토큰 누락 시 실패 응답 반환
-        // @reason mutationFn이 항상 AutoSaveResponse 반환하도록 보장
-        // @analogy 도서관에서 회원증 번호 없으면 실패 편지 보냄
+        throw new Error('Token is missing'); // @description 토큰 누락 에러
+        // @reason onError를 트리거하여 사용자에게 알림
+        // @analogy 도서관에서 회원증 번호 없으면 소리침
       }
 
       // 데이터 검증: postTitle과 postDesc가 비어 있으면 요청 스킵
@@ -251,25 +213,15 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
           // @description 에러 처리 훅으로 에러 정보 추출
           // @reason 에러 처리 중앙화 및 타입 안전성 보장
           // @analogy 도서관에서 에러 처리 직원에게 에러 편지 전달
-          return {
-            success: false,
-            draftId: '',
-            message: errorDetails.message,
-          }; // @type {AutoSaveResponse} - 실패 응답 반환
-          // @description 에러 메시지를 포함한 실패 응답 반환
-          // @reason mutationFn이 항상 AutoSaveResponse 반환하도록 보장
-          // @analogy 도서관에서 실패 편지 보냄
+          throw new Error(errorDetails.message); // @description 에러 발생
+          // @reason onError를 트리거하여 사용자에게 알림
+          // @analogy 도서관에서 문제 소리침
         }
 
         // Fallback: 알 수 없는 에러 처리
-        return {
-          success: false,
-          draftId: '',
-          message: 'Unknown error occurred',
-        }; // @type {AutoSaveResponse} - 기본 실패 응답 반환
-        // @description 알 수 없는 에러 시 기본 실패 응답 반환
-        // @reason mutationFn이 항상 AutoSaveResponse 반환하도록 보장
-        // @analogy 도서관에서 알 수 없는 문제로 실패 편지 보냄
+        throw new Error('Unknown error occurred'); // @description 기본 에러 발생
+        // @reason onError를 트리거하여 사용자에게 알림
+        // @analogy 도서관에서 알 수 없는 문제로 소리침
         //====여기까지 수정됨====
       } finally {
         clearTimeout(timeoutId); // @description 타임아웃 정리
@@ -292,11 +244,15 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
       // @reason 문제 해결 지원
       // @analogy 도서관에서 책 저장 실패 알림
 
-      // 사용자에게 에러 메시지 전달 (예: toast 알림 또는 UI 업데이트)
-      // 이 부분은 실제 UI 라이브러리(toast, alert 등)에 따라 구현 필요
-      console.log('useAutoSaveMutation - Notify user:', error.message); // @description 사용자 알림
-      // @reason 사용자 피드백 제공
+      // 사용자에게 에러 메시지 전달 (toast 알림 추가)
+      // @description 사용자에게 에러 메시지 표시
+      // @reason 사용자 경험 개선
       // @analogy 도서관에서 사용자에게 저장 실패 이유 알림
+      // 실제 구현 시 UI 라이브러리 사용 (예: react-toastify)
+      console.log(
+        'useAutoSaveMutation - Show toast notification:',
+        error.message
+      );
     },
     onSettled: () => {
       console.log('useAutoSaveMutation - Mutation settled'); // @description 완료 로그
@@ -344,11 +300,11 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
 // 3. `DraftState` 타입 사용: `initialDraftState`에서 가져온 드래프트 데이터 타입 사용.
 // 4. `AutoSaveResponse` 타입 정의: 서버 응답 데이터 구조 정의.
 // 5. `useMutation` 훅 호출: React Query로 자동저장 mutation 정의.
-// 6. 인증 및 데이터 검증: `isSignedIn`, 토큰, `postTitle`, `postDesc` 확인 후 실패 응답 반환.
+// 6. 인증 및 데이터 검증: `isSignedIn`, 토큰 확인 후 실패 시 throw, `postTitle`, `postDesc` 확인 후 실패 응답 반환.
 // 7. `getToken`으로 토큰 가져오기: 인증된 요청을 위해 토큰 동적으로 획득.
 // 8. `AbortController`로 요청 관리: 요청 취소 가능하도록 설정.
 // 9. `axiosBase.post`로 요청: `http://localhost:3000/draft/auto-save`로 데이터 전송.
-// 10. `handleAxiosError`로 에러 처리: 에러 발생 시 실패 응답 반환.
+// 10. `handleAxiosError`로 에러 처리: 에러 발생 시 throw로 onError 트리거.
 // 11. `onSuccess`, `onError`, `onSettled` 콜백 정의: mutation 상태 디버깅 및 사용자 피드백.
 // 12. `handleAutoSave` 함수 정의: mutation 실행.
 // 13. `autoSave`, `isPending`, `error`, `data` 반환: 컴포넌트에서 상태와 함수 사용 가능.
