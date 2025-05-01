@@ -1,0 +1,31 @@
+/* @file AutoSaveNotification.css */
+/* @description AutoSaveNotification 컴포넌트 스타일 */
+.auto-save-notification {
+  opacity: 0; /* 초기 투명도 설정 */
+  /* @description 애니메이션 시작 전 투명하게 설정 */
+  /* @reason 초기 상태에서 보이지 않게 함 */
+  position: fixed; /* 고정 위치 설정 */
+  /* @description 화면 상단에 고정 */
+  /* @reason 스크롤과 상관없이 항상 상단에 표시 */
+  top: 0; /* 상단 위치 */
+  /* @description 상단에 배치 */
+  /* @reason 상단 알림 위치 */
+  width: 100%; /* 전체 너비 */
+  /* @description 화면 전체 너비로 설정 */
+  /* @reason 전체 화면에 걸쳐 표시 */
+  z-index: 1000; /* 상위 z-index */
+  /* @description 다른 요소 위에 표시 */
+  /* @reason 알림이 다른 요소에 가려지지 않도록 */
+  background-color: rgba(0, 128, 0, 0.8); /* 녹색 배경 */
+  /* @description 저장 상태를 나타내는 녹색 배경 */
+  /* @reason 성공적인 저장을 시각적으로 표시 */
+  color: white; /* 흰색 텍스트 */
+  /* @description 배경과의 대비를 위해 흰색 텍스트 */
+  /* @reason 가독성 향상 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  /* @description 메시지를 중앙에 배치 */
+  /* @reason 시각적 균형 */
+  padding: 8px; /* 패딩 설정 */
+  /* @description 내부 여백으로 내용과 테두리 간격 조정 */
+  /* @reason 깔끔한 UI 제공 */
+}
