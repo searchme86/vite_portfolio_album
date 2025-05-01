@@ -14,6 +14,37 @@ export const draftSetters = (
 ) => ({
   updateDraft: (draft: Partial<DraftState>): void => {
     const currentState = get(); // @type {DraftState} - 현재 Zustand 스토어 상태
+
+    // 새로운 상태와 현재 상태 비교
+    const hasChanges =
+      (draft.postTitle !== undefined &&
+        draft.postTitle !== currentState.postTitle) ||
+      (draft.postDesc !== undefined &&
+        draft.postDesc !== currentState.postDesc) ||
+      (draft.postContent !== undefined &&
+        draft.postContent !== currentState.postContent) ||
+      (draft.tags !== undefined &&
+        JSON.stringify(draft.tags) !== JSON.stringify(currentState.tags)) ||
+      (draft.imageUrls !== undefined &&
+        JSON.stringify(draft.imageUrls) !==
+          JSON.stringify(currentState.imageUrls)) ||
+      (draft.custom !== undefined &&
+        JSON.stringify(draft.custom) !== JSON.stringify(currentState.custom)) ||
+      (draft.draftId !== undefined && draft.draftId !== currentState.draftId) ||
+      (draft.createdAt !== undefined &&
+        draft.createdAt !== currentState.createdAt) ||
+      (draft.updatedAt !== undefined &&
+        draft.updatedAt !== currentState.updatedAt) ||
+      (draft.isTemporary !== undefined &&
+        draft.isTemporary !== currentState.isTemporary);
+    // @description 상태 변경 여부 확인
+    // @reason 불필요한 업데이트 방지로 무한 루프 방지
+
+    if (!hasChanges) {
+      return; // @description 변경 사항이 없으면 업데이트 중단
+      // @reason 무한 루프 방지
+    }
+
     const updatedState: DraftState = {
       postTitle:
         draft.postTitle !== undefined

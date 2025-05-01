@@ -3,7 +3,7 @@
  * @description 폼 상태 및 초기화 관리 훅
  * @location src/Pages/Post/PostForm/hooks/usePostWriteFormSetup.ts
  */
-import { useState, useEffect } from 'react'; // @type {Function} - React 훅
+import { useState, useEffect, useMemo } from 'react'; // @type {Function} - React 훅
 // @description 상태와 이펙트 관리
 // @reason 폼 상태 및 초기화
 
@@ -28,31 +28,31 @@ export function usePostWriteFormSetup() {
   // @reason 이미지 업로드 상태 관리
 
   // Zustand 셀렉터로 직접 값 가져오기
-  const postTitle = useDraftStore.use.postTitle(); // @type {string} - 포스트 제목
+  const postTitle = useDraftStore().postTitle; // @type {string} - 포스트 제목
   // @description 제목 가져오기
   // @reason 초기값 설정
-  const postDesc = useDraftStore.use.postDesc(); // @type {string} - 포스트 설명
+  const postDesc = useDraftStore().postDesc; // @type {string} - 포스트 설명
   // @description 설명 가져오기
   // @reason 초기값 설정
-  const postContent = useDraftStore.use.postContent(); // @type {string} - 포스트 본문
+  const postContent = useDraftStore().postContent; // @type {string} - 포스트 본문
   // @description 본문 가져오기
   // @reason 초기값 설정
-  const tags = useDraftStore.use.tags(); // @type {string[]} - 포스트 태그
+  const tags = useDraftStore().tags; // @type {string[]} - 포스트 태그
   // @description 태그 가져오기
   // @reason 초기값 설정
-  const draftImageUrls = useDraftStore.use.imageUrls(); // @type {string[]} - 이미지 URL
+  const draftImageUrls = useDraftStore().imageUrls; // @type {string[]} - 이미지 URL
   // @description 이미지 URL 가져오기
   // @reason 초기값 설정
-  const custom = useDraftStore.use.custom(); // @type {Record<string, any>} - 커스텀 데이터
+  const custom = useDraftStore().custom; // @type {Record<string, any>} - 커스텀 데이터
   // @description 커스텀 데이터 가져오기
   // @reason 초기값 설정
-  const draftId = useDraftStore.use.draftId(); // @type {string} - 드래프트 ID
+  const draftId = useDraftStore().draftId; // @type {string} - 드래프트 ID
   // @description 드래프트 ID 가져오기
   // @reason 초기값 설정
-  const createdAt = useDraftStore.use.createdAt(); // @type {Date} - 생성 시간
+  const createdAt = useDraftStore().createdAt; // @type {Date} - 생성 시간
   // @description 생성 시간 가져오기
   // @reason 초기값 설정
-  const isTemporary = useDraftStore.use.isTemporary(); // @type {boolean} - 임시저장 여부
+  const isTemporary = useDraftStore().isTemporary; // @type {boolean} - 임시저장 여부
   // @description 임시저장 여부 가져오기
   // @reason 초기값 설정
 
@@ -99,8 +99,8 @@ export function usePostWriteFormSetup() {
   // @description 폼 리셋 메서드
   // @reason 초기화 제어
 
-  // 초기 로드 시 드래프트 데이터로 폼 초기화
   useEffect(() => {
+    // 초기 로드 시 드래프트 데이터로 폼 초기화
     const initialFormValues = {
       ...postWriteFormDefaultValues, // 기본값 병합
       postTitle: postTitle || '', // 드래프트 제목 초기값
@@ -120,7 +120,7 @@ export function usePostWriteFormSetup() {
     // @description 초기화된 폼 데이터 출력
     // @reason 초기화가 제대로 이루어졌는지 확인
     // @analogy 도서관에서 책 정보를 초기화하는 과정 확인
-  }, [reset, postTitle, postDesc, postContent, tags]); // @description 의존성 배열에 초기값 포함
+  }, []); // @description 의존성 배열에 초기값 포함
   // @reason 초기 데이터 변경 시 폼 리셋
   // @why 의존성 배열에 초기값을 추가하여 데이터 변경 시 폼이 업데이트되도록 함
   // @mechanism
