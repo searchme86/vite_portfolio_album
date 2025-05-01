@@ -40,7 +40,7 @@ interface AutoSaveResult {
   isSaving: boolean; // @type {boolean} - 저장 중 여부
   // @description 로컬 또는 서버 저장 진행 상태
   // @reason UI에서 로딩 상태 표시
-  lastSaved: string | null; // @type {string | null} - 마지막 저장 시간
+  lastSaved: Date | null; // @type {string | null} - 마지막 저장 시간
   // @description 마지막으로 저장된 시간
   // @reason 사용자에게 마지막 저장 시간 표시
 }
@@ -50,9 +50,11 @@ interface AutoSaveResult {
 // @reason 데이터 손실 방지 및 사용자 경험 개선
 // @analogy 도서관에서 책을 로컬과 서버에 저장
 export function useAutoSave(
-  draft: DraftState // @type {Object} - 드래프트 데이터
+  draft: DraftState, // @type {Object} - 드래프트 데이터
   // @description 자동저장할 드래프트 데이터
   // @reason 저장할 데이터 전달
+  isSignedIn: boolean | undefined,
+  getToken: () => Promise<string | null>
 ): AutoSaveResult {
   const previousDraftRef = useRef<DraftState | null>(null); // @type {Object | null} - 이전 드래프트 데이터
   // @description 이전 드래프트 데이터 저장
@@ -70,16 +72,11 @@ export function useAutoSave(
   // @analogy 도서관에서 책을 로컬 서랍에 저장
 
   const { isSaving: isServerSaving, lastSaved } = useAutoSaveServerSync(
-    draft, // @type {Object} - 드래프트 데이터
-    // @description 서버에 저장할 드래프트 데이터
-    // @reason 서버 동기화
-    isOnline // @type {boolean} - 네트워크 상태
-    // @description 네트워크 상태 전달
-    // @reason 서버 저장 제어
-  ); // @type {Object} - 서버 동기화 상태
-  // @description 서버 동기화 실행 및 상태 가져오기
-  // @reason 서버 저장 관리
-  // @analogy 도서관에서 책을 서버에 저장
+    draft,
+    isOnline,
+    isSignedIn,
+    getToken
+  );
 
   // 데이터 변경 감지
   const hasChanged =

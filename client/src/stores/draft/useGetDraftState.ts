@@ -16,8 +16,8 @@ interface DraftState {
   imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
   custom: Record<string, any>; // @type {Record<string, any>} - 커스텀 데이터
   draftId: string; // @type {string} - 드래프트 ID
-  createdAt: Date | string | undefined; // @type {Date | string | undefined} - 생성 시간
-  updatedAt: Date | string | undefined; // @type {Date | string | undefined} - 수정 시간
+  createdAt: Date; // @type {Date | string | undefined} - 생성 시간
+  updatedAt: Date; // @type {Date | string | undefined} - 수정 시간
   isTemporary: boolean; // @type {boolean} - 임시저장 여부
 }
 

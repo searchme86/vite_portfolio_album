@@ -16,8 +16,8 @@ export interface DraftState {
   imageUrls: string[]; // @type {string[]} - 이미지 URL
   custom: Record<string, any>; // @type {Record<string, any>} - 커스텀 데이터
   draftId: string; // @type {string} - 드래프트 ID
-  createdAt: Date | string | undefined; // @type {Date | string | undefined} - 생성 시간
-  updatedAt: Date | string | undefined; // @type {Date | string | undefined} - 수정 시간
+  createdAt: Date; // @type {Date | string | undefined} - 생성 시간
+  updatedAt: Date; // @type {Date | string | undefined} - 수정 시간
   isTemporary: boolean; // @type {boolean} - 임시저장 여부
 }
 
@@ -30,7 +30,7 @@ export const initialDraftState: DraftState = {
   imageUrls: [], // @type {string[]} - 초기 이미지 URL
   custom: {}, // @type {Record<string, any>} - 초기 커스텀 데이터
   draftId: uuidv4(), // @type {string} - 초기 드래프트 ID (UUID로 생성)
-  createdAt: undefined, // @type {undefined} - 초기 생성 시간
-  updatedAt: undefined, // @type {undefined} - 초기 수정 시간
+  createdAt: new Date(), // @type {undefined} - 초기 생성 시간
+  updatedAt: new Date(), // @type {undefined} - 초기 수정 시간
   isTemporary: false, // @type {boolean} - 초기 임시저장 여부
 };

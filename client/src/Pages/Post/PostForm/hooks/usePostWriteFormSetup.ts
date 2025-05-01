@@ -3,7 +3,7 @@
  * @description 폼 상태 및 초기화 관리 훅
  * @location src/Pages/Post/PostForm/hooks/usePostWriteFormSetup.ts
  */
-import { useState, useEffect, useMemo } from 'react'; // @type {Function} - React 훅
+import { useState, useEffect } from 'react'; // @type {Function} - React 훅
 // @description 상태와 이펙트 관리
 // @reason 폼 상태 및 초기화
 
@@ -52,6 +52,8 @@ export function usePostWriteFormSetup() {
   const createdAt = useDraftStore().createdAt; // @type {Date} - 생성 시간
   // @description 생성 시간 가져오기
   // @reason 초기값 설정
+
+  const updatedAt = useDraftStore().updatedAt;
   const isTemporary = useDraftStore().isTemporary; // @type {boolean} - 임시저장 여부
   // @description 임시저장 여부 가져오기
   // @reason 초기값 설정
@@ -136,6 +138,7 @@ export function usePostWriteFormSetup() {
     imageUrls: draftImageUrls, // 드래프트 이미지 URL
     custom, // 드래프트 커스텀 데이터
     draftId, // 드래프트 ID
+    updatedAt,
     createdAt, // 드래프트 생성 시간
     isTemporary, // 드래프트 임시저장 여부
   };
