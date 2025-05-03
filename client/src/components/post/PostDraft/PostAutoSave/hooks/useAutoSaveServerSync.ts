@@ -76,8 +76,16 @@ export default function useAutoSaveServerSync(
       'useAutoSaveServerSync - Sending auto-save request:',
       draftData
     );
-    await autoSave(draftData);
-    previousDraftRef.current = { ...draftData };
+    try {
+      await autoSave(draftData);
+      previousDraftRef.current = { ...draftData };
+    } catch (networkError) {
+      console.error(
+        'useAutoSaveServerSync - Network error during save:',
+        networkError
+      );
+      setIsSavingLocal(false);
+    }
   };
 
   useEffect(() => {
@@ -89,8 +97,6 @@ export default function useAutoSaveServerSync(
         draftId: data.draftId,
         timestamp: now,
       });
-      // @description DB 저장 성공 로그
-      // @reason 저장 여부 확인
     } else if (error) {
       console.log('useAutoSaveServerSync - Save failed:', error.message);
       setLastSaved(new Date());

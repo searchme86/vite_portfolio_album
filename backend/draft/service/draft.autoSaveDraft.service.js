@@ -31,17 +31,10 @@ const autoSaveDraftService = async (userId, draftData) => {
       isTemporary: draftData.isTemporary || false,
     };
 
-    //====여기부터 수정됨====
-    // 동일 userId를 가진 모든 이전 드래프트 삭제
     await DraftModel.deleteMany({
       userId,
       draftId: { $ne: draftData.draftId },
     });
-    // @description 동일 userId에 다른 draftId를 가진 데이터 삭제
-    // @reason 최신 데이터만 유지
-    // @why 이전 데이터 누적으로 인한 문제 해결
-
-    // 최신 데이터 저장
     const result = await DraftModel.updateOne(
       { draftId: draftData.draftId, userId },
       { $set: draftToSave },
@@ -54,7 +47,6 @@ const autoSaveDraftService = async (userId, draftData) => {
       draftId: draftData.draftId,
       userId,
     });
-    //====여기까지 수정됨====
 
     return draftToSave;
   } catch (error) {
