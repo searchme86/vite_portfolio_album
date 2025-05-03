@@ -39,8 +39,25 @@ export default function useAutoSaveServerSync(
   // @reason 주기적 저장 관리
   // @analogy 도서관에서 주기적 저장 타이머
 
+  const previousDraftRef = useRef<DraftState | null>(null); // @type {DraftState | null} - 이전 드래프트 데이터
+  // @description 이전 드래프트 데이터 저장
+  // @reason 변경 감지
+
   // 서버 저장 함수
   const saveToServer = async () => {
+    // 변경 감지
+    const hasChanged =
+      JSON.stringify(previousDraftRef.current) !== JSON.stringify(draftData); // @type {boolean} - 변경 여부
+    // @description 이전 데이터와 현재 데이터 비교
+    // @reason 불필요한 저장 방지
+    if (!hasChanged) {
+      console.log('useAutoSaveServerSync - No changes detected, skipping save');
+      // @description 변경 없음 로그
+      // @reason 불필요한 저장 방지
+      setIsSavingLocal(false);
+      return;
+    }
+
     // 네트워크 상태 확인
     if (!isOnline) {
       console.log('useAutoSaveServerSync - Offline, skipping server save');
@@ -72,24 +89,26 @@ export default function useAutoSaveServerSync(
     }
 
     // 필수 필드 유효성 검사 (완화된 조건)
-    //====여기부터 수정됨====
     const isPostContentEmpty =
       draftData.postContent.trim() === '' ||
       draftData.postContent === '<p><br></p>';
+    //====여기부터 수정됨====
     if (
       !draftData.postTitle ||
       draftData.postTitle.trim() === '' ||
       !draftData.postContent ||
-      isPostContentEmpty
+      isPostContentEmpty ||
+      !draftData.draftId ||
+      draftData.draftId.trim() === ''
     ) {
       console.log(
-        'useAutoSaveServerSync - Missing required fields (title or content), skipping server save:',
+        'useAutoSaveServerSync - Missing required fields (title, content, or draftId), skipping server save:',
         draftData
       );
-      // @description 필수 필드 누락 로그 (title과 content만 확인)
+      // @description 필수 필드 누락 로그 (title, content, draftId 확인)
       // @reason 요청 실패 방지
-      // @why tags와 imageUrls는 백엔드에서 필수로 요구하지 않음
-      // @analogy 도서관에서 책 제목과 내용만 확인
+      // @why draftId가 백엔드에서 필수 필드로 요구됨
+      // @analogy 도서관에서 책 제목, 내용, 책 번호 확인
       setIsSavingLocal(false);
       return;
     }
@@ -105,6 +124,9 @@ export default function useAutoSaveServerSync(
     // @reason 요청 데이터 확인
     await autoSave(draftData); // @description 뮤테이션 호출
     // @reason 서버에 드래프트 데이터 저장
+    previousDraftRef.current = draftData; // @type {DraftState} - 이전 데이터 업데이트
+    // @description 현재 드래프트 데이터를 이전 데이터로 저장
+    // @reason 다음 변경 감지 준비
   };
 
   // 뮤테이션 결과 처리

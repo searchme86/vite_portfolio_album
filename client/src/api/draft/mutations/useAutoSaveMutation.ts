@@ -121,28 +121,30 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
       }
 
       // 데이터 검증: 필수 필드 확인 (완화된 조건)
-      //====여기부터 수정됨====
       const isPostContentEmpty =
         draftData.postContent.trim() === '' ||
         draftData.postContent === '<p><br></p>';
+      //====여기부터 수정됨====
       if (
         !draftData.postTitle ||
         draftData.postTitle.trim() === '' ||
         !draftData.postContent ||
-        isPostContentEmpty
+        isPostContentEmpty ||
+        !draftData.draftId ||
+        draftData.draftId.trim() === ''
       ) {
         console.log(
-          'useAutoSaveMutation - Missing required fields (title or content), skipping save:',
+          'useAutoSaveMutation - Missing required fields (title, content, or draftId), skipping save:',
           draftData
         );
-        // @description 필수 필드 누락 로그 (title과 content만 확인)
+        // @description 필수 필드 누락 로그 (title, content, draftId 확인)
         // @reason 저장 요청 스킵 (백엔드 요구사항 충족)
-        // @why tags와 imageUrls는 백엔드에서 필수로 요구하지 않음
-        // @analogy 도서관에서 책 제목과 내용만 확인
+        // @why draftId가 백엔드에서 필수로 요구됨
+        // @analogy 도서관에서 책 제목, 내용, 책 번호 확인
         return {
           success: false,
           draftId: '',
-          message: 'Required fields (title or content) are missing',
+          message: 'Required fields (title, content, or draftId) are missing',
         }; // @type {AutoSaveResponse} - 실패 응답 반환
         // @description 에러 대신 실패 응답 반환
         // @reason 상위에서 에러로 처리되지 않도록

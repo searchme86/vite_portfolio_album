@@ -3,7 +3,7 @@
  * @description 드래프트 데이터를 localStorage에 자동저장하는 커스텀 훅
  * @location src/components/post/PostDraft/PostAutoSave/hooks/useAutoSaveLocalStorage.ts
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { DraftState } from '../../../../../stores/draft/initialDraftState';
 
 interface AutoSaveLocalStorageResult {
@@ -23,21 +23,38 @@ export function useAutoSaveLocalStorage(
   // @description 로컬 저장 진행 상태 관리
   // @reason 저장 상태를 UI에 반영
 
-  // 드래프트 데이터가 변경될 때마다 로컬 스토리지에 저장
+  const previousDraftRef = useRef<DraftState | null>(null); // @type {DraftState | null} - 이전 드래프트 데이터
+  // @description 이전 드래프트 데이터 저장
+  // @reason 변경 감지
+
+  // 드래프트 데이터가 변경될 때만 로컬 스토리지에 저장
   useEffect(() => {
+    // 변경 감지
+    const hasChanged =
+      JSON.stringify(previousDraftRef.current) !== JSON.stringify(draft); // @type {boolean} - 변경 여부
+    // @description 이전 데이터와 현재 데이터 비교
+    // @reason 불필요한 저장 방지
+
+    if (!hasChanged) {
+      console.log(
+        'useAutoSaveLocalStorage - No changes detected, skipping save'
+      );
+      // @description 변경 없음 로그
+      // @reason 불필요한 저장 방지
+      return;
+    }
+
     const saveToLocalStorage = async () => {
       try {
         setIsSaving(true); // @description 저장 시작 시 상태 업데이트
         // @reason UI에 저장 중임을 표시
 
-        //====여기부터 수정됨====
         // 기존 데이터 삭제
         localStorage.removeItem(DRAFT_STORAGE_KEY); // @type {Function} - 로컬 스토리지에서 기존 데이터 삭제
         // @description 이전 드래프트 데이터 제거
         // @reason 최신 데이터만 유지하기 위해
         // @why 이전 데이터를 삭제하지 않으면 로컬 스토리지에 누적됨
         // @analogy 도서관에서 오래된 책을 치우고 새 책만 남김
-        //====여기까지 수정됨====
 
         // 새로운 데이터 저장
         const serializedDraft = JSON.stringify({
@@ -60,6 +77,9 @@ export function useAutoSaveLocalStorage(
       } finally {
         setIsSaving(false); // @description 저장 완료 후 상태 업데이트
         // @reason UI에 저장 완료 표시
+        previousDraftRef.current = draft; // @type {DraftState} - 이전 데이터 업데이트
+        // @description 현재 드래프트 데이터를 이전 데이터로 저장
+        // @reason 다음 변경 감지 준비
       }
     };
 

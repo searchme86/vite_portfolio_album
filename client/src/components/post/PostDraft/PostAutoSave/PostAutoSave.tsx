@@ -7,6 +7,9 @@ import { useAutoSave } from './hooks/useAutoSave';
 import AutoSaveNotification from './parts/AutoSaveNotification';
 import useGetDraftState from '@/stores/draft/useGetDraftState';
 import { useCheckAuthToken } from '@/hooks/useCheckUserAuthToken';
+import { v4 as uuidv4 } from 'uuid'; // @type {Function} - UUID 생성 함수
+// @description 고유 ID 생성
+// @reason draftId 생성
 
 interface PostWriteFormData {
   postTitle: string; // @type {string} - 포스트 제목
@@ -57,6 +60,16 @@ function PostAutoSave({ formData, imageUrls }: PostAutoSaveProps) {
     ), // @type {string[]} - 이미지 URL
     // @description 전달받은 이미지 URL 사용, 없으면 스토어에서, 빈 URL 제거
     // @reason 백엔드 요구 필수 필드 보장
+    //====여기부터 수정됨====
+    draftId:
+      draftFromStore.draftId && draftFromStore.draftId.trim() !== ''
+        ? draftFromStore.draftId
+        : uuidv4(), // @type {string} - 드래프트 ID (필수)
+    // @description draftId가 비어 있거나 유효하지 않으면 새 UUID 생성
+    // @reason 백엔드에서 draftId를 필수 필드로 요구
+    // @why 빈 draftId로 인해 400 에러 발생
+    // @analogy 도서관에서 책 번호가 없으면 새 번호 부여
+    //====여기까지 수정됨====
   };
 
   // 디버깅 로그: 드래프트 데이터 확인
