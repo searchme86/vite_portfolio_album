@@ -72,18 +72,12 @@ export default function useAutoSaveServerSync(
     }
 
     setIsSavingLocal(true);
-    //====여기부터 수정됨====
     console.log(
       'useAutoSaveServerSync - Sending auto-save request:',
       draftData
     );
-    // @description 요청 전송 로그 추가
-    // @reason 요청이 서버에 도달하는지 확인
     await autoSave(draftData);
     previousDraftRef.current = { ...draftData };
-    // @description 변경 감지 후 콘솔 출력 조건
-    // @reason 불필요한 콘솔 줄이기
-    //====여기까지 수정됨====
   };
 
   useEffect(() => {
@@ -91,7 +85,12 @@ export default function useAutoSaveServerSync(
       const now = new Date();
       setLastSaved(now);
       setIsSavingLocal(false);
-      console.log('useAutoSaveServerSync - Last saved updated:', now);
+      console.log('useAutoSaveServerSync - Draft saved to DB successfully:', {
+        draftId: data.draftId,
+        timestamp: now,
+      });
+      // @description DB 저장 성공 로그
+      // @reason 저장 여부 확인
     } else if (error) {
       console.log('useAutoSaveServerSync - Save failed:', error.message);
       setLastSaved(new Date());

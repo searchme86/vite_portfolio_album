@@ -32,15 +32,21 @@ const autoSaveDraftService = async (userId, draftData) => {
     };
 
     //====여기부터 수정됨====
-    // 항상 업데이트로 처리, 기존 데이터 덮어쓰기
+    // 동일 userId를 가진 모든 이전 드래프트 삭제
+    await DraftModel.deleteMany({
+      userId,
+      draftId: { $ne: draftData.draftId },
+    });
+    // @description 동일 userId에 다른 draftId를 가진 데이터 삭제
+    // @reason 최신 데이터만 유지
+    // @why 이전 데이터 누적으로 인한 문제 해결
+
+    // 최신 데이터 저장
     const result = await DraftModel.updateOne(
       { draftId: draftData.draftId, userId },
       { $set: draftToSave },
       { upsert: true, runValidators: true }
     );
-    // @description upsert: true로 새 데이터 생성 가능
-    // @reason 기존 데이터 없으면 생성, 있으면 덮어쓰기
-    // @why 사용자가 이전 데이터 삭제 대신 덮어쓰기를 원함
     if (result.matchedCount === 0 && result.upsertedCount === 0) {
       throw new Error('Database update failed, no document matched or created');
     }
@@ -48,8 +54,6 @@ const autoSaveDraftService = async (userId, draftData) => {
       draftId: draftData.draftId,
       userId,
     });
-    // @description 저장 성공 시 조건적 로그
-    // @reason 불필요한 콘솔 줄이기
     //====여기까지 수정됨====
 
     return draftToSave;
@@ -65,9 +69,7 @@ const autoSaveDraftService = async (userId, draftData) => {
       createdAt: draftData.createdAt || new Date().toISOString(),
       isTemporary: draftData.isTemporary || false,
     };
-    throw error; // 명확한 에러 전달
-    // @description 에러를 상위로 전달
-    // @reason DB 저장 실패 식별
+    throw error;
   }
 };
 

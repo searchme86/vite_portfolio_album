@@ -44,7 +44,6 @@ const autoSaveDraftController = async (req, res) => {
       message: 'Draft auto-saved successfully',
     });
   } catch (error) {
-    //====여기부터 수정됨====
     console.error('autoSaveDraftController - Auto-save failed:', {
       message: error.message,
       stack: error.stack,
@@ -54,9 +53,6 @@ const autoSaveDraftController = async (req, res) => {
       draftId: req.body?.draftId || '',
       message: error.message || 'Failed to auto-save draft',
     });
-    // @description 명확한 에러 응답
-    // @reason DB 저장 실패 식별 가능
-    //====여기까지 수정됨====
   }
 };
 
