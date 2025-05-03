@@ -8,184 +8,125 @@ import useAutoSaveMutation from '../../../../../api/draft/mutations/useAutoSaveM
 import type { DraftState } from '../../../../../stores/draft/initialDraftState';
 
 interface AutoSaveServerSyncResult {
-  isSaving: boolean; // @type {boolean} - 저장 중 여부
-  lastSaved: Date | null; // @type {Date | null} - 마지막 저장 시간
+  isSaving: boolean;
+  lastSaved: Date | null;
 }
 
-// 커스텀 훅 정의
 export default function useAutoSaveServerSync(
-  draftData: DraftState, // @type {DraftState} - 드래프트 데이터
-  isOnline: boolean, // @type {boolean} - 네트워크 상태
-  isSignedIn: boolean | undefined, // @type {boolean | undefined} - 로그인 상태
-  getToken: () => Promise<string | null> // @type {Function} - 토큰 가져오기 함수
+  draftData: DraftState,
+  isOnline: boolean,
+  isSignedIn: boolean | undefined,
+  getToken: () => Promise<string | null>
 ): AutoSaveServerSyncResult {
-  const { autoSave, isPending, error, data } = useAutoSaveMutation(); // @type {Object} - 뮤테이션 상태
-  // @description TanStack Query 뮤테이션 훅 호출
-  // @reason 서버 요청 관리
-  // @analogy 도서관에서 서버 저장 도구 가져오기
+  const { autoSave, isPending, error, data } = useAutoSaveMutation();
+  const [lastSaved, setLastSaved] = useState<Date | null>(new Date());
+  const [isSavingLocal, setIsSavingLocal] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const previousDraftRef = useRef<DraftState | null>(null);
 
-  const [lastSaved, setLastSaved] = useState<Date | null>(new Date()); // @type {Date | null} - 마지막 저장 시간
-  // @description 마지막 저장 시간 상태 초기화 (null이 아닌 기본값)
-  // @reason lastSaved가 null로 유지되지 않도록 보장
-  // @analogy 도서관에서 처음 저장 시간을 현재 시간으로 설정
-
-  const [isSavingLocal, setIsSavingLocal] = useState(false); // @type {boolean} - 로컬 저장 상태
-  // @description 로컬에서 관리하는 isSaving 상태
-  // @reason 에러 발생 시도 애니메이션 유지
-  // @analogy 도서관에서 저장 중 표시 유지
-
-  const intervalRef = useRef<NodeJS.Timeout | null>(null); // @type {NodeJS.Timeout | null} - 인터벌 참조
-  // @description 주기적 저장을 위한 인터벌 참조
-  // @reason 주기적 저장 관리
-  // @analogy 도서관에서 주기적 저장 타이머
-
-  const previousDraftRef = useRef<DraftState | null>(null); // @type {DraftState | null} - 이전 드래프트 데이터
-  // @description 이전 드래프트 데이터 저장
-  // @reason 변경 감지
-
-  // 서버 저장 함수
   const saveToServer = async () => {
-    // 변경 감지
     const hasChanged =
-      JSON.stringify(previousDraftRef.current) !== JSON.stringify(draftData); // @type {boolean} - 변경 여부
-    // @description 이전 데이터와 현재 데이터 비교
-    // @reason 불필요한 저장 방지
+      JSON.stringify(previousDraftRef.current) !== JSON.stringify(draftData);
     if (!hasChanged) {
       console.log('useAutoSaveServerSync - No changes detected, skipping save');
-      // @description 변경 없음 로그
-      // @reason 불필요한 저장 방지
       setIsSavingLocal(false);
       return;
     }
 
-    // 네트워크 상태 확인
     if (!isOnline) {
       console.log('useAutoSaveServerSync - Offline, skipping server save');
-      // @description 오프라인 상태 로그
-      // @reason 서버 저장 스킵
       setIsSavingLocal(false);
       return;
     }
 
-    // 로그인 상태 확인
     if (isSignedIn !== true) {
       console.log(
         'useAutoSaveServerSync - Not signed in, skipping server save'
       );
-      // @description 로그인 안됨 로그
-      // @reason 서버 저장 스킵
       setIsSavingLocal(false);
       return;
     }
 
-    // 토큰 확인
     const token = await getToken();
     if (!token) {
       console.log('useAutoSaveServerSync - No token, skipping server save');
-      // @description 토큰 없음 로그
-      // @reason 서버 저장 스킵
       setIsSavingLocal(false);
       return;
     }
 
-    // 필수 필드 유효성 검사 (완화된 조건)
-    const isPostContentEmpty =
-      draftData.postContent.trim() === '' ||
-      draftData.postContent === '<p><br></p>';
-    //====여기부터 수정됨====
     if (
       !draftData.postTitle ||
       draftData.postTitle.trim() === '' ||
       !draftData.postContent ||
-      isPostContentEmpty ||
+      draftData.postContent.trim() === '' ||
+      draftData.postContent === '<p><br></p>' ||
       !draftData.draftId ||
       draftData.draftId.trim() === ''
     ) {
       console.log(
-        'useAutoSaveServerSync - Missing required fields (title, content, or draftId), skipping server save:',
+        'useAutoSaveServerSync - Missing required fields, skipping save:',
         draftData
       );
-      // @description 필수 필드 누락 로그 (title, content, draftId 확인)
-      // @reason 요청 실패 방지
-      // @why draftId가 백엔드에서 필수 필드로 요구됨
-      // @analogy 도서관에서 책 제목, 내용, 책 번호 확인
       setIsSavingLocal(false);
       return;
     }
-    //====여기까지 수정됨====
 
-    // 서버 저장 시도
-    setIsSavingLocal(true); // 저장 시작
+    //====여기부터 수정됨====
+    setIsSavingLocal(true);
     console.log(
       'useAutoSaveServerSync - Attempting to save draft to server:',
       draftData
     );
-    // @description 서버 저장 시도 로그
-    // @reason 요청 데이터 확인
-    await autoSave(draftData); // @description 뮤테이션 호출
-    // @reason 서버에 드래프트 데이터 저장
-    previousDraftRef.current = draftData; // @type {DraftState} - 이전 데이터 업데이트
-    // @description 현재 드래프트 데이터를 이전 데이터로 저장
-    // @reason 다음 변경 감지 준비
+    await autoSave(draftData);
+    previousDraftRef.current = { ...draftData }; // 깊은 복사로 변경 감지 보장
+    // @description 이전 데이터에 깊은 복사 적용
+    // @reason 동일한 참조 문제로 인해 변경 감지 실패 방지
+    //====여기까지 수정됨====
   };
 
-  // 뮤테이션 결과 처리
   useEffect(() => {
     if (data?.success) {
       const now = new Date();
       setLastSaved(now);
       setIsSavingLocal(false);
       console.log('useAutoSaveServerSync - Last saved updated:', now);
-      // @description 성공 시 마지막 저장 시간 업데이트
-      // @reason 사용자에게 최신 저장 시간 표시
     } else if (error) {
       console.log('useAutoSaveServerSync - Save failed:', error.message);
-      setLastSaved(new Date()); // 에러 발생 시에도 기본값 설정
-      setIsSavingLocal(false); // 에러 후 저장 중지
-      // @description 에러 발생 시 기본값 설정
-      // @reason lastSaved가 null이 되지 않도록 보장
+      setLastSaved(new Date());
+      setIsSavingLocal(false);
     } else if (!data && !error) {
-      // 데이터도 없고 에러도 없으면 기본값 유지
       console.log('useAutoSaveServerSync - No data, keeping default lastSaved');
-      // @description 기본값 유지 로그
-      // @reason lastSaved가 null이 되지 않도록 보장
     }
   }, [data, error]);
 
-  // 주기적 저장 설정
   useEffect(() => {
     console.log('useAutoSaveServerSync - Setting up auto-save interval');
-    // @description 인터벌 설정 로그
-    // @reason 주기적 저장 시작
-
+    //====여기부터 수정됨====
     intervalRef.current = setInterval(async () => {
       await saveToServer();
-    }, 30000); // 30초마다 저장
+    }, 5000); // 5초로 단축
+    // @description 인터벌을 5초로 변경
+    // @reason 10초 이내 애니메이션 트리거 보장
+    // @why 30초 설정으로 인해 지연 발생
+    //====여기까지 수정됨====
 
     if (error) {
       console.log(
         'useAutoSaveServerSync - Error occurred, but continuing auto-save:',
         error.message
       );
-      // @description 에러 발생 시 로그
-      // @reason 에러에도 불구하고 저장 지속
     }
 
-    // cleanup
     return () => {
       if (intervalRef.current) {
         console.log('useAutoSaveServerSync - Cleaning up auto-save interval');
         clearInterval(intervalRef.current);
-        // @description 인터벌 정리 로그
-        // @reason 메모리 누수 방지
       }
     };
   }, [draftData, error, isOnline, isSignedIn]);
 
   return {
-    isSaving: isSavingLocal || isPending, // @type {boolean} - 저장 진행 상태
-    // @description 로컬 상태 또는 뮤테이션 대기 상태로 isSaving 결정
-    // @reason 에러 발생 시도 애니메이션 유지
-    lastSaved, // @type {Date | null} - 마지막 저장 시간
+    isSaving: isSavingLocal || isPending,
+    lastSaved,
   };
 }
