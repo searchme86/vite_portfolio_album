@@ -136,8 +136,8 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
     // @reason 사용자 알림
   } else {
     content = (
-      <div className="max-w-4xl p-4 mx-auto">
-        <div className="mb-8">
+      <div className="relative max-w-4xl p-4 mx-auto">
+        <div className="mb-8 ">
           <h1 className="mb-4 text-2xl font-bold">Create a New Post</h1>
           <PostAutoSave formData={formData} imageUrls={imageUrls} />{' '}
           {/* PostAutoSave 컴포넌트 */}

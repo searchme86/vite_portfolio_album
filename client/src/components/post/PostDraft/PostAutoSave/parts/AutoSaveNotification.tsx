@@ -68,7 +68,7 @@ function AutoSaveNotification({
       ref={notificationRef}
       style={{
         opacity: 0, // 초기 투명도 설정
-        position: 'fixed',
+        // position: 'absolute',
         top: 0,
         width: '100%',
         zIndex: 1000,
