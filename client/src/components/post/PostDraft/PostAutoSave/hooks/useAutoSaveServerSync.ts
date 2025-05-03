@@ -71,16 +71,18 @@ export default function useAutoSaveServerSync(
       return;
     }
 
-    //====여기부터 수정됨====
     setIsSavingLocal(true);
+    //====여기부터 수정됨====
     console.log(
-      'useAutoSaveServerSync - Attempting to save draft to server:',
+      'useAutoSaveServerSync - Sending auto-save request:',
       draftData
     );
+    // @description 요청 전송 로그 추가
+    // @reason 요청이 서버에 도달하는지 확인
     await autoSave(draftData);
-    previousDraftRef.current = { ...draftData }; // 깊은 복사로 변경 감지 보장
-    // @description 이전 데이터에 깊은 복사 적용
-    // @reason 동일한 참조 문제로 인해 변경 감지 실패 방지
+    previousDraftRef.current = { ...draftData };
+    // @description 변경 감지 후 콘솔 출력 조건
+    // @reason 불필요한 콘솔 줄이기
     //====여기까지 수정됨====
   };
 
@@ -101,14 +103,9 @@ export default function useAutoSaveServerSync(
 
   useEffect(() => {
     console.log('useAutoSaveServerSync - Setting up auto-save interval');
-    //====여기부터 수정됨====
     intervalRef.current = setInterval(async () => {
       await saveToServer();
-    }, 5000); // 5초로 단축
-    // @description 인터벌을 5초로 변경
-    // @reason 10초 이내 애니메이션 트리거 보장
-    // @why 30초 설정으로 인해 지연 발생
-    //====여기까지 수정됨====
+    }, 5000);
 
     if (error) {
       console.log(

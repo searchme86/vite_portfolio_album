@@ -38,24 +38,25 @@ const autoSaveDraftController = async (req, res) => {
 
     const savedDraft = await autoSaveDraftService(userId, draftData);
 
-    console.log('autoSaveDraftController - Draft saved:', savedDraft);
-
     return res.status(200).json({
       success: true,
       draftId: savedDraft.draftId,
       message: 'Draft auto-saved successfully',
     });
   } catch (error) {
+    //====여기부터 수정됨====
     console.error('autoSaveDraftController - Auto-save failed:', {
       message: error.message,
       stack: error.stack,
     });
-    const fallbackResponse = {
+    return res.status(500).json({
       success: false,
       draftId: req.body?.draftId || '',
       message: error.message || 'Failed to auto-save draft',
-    };
-    return res.status(500).json(fallbackResponse);
+    });
+    // @description 명확한 에러 응답
+    // @reason DB 저장 실패 식별 가능
+    //====여기까지 수정됨====
   }
 };
 
