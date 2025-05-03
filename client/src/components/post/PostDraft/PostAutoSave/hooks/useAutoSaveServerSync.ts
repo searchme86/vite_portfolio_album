@@ -49,8 +49,15 @@ export default function useAutoSaveServerSync(
       const now = new Date();
       setLastSaved(now);
       console.log('useAutoSaveServerSync - Last saved updated:', now);
+    } else if (!data && !error) {
+      // 데이터가 없고 에러도 없으면 기본값 설정
+      setLastSaved(new Date());
+      console.log('useAutoSaveServerSync - No data, setting default lastSaved');
+    } else if (error) {
+      console.log('useAutoSaveServerSync - Save failed:', error.message);
+      setLastSaved(new Date()); // 에러 발생 시에도 기본값 설정
     }
-  }, [data]);
+  }, [data, error]);
 
   useEffect(() => {
     console.log('useAutoSaveServerSync - Setting up auto-save interval');

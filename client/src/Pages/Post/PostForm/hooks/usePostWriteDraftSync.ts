@@ -105,7 +105,7 @@ export function usePostWriteDraftSync(
         'usePostWriteDraftSync - Draft updated with form data and image URLs'
       );
       // @description 드래프트 업데이트 완료 로그
-    }, 300), // 300ms 디바운싱
+    }, 6000), // 300ms 디바운싱
     [updateDraft] // @description 의존성 배열: updateDraft 변경 시 새로운 디바운싱 함수 생성
   );
   // @description 디바운싱된 updateDraft 함수 생성
