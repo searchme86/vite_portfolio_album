@@ -22,7 +22,7 @@ import { getOrCreateCsrfToken } from '../utils/csrfTokenUtil'; // @type {Functio
 // @analogy 도서관에서 요청서에 인증 코드 추가
 
 // AxiosInstance 타입 확장
-// @description AxiosInstance에 isCancel 메서드 추가
+// @description AxiosInstance에 isCancel과 isAxiosError 메서드 추가
 // @reason 타입 안정성 보장
 // @analogy 도서관에서 우체부에게 새 기능 추가
 interface CustomAxiosInstance extends AxiosInstance {
@@ -30,6 +30,10 @@ interface CustomAxiosInstance extends AxiosInstance {
   // @description axios.isCancel 메서드 타입 정의
   // @reason 타입스크립트에서 isCancel 사용 가능
   // @analogy 도서관에서 우체부에게 취소 확인 기능 추가
+  isAxiosError: typeof axios.isAxiosError; // @type {Function} - Axios 에러 확인 메서드
+  // @description axios.isAxiosError 메서드 타입 정의
+  // @reason 타입스크립트에서 isAxiosError 사용 가능
+  // @analogy 도서관에서 우체부에게 에러 확인 기능 추가
 }
 
 // axios 인스턴스 생성
@@ -56,7 +60,7 @@ export const axiosBase = axios.create({
     // @analogy 도서관에서 우체부에게 편지 형식 지정
   },
 }) as CustomAxiosInstance; // @type {CustomAxiosInstance} - 커스텀 타입으로 캐스팅
-// @description 커스텀 타입으로 캐스팅하여 isCancel 사용 가능
+// @description 커스텀 타입으로 캐스팅하여 isCancel, isAxiosError 사용 가능
 // @reason 타입 안정성 보장
 // @analogy 도서관에서 우체부에게 새 기능 추가 후 사용 가능
 
@@ -68,6 +72,15 @@ axiosBase.isCancel = axios.isCancel; // @type {Function} - axios.isCancel 메서
 // @description axios의 isCancel 메서드를 axiosBase에 추가
 // @reason 코드 일관성 유지
 // @analogy 도서관에서 우체부에게 본사의 취소 확인 기능을 빌려줌
+
+// isAxiosError 메서드 추가
+// @description axiosBase에 isAxiosError 메서드 추가
+// @reason 인스턴스에서 직접 isAxiosError 사용 가능
+// @analogy 도서관에서 우체부에게 에러 확인 기능 추가
+axiosBase.isAxiosError = axios.isAxiosError; // @type {Function} - axios.isAxiosError 메서드 할당
+// @description axios의 isAxiosError 메서드를 axiosBase에 추가
+// @reason 코드 일관성 유지
+// @analogy 도서관에서 우체부에게 본사의 에러 확인 기능을 빌려줌
 
 // 요청 인터셉터에 CSRF 토큰 추가
 // @description 모든 요청에 CSRF 토큰 포함
@@ -96,20 +109,21 @@ axiosBase.isCancel = axios.isCancel; // @type {Function} - axios.isCancel 메서
 //   }
 // );
 
-// // 인터셉터 적용
-// // @description 요청 및 응답 처리 규칙 설정
-// // @reason 공통 로직 적용
-// // @analogy 도서관에서 요청서 처리 규칙 적용
+// 인터셉터 적용
+// @description 요청 및 응답 처리 규칙 설정
+// @reason 공통 로직 적용
+// @analogy 도서관에서 요청서 처리 규칙 적용
 // combineInterceptors(axiosBase); // @type {Function} - 인터셉터 적용 함수 호출
-// // @description combineInterceptors 함수로 인터셉터 설정
-// // @reason 요청 및 응답 처리 규칙 적용
-// // @analogy 도서관에서 요청서 처리 규칙 적용
+// @description combineInterceptors 함수로 인터셉터 설정
+// @reason 요청 및 응답 처리 규칙 적용
+// @analogy 도서관에서 요청서 처리 규칙 적용
 
 // **작동 매커니즘**
 // 1. `axios.create`로 인스턴스 생성: 기본 URL, 타임아웃, 쿠키 설정.
-// 2. `CustomAxiosInstance` 타입 정의: `isCancel` 메서드 포함하도록 타입 확장.
+// 2. `CustomAxiosInstance` 타입 정의: `isCancel`, `isAxiosError` 메서드 포함하도록 타입 확장.
 // 3. `axiosBase.isCancel` 추가: `axios.isCancel` 메서드를 할당.
-// 4. 요청 인터셉터 설정: CSRF 토큰 추가.
-// 5. `combineInterceptors` 호출: 추가 인터셉터 적용.
+// 4. `axiosBase.isAxiosError` 추가: `axios.isAxiosError` 메서드를 할당.
+// 5. 요청 인터셉터 설정: CSRF 토큰 추가.
+// 6. `combineInterceptors` 호출: 추가 인터셉터 적용.
 // @reason 요청 설정을 중앙에서 관리하여 유지보수성 향상.
 // @analogy 도서관에서 우체부에게 기본 규칙과 새 기능을 정해줌.

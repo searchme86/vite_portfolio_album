@@ -120,7 +120,7 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
         // @analogy 도서관에서 회원증 번호 없으면 소리침
       }
 
-      // 데이터 검증: postTitle과 postDesc가 비어 있으면 요청 스킵
+      // 데이터 검증: postTitle과 postContent가 비어 있으면 요청 스킵
       if (!draftData.postTitle || draftData.postTitle.trim() === '') {
         console.log('useAutoSaveMutation - postTitle is empty, skipping save');
         // @description postTitle 빈 값 로그
@@ -136,15 +136,17 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
         // @analogy 도서관에서 저장 안 했다고 조용히 알림
       }
 
-      if (!draftData.postDesc || draftData.postDesc.trim() === '') {
-        console.log('useAutoSaveMutation - postDesc is empty, skipping save');
-        // @description postDesc 빈 값 로그
+      if (!draftData.postContent || draftData.postContent.trim() === '') {
+        console.log(
+          'useAutoSaveMutation - postContent is empty, skipping save'
+        );
+        // @description postContent 빈 값 로그
         // @reason 저장 요청 스킵 (사용자가 아직 입력하지 않은 상태)
-        // @analogy 도서관에서 책 설명이 없으면 저장 안 함
+        // @analogy 도서관에서 책 내용이 없으면 저장 안 함
         return {
           success: false,
           draftId: '',
-          message: 'postDesc is empty',
+          message: 'postContent is empty',
         }; // @type {AutoSaveResponse} - 실패 응답 반환
         // @description 에러 대신 실패 응답 반환
         // @reason 상위에서 에러로 처리되지 않도록
@@ -206,23 +208,37 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
         // @reason 상위 함수에서 응답 사용
         // @analogy 도서관에서 저장 확인 메시지 반환
       } catch (error: unknown) {
-        //====여기부터 수정됨====
-        if (error instanceof Error) {
-          // 에러 처리: useAxiosErrorHandler 사용
+        if (error instanceof Error && axiosBase.isAxiosError(error)) {
           const errorDetails = handleAxiosError(error); // @type {Object} - 에러 세부 정보
-          // @description 에러 처리 훅으로 에러 정보 추출
+          // @description Axios 에러 처리 훅으로 에러 정보 추출
           // @reason 에러 처리 중앙화 및 타입 안전성 보장
           // @analogy 도서관에서 에러 처리 직원에게 에러 편지 전달
-          throw new Error(errorDetails.message); // @description 에러 발생
+          console.log(
+            'useAutoSaveMutation - Axios error details:',
+            errorDetails
+          );
+          // @description Axios 에러 로그
+          // @reason 에러 디버깅
+          throw new Error(errorDetails.message || 'Unknown Axios error');
+          // @description 에러 발생
           // @reason onError를 트리거하여 사용자에게 알림
           // @analogy 도서관에서 문제 소리침
+        } else if (error instanceof Error) {
+          console.log('useAutoSaveMutation - Generic error:', error.message);
+          // @description 일반 에러 로그
+          // @reason 에러 디버깅
+          throw error; // @description 에러 발생
+          // @reason onError를 트리거하여 사용자에게 알림
+          // @analogy 도서관에서 문제 소리침
+        } else {
+          console.log('useAutoSaveMutation - Unknown error type:', error);
+          // @description 알 수 없는 에러 로그
+          // @reason 에러 디버깅
+          throw new Error('Unknown error occurred');
+          // @description 기본 에러 발생
+          // @reason onError를 트리거하여 사용자에게 알림
+          // @analogy 도서관에서 알 수 없는 문제로 소리침
         }
-
-        // Fallback: 알 수 없는 에러 처리
-        throw new Error('Unknown error occurred'); // @description 기본 에러 발생
-        // @reason onError를 트리거하여 사용자에게 알림
-        // @analogy 도서관에서 알 수 없는 문제로 소리침
-        //====여기까지 수정됨====
       } finally {
         clearTimeout(timeoutId); // @description 타임아웃 정리
         // @reason 리소스 정리
@@ -300,7 +316,7 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
 // 3. `DraftState` 타입 사용: `initialDraftState`에서 가져온 드래프트 데이터 타입 사용.
 // 4. `AutoSaveResponse` 타입 정의: 서버 응답 데이터 구조 정의.
 // 5. `useMutation` 훅 호출: React Query로 자동저장 mutation 정의.
-// 6. 인증 및 데이터 검증: `isSignedIn`, 토큰 확인 후 실패 시 throw, `postTitle`, `postDesc` 확인 후 실패 응답 반환.
+// 6. 인증 및 데이터 검증: `isSignedIn`, 토큰 확인 후 실패 시 throw, `postTitle`, `postContent` 확인 후 실패 응답 반환.
 // 7. `getToken`으로 토큰 가져오기: 인증된 요청을 위해 토큰 동적으로 획득.
 // 8. `AbortController`로 요청 관리: 요청 취소 가능하도록 설정.
 // 9. `axiosBase.post`로 요청: `http://localhost:3000/draft/auto-save`로 데이터 전송.
