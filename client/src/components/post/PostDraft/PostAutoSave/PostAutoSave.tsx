@@ -31,23 +31,31 @@ function PostAutoSave({ formData, imageUrls }: PostAutoSaveProps) {
   // @reason 기존 드래프트 데이터와 병합
   // @analogy 도서관에서 기존 기록부 가져오기
 
-  // 드래프트 객체 생성 (필수 필드 기본값 보장)
+  // 드래프트 객체 생성 (필수 필드 유효성 보장)
   const draft = {
     ...draftFromStore,
-    postTitle: formData.postTitle || draftFromStore.postTitle || '', // @type {string} - 제목 (필수)
-    // @description 폼에서 제목 가져오기, 없으면 스토어에서, 그것도 없으면 빈 문자열 (fallback)
+    postTitle:
+      (formData.postTitle || draftFromStore.postTitle || '').trim() ||
+      'Untitled', // @type {string} - 제목 (필수)
+    // @description 폼에서 제목 가져오기, 없으면 스토어에서, 빈 문자열 제거 후 기본값 'Untitled'
+    // @reason 백엔드 요구 필수 필드 보장 및 400 에러 방지
+    postDesc: (formData.postDesc || draftFromStore.postDesc || '').trim() || '', // @type {string} - 설명
+    // @description 폼에서 설명 가져오기, 없으면 스토어에서, 빈 문자열 제거
+    // @reason 백엔드 요구 선택 필드 보장
+    postContent:
+      (formData.postContent || draftFromStore.postContent || '').trim() ||
+      'No content', // @type {string} - 본문 (필수)
+    // @description 폼에서 본문 가져오기, 없으면 스토어에서, 빈 문자열 제거 후 기본값 'No content'
+    // @reason 백엔드 요구 필수 필드 보장 및 400 에러 방지
+    tags: (formData.tags || draftFromStore.tags || []).filter(
+      (tag) => tag.trim() !== ''
+    ), // @type {string[]} - 태그 (필수)
+    // @description 폼에서 태그 가져오기, 없으면 스토어에서, 빈 태그 제거
     // @reason 백엔드 요구 필수 필드 보장
-    postDesc: formData.postDesc || draftFromStore.postDesc || '', // @type {string} - 설명 (필수)
-    // @description 폼에서 설명 가져오기, 없으면 스토어에서, 그것도 없으면 빈 문자열 (fallback)
-    // @reason 백엔드 요구 필수 필드 보장
-    postContent: formData.postContent || draftFromStore.postContent || '', // @type {string} - 본문 (필수)
-    // @description 폼에서 본문 가져오기, 없으면 스토어에서, 그것도 없으면 빈 문자열 (fallback)
-    // @reason 백엔드 요구 필수 필드 보장
-    tags: formData.tags || draftFromStore.tags || [], // @type {string[]} - 태그 (필수)
-    // @description 폼에서 태그 가져오기, 없으면 스토어에서, 그것도 없으면 빈 배열 (fallback)
-    // @reason 백엔드 요구 필수 필드 보장
-    imageUrls: imageUrls || draftFromStore.imageUrls || [], // @type {string[]} - 이미지 URL (필수)
-    // @description 전달받은 이미지 URL 사용, 없으면 스토어에서, 그것도 없으면 빈 배열 (fallback)
+    imageUrls: (imageUrls || draftFromStore.imageUrls || []).filter(
+      (url) => url.trim() !== ''
+    ), // @type {string[]} - 이미지 URL
+    // @description 전달받은 이미지 URL 사용, 없으면 스토어에서, 빈 URL 제거
     // @reason 백엔드 요구 필수 필드 보장
   };
 

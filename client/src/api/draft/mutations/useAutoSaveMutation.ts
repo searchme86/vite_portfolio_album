@@ -120,33 +120,28 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
         // @analogy 도서관에서 회원증 번호 없으면 소리침
       }
 
-      // 데이터 검증: postTitle과 postContent가 비어 있으면 요청 스킵
-      if (!draftData.postTitle || draftData.postTitle.trim() === '') {
-        console.log('useAutoSaveMutation - postTitle is empty, skipping save');
-        // @description postTitle 빈 값 로그
-        // @reason 저장 요청 스킵 (사용자가 아직 입력하지 않은 상태)
-        // @analogy 도서관에서 책 제목이 없으면 저장 안 함
-        return {
-          success: false,
-          draftId: '',
-          message: 'postTitle is empty',
-        }; // @type {AutoSaveResponse} - 실패 응답 반환
-        // @description 에러 대신 실패 응답 반환
-        // @reason 상위에서 에러로 처리되지 않도록
-        // @analogy 도서관에서 저장 안 했다고 조용히 알림
-      }
-
-      if (!draftData.postContent || draftData.postContent.trim() === '') {
+      // 데이터 검증: 필수 필드 확인
+      if (
+        !draftData.postTitle ||
+        draftData.postTitle.trim() === '' ||
+        !draftData.postContent ||
+        draftData.postContent.trim() === '' ||
+        !draftData.tags ||
+        draftData.tags.length === 0 ||
+        !draftData.imageUrls ||
+        draftData.imageUrls.length === 0
+      ) {
         console.log(
-          'useAutoSaveMutation - postContent is empty, skipping save'
+          'useAutoSaveMutation - Missing required fields, skipping save:',
+          draftData
         );
-        // @description postContent 빈 값 로그
-        // @reason 저장 요청 스킵 (사용자가 아직 입력하지 않은 상태)
-        // @analogy 도서관에서 책 내용이 없으면 저장 안 함
+        // @description 필수 필드 누락 로그
+        // @reason 저장 요청 스킵 (백엔드 요구사항 충족)
+        // @analogy 도서관에서 책 제목, 내용, 태그, 이미지 없는 경우 저장 안 함
         return {
           success: false,
           draftId: '',
-          message: 'postContent is empty',
+          message: 'Required fields are missing',
         }; // @type {AutoSaveResponse} - 실패 응답 반환
         // @description 에러 대신 실패 응답 반환
         // @reason 상위에서 에러로 처리되지 않도록
@@ -264,7 +259,6 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
       // @description 사용자에게 에러 메시지 표시
       // @reason 사용자 경험 개선
       // @analogy 도서관에서 사용자에게 저장 실패 이유 알림
-      // 실제 구현 시 UI 라이브러리 사용 (예: react-toastify)
       console.log(
         'useAutoSaveMutation - Show toast notification:',
         error.message
@@ -316,7 +310,7 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
 // 3. `DraftState` 타입 사용: `initialDraftState`에서 가져온 드래프트 데이터 타입 사용.
 // 4. `AutoSaveResponse` 타입 정의: 서버 응답 데이터 구조 정의.
 // 5. `useMutation` 훅 호출: React Query로 자동저장 mutation 정의.
-// 6. 인증 및 데이터 검증: `isSignedIn`, 토큰 확인 후 실패 시 throw, `postTitle`, `postContent` 확인 후 실패 응답 반환.
+// 6. 인증 및 데이터 검증: `isSignedIn`, 토큰 확인 후 실패 시 throw, 모든 필수 필드(`postTitle`, `postContent`, `tags`, `imageUrls`) 확인.
 // 7. `getToken`으로 토큰 가져오기: 인증된 요청을 위해 토큰 동적으로 획득.
 // 8. `AbortController`로 요청 관리: 요청 취소 가능하도록 설정.
 // 9. `axiosBase.post`로 요청: `http://localhost:3000/draft/auto-save`로 데이터 전송.
