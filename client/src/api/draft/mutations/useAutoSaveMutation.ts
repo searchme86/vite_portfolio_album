@@ -120,33 +120,35 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
         // @analogy 도서관에서 회원증 번호 없으면 소리침
       }
 
-      // 데이터 검증: 필수 필드 확인
+      // 데이터 검증: 필수 필드 확인 (완화된 조건)
+      //====여기부터 수정됨====
+      const isPostContentEmpty =
+        draftData.postContent.trim() === '' ||
+        draftData.postContent === '<p><br></p>';
       if (
         !draftData.postTitle ||
         draftData.postTitle.trim() === '' ||
         !draftData.postContent ||
-        draftData.postContent.trim() === '' ||
-        !draftData.tags ||
-        draftData.tags.length === 0 ||
-        !draftData.imageUrls ||
-        draftData.imageUrls.length === 0
+        isPostContentEmpty
       ) {
         console.log(
-          'useAutoSaveMutation - Missing required fields, skipping save:',
+          'useAutoSaveMutation - Missing required fields (title or content), skipping save:',
           draftData
         );
-        // @description 필수 필드 누락 로그
+        // @description 필수 필드 누락 로그 (title과 content만 확인)
         // @reason 저장 요청 스킵 (백엔드 요구사항 충족)
-        // @analogy 도서관에서 책 제목, 내용, 태그, 이미지 없는 경우 저장 안 함
+        // @why tags와 imageUrls는 백엔드에서 필수로 요구하지 않음
+        // @analogy 도서관에서 책 제목과 내용만 확인
         return {
           success: false,
           draftId: '',
-          message: 'Required fields are missing',
+          message: 'Required fields (title or content) are missing',
         }; // @type {AutoSaveResponse} - 실패 응답 반환
         // @description 에러 대신 실패 응답 반환
         // @reason 상위에서 에러로 처리되지 않도록
         // @analogy 도서관에서 저장 안 했다고 조용히 알림
       }
+      //====여기까지 수정됨====
 
       // 요청 취소 컨트롤러 생성
       const controller = new AbortController(); // @type {AbortController} - 요청 취소 컨트롤러
@@ -303,20 +305,3 @@ export default function useAutoSaveMutation(): AutoSaveMutationResult {
   // @reason 컴포넌트에서 자동저장 기능 사용 가능
   // @analogy 도서관에서 책 저장 시스템과 상태 반환
 }
-
-// **작동 매커니즘**
-// 1. `useAuth`로 인증 상태 가져오기: Clerk에서 로그인 상태와 `getToken` 함수 가져옴.
-// 2. `useAxiosErrorHandler` 호출: 에러 처리 함수 가져옴.
-// 3. `DraftState` 타입 사용: `initialDraftState`에서 가져온 드래프트 데이터 타입 사용.
-// 4. `AutoSaveResponse` 타입 정의: 서버 응답 데이터 구조 정의.
-// 5. `useMutation` 훅 호출: React Query로 자동저장 mutation 정의.
-// 6. 인증 및 데이터 검증: `isSignedIn`, 토큰 확인 후 실패 시 throw, 모든 필수 필드(`postTitle`, `postContent`, `tags`, `imageUrls`) 확인.
-// 7. `getToken`으로 토큰 가져오기: 인증된 요청을 위해 토큰 동적으로 획득.
-// 8. `AbortController`로 요청 관리: 요청 취소 가능하도록 설정.
-// 9. `axiosBase.post`로 요청: `http://localhost:3000/draft/auto-save`로 데이터 전송.
-// 10. `handleAxiosError`로 에러 처리: 에러 발생 시 throw로 onError 트리거.
-// 11. `onSuccess`, `onError`, `onSettled` 콜백 정의: mutation 상태 디버깅 및 사용자 피드백.
-// 12. `handleAutoSave` 함수 정의: mutation 실행.
-// 13. `autoSave`, `isPending`, `error`, `data` 반환: 컴포넌트에서 상태와 함수 사용 가능.
-// @reason 자동저장 mutation 로직을 캡슐화하여 코드 재사용성과 유지보수성 향상.
-// @analogy 도서관에서 책을 주기적으로 저장하는 시스템.

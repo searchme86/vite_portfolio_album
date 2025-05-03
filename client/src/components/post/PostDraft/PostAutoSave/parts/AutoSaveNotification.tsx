@@ -1,10 +1,9 @@
 /**
  * @file AutoSaveNotification.tsx
  * @description 자동저장 상태와 애니메이션을 표시하는 알림 UI 컴포넌트
+ * @location src/components/post/PostDraft/PostAutoSave/parts/AutoSaveNotification.tsx
  */
-
 import { useRef, useEffect } from 'react';
-import useAutoSaveAnimation from '../hooks/useAutoSaveAnimation';
 
 interface AutoSaveNotificationProps {
   isSaving: boolean; // @type {boolean} - 저장 중 여부
@@ -23,8 +22,42 @@ function AutoSaveNotification({
     console.log('AutoSaveNotification - lastSaved:', lastSaved);
   }, [isSaving, lastSaved]);
 
-  // useAutoSaveAnimation 훅 호출 (lastSaved 기반으로 애니메이션 트리거)
-  useAutoSaveAnimation(lastSaved, notificationRef);
+  // 애니메이션 로직 직접 구현
+  //====여기부터 수정됨====
+  useEffect(() => {
+    if (notificationRef.current) {
+      if (isSaving) {
+        // 저장 중일 때 애니메이션 표시
+        notificationRef.current.style.opacity = '1'; // @type {string} - 투명도 설정
+        // @description 저장 중임을 알리기 위해 알림 표시
+        // @reason 사용자에게 저장 상태 피드백
+        // @analogy 도서관에서 "저장 중" 표지판 올리기
+        notificationRef.current.style.transition = 'opacity 0.3s ease-in'; // @type {string} - 전환 효과
+        // @description 부드러운 페이드인 효과
+        // @reason 시각적 부드러움 제공
+      } else if (lastSaved) {
+        // 저장 완료 시 애니메이션
+        notificationRef.current.style.opacity = '1'; // @type {string} - 투명도 설정
+        // @description 저장 완료 알림 표시
+        // @reason 사용자에게 완료 피드백
+        setTimeout(() => {
+          if (notificationRef.current) {
+            notificationRef.current.style.opacity = '0'; // @type {string} - 투명도 설정
+            // @description 일정 시간 후 알림 숨김
+            // @reason 불필요한 UI 방해 방지
+            notificationRef.current.style.transition = 'opacity 0.5s ease-out'; // @type {string} - 전환 효과
+            // @description 부드러운 페이드아웃 효과
+            // @reason 시각적 부드러움 제공
+          }
+        }, 2000); // 2초 후 숨김
+      }
+    }
+  }, [isSaving, lastSaved]);
+  // @description isSaving 또는 lastSaved 변경 시 애니메이션 실행
+  // @reason 저장 상태 변화에 반응
+  // @why 애니메이션 동작 보장
+  // @analogy 도서관에서 저장 상태에 따라 표지판 업데이트
+  //====여기까지 수정됨====
 
   const timeFormattedLastSaved = lastSaved
     ? lastSaved.toLocaleTimeString()
@@ -45,7 +78,9 @@ function AutoSaveNotification({
         padding: '8px',
       }}
     >
-      {isSaving ? '포스트 내용이 저장 중입니다.' : '자동저장 완료'}
+      {isSaving
+        ? '포스트 내용이 저장 중입니다.'
+        : `자동저장 완료 (${timeFormattedLastSaved})`}
     </div>
   );
 }

@@ -28,7 +28,6 @@ export default function useAutoSaveServerSync(
   // @description 마지막 저장 시간 상태 초기화 (null이 아닌 기본값)
   // @reason lastSaved가 null로 유지되지 않도록 보장
   // @analogy 도서관에서 처음 저장 시간을 현재 시간으로 설정
-  // @note 초기값을 null로 설정하지 않아 UI 문제 해결
 
   const [isSavingLocal, setIsSavingLocal] = useState(false); // @type {boolean} - 로컬 저장 상태
   // @description 로컬에서 관리하는 isSaving 상태
@@ -72,24 +71,29 @@ export default function useAutoSaveServerSync(
       return;
     }
 
-    // 필수 필드 유효성 검사
+    // 필수 필드 유효성 검사 (완화된 조건)
+    //====여기부터 수정됨====
+    const isPostContentEmpty =
+      draftData.postContent.trim() === '' ||
+      draftData.postContent === '<p><br></p>';
     if (
       !draftData.postTitle ||
-      !draftData.postContent ||
-      !draftData.tags ||
-      !draftData.imageUrls ||
       draftData.postTitle.trim() === '' ||
-      draftData.postContent.trim() === ''
+      !draftData.postContent ||
+      isPostContentEmpty
     ) {
       console.log(
-        'useAutoSaveServerSync - Missing required fields, skipping server save:',
+        'useAutoSaveServerSync - Missing required fields (title or content), skipping server save:',
         draftData
       );
-      // @description 필수 필드 누락 로그
+      // @description 필수 필드 누락 로그 (title과 content만 확인)
       // @reason 요청 실패 방지
+      // @why tags와 imageUrls는 백엔드에서 필수로 요구하지 않음
+      // @analogy 도서관에서 책 제목과 내용만 확인
       setIsSavingLocal(false);
       return;
     }
+    //====여기까지 수정됨====
 
     // 서버 저장 시도
     setIsSavingLocal(true); // 저장 시작

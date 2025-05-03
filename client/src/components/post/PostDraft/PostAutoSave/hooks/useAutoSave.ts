@@ -66,16 +66,16 @@ export function useAutoSave(
   // @description 드래프트 데이터 로그
   // @reason 데이터 상태 확인
 
-  // isSaving이 항상 정의되도록 보장
-  const finalIsSaving = isLocalSaving || isServerSaving || false; // @type {boolean} - 최종 저장 상태
+  // isSaving 상태 통합
+  const finalIsSaving = isLocalSaving || isServerSaving; // @type {boolean} - 최종 저장 상태
   // @description 로컬 또는 서버 저장 중 여부 확인
-  // @reason undefined 방지
+  // @reason 애니메이션 상태 정확히 반영
+  // @why undefined 방지 및 로컬/서버 저장 모두 반영
 
   return {
     isSaving: finalIsSaving,
-    lastSaved: lastSaved || new Date(), // @type {Date} - null이면 기본값 설정
-    // @description lastSaved가 null일 경우 현재 시간으로 대체
-    // @reason AutoSaveNotification에서 null 방지
-    // @analogy 도서관에서 저장 시간이 없으면 현재 시간으로 기록
+    lastSaved, // @type {Date | null} - 마지막 저장 시간
+    // @description lastSaved 그대로 반환
+    // @reason AutoSaveNotification에서 정확한 시간 표시
   };
 }
