@@ -2,7 +2,7 @@ import { ImageUploadContext } from '../context/ImageUploadContext';
 import useImageUploadState from './hooks/useImageUploadState';
 import useBaseFileNamesWithoutSuffix from './hooks/useBaseFileNamesWithoutSuffix';
 import useImageUploaderKey from './hooks/useImageUploaderKey';
-import ImageUploadLayout from './components/ImageUploadLayout';
+import ImageUploadLayout from './parts/ImageUploadLayout';
 
 type ImageUploadManagerType = {
   postId: string;

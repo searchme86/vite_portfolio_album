@@ -24,6 +24,8 @@ interface PostAutoSaveProps {
 }
 
 function PostAutoSave({ formData, imageUrls }: PostAutoSaveProps) {
+  console.log('PostAutoSave, imageUrls', imageUrls);
+  console.log('PostAutoSave, formData', formData);
   const { isSignedIn, getToken } = useCheckAuthToken(); // @type {Object} - 인증 상태와 토큰
   // @description 인증 상태와 토큰 가져오기
   // @reason 서버 요청 시 토큰 필요
