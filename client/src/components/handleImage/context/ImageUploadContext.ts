@@ -5,7 +5,7 @@ import { createContext, useContext } from 'react';
 type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
 // ImageUrl 타입 정의
-interface ImageUrl {
+export interface ImageUrl {
   url: string;
   isNew: boolean;
 }
