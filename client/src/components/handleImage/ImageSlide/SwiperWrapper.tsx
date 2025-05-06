@@ -2,8 +2,8 @@
 // 단일 책임: Swiper 슬라이드 기능 제공 및 공통 컴포넌트 사용
 import { Swiper, SwiperSlide } from 'swiper/react';
 import useSafeImages from './hooks/useSafeImages';
-import SlideImage from './components/SlideImage';
-import SlideFallback from './components/SlideFallback';
+import SlideImage from './parts/SlideImage';
+import SlideFallback from './parts/SlideFallback';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';

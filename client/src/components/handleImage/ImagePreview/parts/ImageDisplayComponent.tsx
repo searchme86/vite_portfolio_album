@@ -4,6 +4,8 @@ type Props = {
 };
 
 function ImageDisplayComponent({ url, index }: Props) {
+  console.log('ImageDisplayComponent 컴포넌트에서 url', url);
+  console.log('ImageDisplayComponent 컴포넌트에서 index', index);
   if (url) {
     return (
       <img

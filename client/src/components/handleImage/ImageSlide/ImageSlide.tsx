@@ -4,8 +4,8 @@
 import { useImageUploadContext } from '../context/ImageUploadContext';
 import { useImageSlide } from './hooks/useImageSlide';
 import useSafeImages from './hooks/useSafeImages';
-import SlideContainer from './components/SlideContainer';
-import SlideFallback from './components/SlideFallback';
+import SlideContainer from './parts/SlideContainer';
+import SlideFallback from './parts/SlideFallback';
 // import SwiperWrapper from './SwiperWrapper';
 import SwiperWrapper from './SwiperWrapper';
 
