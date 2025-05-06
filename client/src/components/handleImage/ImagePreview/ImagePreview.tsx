@@ -1,8 +1,8 @@
 import { useImageUploadContext } from '../context/ImageUploadContext';
 import { useImagePreview } from './hooks/useImagePreview';
 import { useImageValidation } from './hooks/useImageValidation';
-import ImageListContainerComponent from './components/ImageListContainerComponent';
-import MinimumImagesWarningComponent from './components/MinimumImagesWarningComponent';
+import ImageListContainerComponent from './parts/ImageListContainerComponent';
+import MinimumImagesWarningComponent from './parts/MinimumImagesWarningComponent';
 
 function ImagePreview() {
   const { imageUrls, minImages } = useImageUploadContext();
