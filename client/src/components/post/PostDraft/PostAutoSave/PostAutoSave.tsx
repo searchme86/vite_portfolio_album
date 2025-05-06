@@ -57,9 +57,11 @@ function PostAutoSave({ formData, imageUrls }: PostAutoSaveProps) {
     ), // @type {string[]} - 태그 (필수)
     // @description 폼에서 태그 가져오기, 없으면 스토어에서, 빈 태그 제거
     // @reason 백엔드 요구 필수 필드 보장
-    imageUrls: (imageUrls || draftFromStore.imageUrls || []).filter(
-      (url) => url.trim() !== ''
-    ), // @type {string[]} - 이미지 URL
+    imageUrls: Array.isArray(imageUrls)
+      ? imageUrls.filter((url) => typeof url === 'string' && url.trim() !== '')
+      : (draftFromStore.imageUrls || []).filter(
+          (url) => typeof url === 'string' && url.trim() !== ''
+        ), // @type {string[]} - 이미지 URL
     // @description 전달받은 이미지 URL 사용, 없으면 스토어에서, 빈 URL 제거
     // @reason 백엔드 요구 필수 필드 보장
     //====여기부터 수정됨====
