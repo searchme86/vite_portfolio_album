@@ -31,6 +31,8 @@ export function useAutoSave(
   // @description 로컬 저장 실행 및 상태 가져오기
   // @reason 로컬 저장 관리
 
+  console.log('<-----받은 useAutoSave, draft의 값은', draft);
+
   const { isSaving: isServerSaving, lastSaved } = useAutoSaveServerSync(
     draft,
     isOnline,

@@ -31,6 +31,11 @@ interface PostWriteFormData {
   imageUrls: string[]; // @type {string[]} - 이미지 URL 배열
 }
 
+interface ImageUrlObject {
+  url: string; // @type {string} - 이미지 URL
+  isNew: boolean; // @type {boolean} - 새 이미지 여부
+}
+
 interface PostAutoSaveProps {
   formData: PostWriteFormData; // @type {PostWriteFormData} - 폼 데이터
   // @description 폼 데이터 (imageUrls 포함)
@@ -59,6 +64,12 @@ function PostAutoSave({ formData }: PostAutoSaveProps) {
   // @description 스토어 데이터 출력
   // @reason 스토어 데이터가 올바른지 확인
 
+  console.log(
+    'PostAutoSave - draftFromStore.imageUrls:',
+    draftFromStore.imageUrls
+  );
+  console.log('PostAutoSave - formData.imageUrls:', formData.imageUrls);
+
   // 드래프트 객체 생성 (필수 필드 유효성 보장)
   const draft = {
     ...draftFromStore, // 기존 스토어 데이터 병합
@@ -80,12 +91,24 @@ function PostAutoSave({ formData }: PostAutoSaveProps) {
     ), // @type {string[]} - 태그 (필수)
     // @description 폼에서 태그 가져오기, 없으면 스토어에서, 빈 태그 제거
     // @reason 백엔드 요구 필수 필드 보장
-    imageUrls: (formData.imageUrls || draftFromStore.imageUrls || []).filter(
-      (url) => typeof url === 'string' && url.trim() !== ''
-    ), // @type {string[]} - 이미지 URL
-    // @description 폼에서 이미지 URL 가져오기, 없으면 스토어에서, 빈 URL 제거
-    // @reason 백엔드 요구 필수 필드 보장
-    // @why formData.imageUrls를 사용: imageUrls가 PostWriteFormData에 포함됨
+    //====여기부터 수정됨====
+    imageUrls: [
+      ...(formData.imageUrls || []),
+      ...(() => {
+        const wrappedUrls = (draftFromStore.imageUrls || []).map((url) => ({
+          url,
+        }));
+        return wrappedUrls
+          .filter(
+            (item) => typeof item.url === 'string' && item.url.trim() !== ''
+          )
+          .map((item) => item.url); // 다시 string[]로 만들고 싶을 경우
+      })(),
+    ],
+    // @description formData와 draftFromStore의 url을 병합
+    // @reason imageUrls를 string[]로 유지
+    // @analogy 도서관에서 사진 정보(객체)에서 파일 이름(문자열)만 추려 목록에 추가
+    //====여기까지 수정됨====
     draftId:
       draftFromStore.draftId && draftFromStore.draftId.trim() !== ''
         ? draftFromStore.draftId
