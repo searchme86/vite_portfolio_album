@@ -62,8 +62,8 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
   // @description useCheckAuthToken으로 토큰 가져오기
   // @reason 포스트 생성 및 자동저장에 필요
 
-  const { form, imageUrls, setImageUrls, draftData } = usePostWriteFormSetup(); // 폼 상태 및 초기화
-  // @description 폼 상태, 이미지 URL, 드래프트 데이터 가져오기
+  const { form, setImageUrls, draftData } = usePostWriteFormSetup(); // 폼 상태 및 초기화
+  // @description 폼 상태, 이미지 URL 설정 함수, 드래프트 데이터 가져오기
   // @reason 폼 관리 및 초기화
 
   const { handleSubmit, formState, watch } = form; // 폼 메서드 및 상태
@@ -77,18 +77,15 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
   console.log('PostWriteForm - Watched formData:', formData);
   // @description 감지된 폼 데이터 출력
   // @reason 폼 값이 제대로 감지되는지 확인
-  // @analogy 도서관에서 책 정보를 실시간으로 기록하는 과정 확인
 
   // **디버깅 로그 추가**: PostAutoSave로 전달되는 데이터 확인
   console.log('PostWriteForm - Data passed to PostAutoSave:', {
     formData,
-    imageUrls,
   });
   // @description PostAutoSave로 전달된 데이터 출력
   // @reason 데이터가 제대로 전달되는지 확인
-  // @analogy 도서관에서 대여 기록을 다른 부서로 전달하는 과정 확인
 
-  usePostWriteDraftSync(form, imageUrls, draftData); // 드래프트 동기화
+  usePostWriteDraftSync(form, draftData); // 드래프트 동기화
   // @description 폼 값과 드래프트 동기화
   // @reason Zustand 스토어와 동기화
 
@@ -96,7 +93,7 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
     watch('postTitle'),
     watch('postDesc'),
     watch('postContent'),
-    imageUrls,
+    watch('imageUrls'), // @type {string[]} - form에서 imageUrls 가져오기
     watch('tags'),
     authState.getToken
   ); // 폼 제출 로직
@@ -137,11 +134,10 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
   } else {
     content = (
       <div className="relative max-w-4xl p-4 mx-auto">
-        <div className="mb-8 ">
+        <div className="mb-8">
           <h1 className="mb-4 text-2xl font-bold">Create a New Post</h1>
-          <PostAutoSave formData={formData} imageUrls={imageUrls} />{' '}
-          {/* PostAutoSave 컴포넌트 */}
-          {/* @description formData와 imageUrls를 PostAutoSave에 전달 */}
+          <PostAutoSave formData={formData} /> {/* PostAutoSave 컴포넌트 */}
+          {/* @description formData를 PostAutoSave에 전달 */}
           {/* @reason 자동저장 로직에서 폼 데이터 사용 */}
           <PostWriteImageUploader
             initialImageUrls={initialImageUrls}
