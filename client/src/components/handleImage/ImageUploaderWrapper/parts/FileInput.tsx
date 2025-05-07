@@ -16,7 +16,7 @@ function FileInput({ onChange, inputRef }) {
       onChange={onChange}
       className="hidden"
       id="image-upload"
-      aria-label="Upload images for the post"
+      aria-label="Upload images for the post!!!"
     />
   );
 }

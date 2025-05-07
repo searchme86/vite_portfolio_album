@@ -24,7 +24,7 @@ interface PostAutoSaveProps {
 }
 
 function PostAutoSave({ formData, imageUrls }: PostAutoSaveProps) {
-  console.log('PostAutoSave, imageUrls', imageUrls);
+  console.log('PostAutoSave<----, imageUrls', imageUrls);
   console.log('PostAutoSave, formData', formData);
   const { isSignedIn, getToken } = useCheckAuthToken(); // @type {Object} - 인증 상태와 토큰
   // @description 인증 상태와 토큰 가져오기
@@ -35,6 +35,11 @@ function PostAutoSave({ formData, imageUrls }: PostAutoSaveProps) {
   // @description 스토어에서 드래프트 데이터 가져오기
   // @reason 기존 드래프트 데이터와 병합
   // @analogy 도서관에서 기존 기록부 가져오기
+
+  console.log('현재 체크중,draftFromStore<--- ', draftFromStore);
+  console.log('현재 체크중,formData<--- ', formData);
+  console.log('현재 체크중,imageUrls<--- ', imageUrls);
+  console.log('이건뭘까, <---', imageUrls);
 
   // 드래프트 객체 생성 (필수 필드 유효성 보장)
   const draft = {
@@ -77,7 +82,7 @@ function PostAutoSave({ formData, imageUrls }: PostAutoSaveProps) {
   };
 
   // 디버깅 로그: 드래프트 데이터 확인
-  console.log('PostAutoSave - draft:', draft);
+  console.log('PostAutoSave - draft<---:', draft);
   // @description 생성된 드래프트 데이터 출력
   // @reason 데이터가 제대로 구성되었는지 확인
   // @analogy 도서관에서 책 정보를 기록하기 전 확인

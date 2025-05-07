@@ -1,16 +1,8 @@
-//====여기부터 수정됨====
-// ImageUploaderWrapper 컴포넌트: ImageUploader를 감싸고 데이터 관리
-// 단일 책임: ImageUploader에 필요한 데이터를 준비하고 렌더링
 import ImageUploader from './ImageUploader';
-// import { useImageUploadContext } from '../context/ImageUploadContext';
 import { useImageUploadContext } from '../context/ImageUploadContext';
-import useHandleFilesChange from './hooks/useHandleFilesChange'; // <!---여기수정: useImageUploader 대신 useHandleFilesChange 사용
+import useHandleFilesChange from './hooks/useHandleFilesChange';
 
-// ImageUploaderWrapper 컴포넌트 정의
-// Context와 훅을 사용하여 데이터 준비
 function ImageUploaderWrapper() {
-  // Context에서 값 가져오기
-  // ImageUploadManager에서 제공된 값 사용
   const {
     postId,
     imageUploaderKey,
@@ -22,9 +14,7 @@ function ImageUploaderWrapper() {
     baseFileNamesWithoutSuffix,
   } = useImageUploadContext();
 
-  // 훅 사용
-  // 파일 변경 핸들링 (새로운 훅으로 변경)
-  const { handleFilesChange } = useHandleFilesChange(); // <!---여기수정: useImageUploader 대신 새로운 훅 사용
+  const { handleFilesChange } = useHandleFilesChange();
 
   // postId가 없을 경우 기본값 설정
   // API 호출 시 문제 방지

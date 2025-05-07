@@ -1,12 +1,6 @@
-//====여기부터 수정됨====
-// useHandleFilesChange 훅: 업로드된 파일 처리 및 상태 업데이트 조합
-// 단일 책임: 분리된 훅을 조합하여 파일 변경 핸들링 로직 제공
-// import useSafeFileChangeParams from './useSafeFileChangeParams';
 import useSafeFileChangeParams from './useSafeFileChangeParams';
-// import usePrepareExistingFileNames from './usePrepareExistingFileNames';
 import usePrepareExistingFileNames from './usePrepareExistingFileNames';
 import useFilterDuplicateAndDeletedUrls from './useFilterDuplicateAndDeletedUrls';
-// import useUpdateImageUrlsAndState from './useUpdateImageUrlsAndState';
 import useUpdateImageUrlsAndState from './useUpdateImageUrlsAndState';
 
 // 훅 정의

@@ -1,7 +1,3 @@
-//====여기부터 수정됨====
-// useImageUploadContextValues 훅: 컨텍스트 값 가져오기 및 안전 처리
-// 단일 책임: 컨텍스트 값 추출 및 안전한 기본값 제공
-// import { useImageUploadContext } from '../../context/ImageUploadContext';
 import { useImageUploadContext } from '../../context/ImageUploadContext';
 
 // 훅 정의

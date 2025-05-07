@@ -1,8 +1,5 @@
-// src/components/ImageUploader.jsx
 import { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
-// import ImagePreview from '../../ImagePreview';
-// import ImagePreview from '../ImagePreview/ImagePreview';
 import ImagePreview from '../ImagePreview/ImagePreview';
 import { useAuth } from '@clerk/clerk-react';
 import { toast } from 'react-toastify';
@@ -174,7 +171,7 @@ function ImageUploader({
           onChange={handleFileChange}
           className="hidden"
           id="image-upload"
-          aria-label="Upload images for the post"
+          aria-label="업로드할 이미지 파일을 선택해주세요"
         />
         <button
           type="button"
