@@ -26,8 +26,11 @@ interface ImageManagementState {
   // @reason 상태 변경
 }
 
-export const useImageManagementStore = create<ImageManagementState>()(
-  persist<ImageManagementState>(
+export const useImageManagementStore = create<
+  ImageManagementState,
+  [['zustand/persist', unknown]]
+>(
+  persist(
     (set) => ({
       ...initialImageManagementState,
       setImageUrls: setImageUrls(set),

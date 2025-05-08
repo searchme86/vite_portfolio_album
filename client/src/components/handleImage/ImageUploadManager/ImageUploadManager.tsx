@@ -48,10 +48,10 @@ function ImageUploadManager({
     typeof onImageUrlsChange === 'function' ? onImageUrlsChange : () => {};
   // 디버깅: safeOnImageUrlsChange 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'ImageUploadManager - safeOnImageUrlsChange:',
-    safeOnImageUrlsChange
-  );
+  // console.log(
+  //   'ImageUploadManager - safeOnImageUrlsChange:',
+  //   safeOnImageUrlsChange
+  // );
 
   // progressBarColor가 문자열인지 확인, 아니면 기본값으로 대체
   // 클래스 이름 오류 방지

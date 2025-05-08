@@ -33,7 +33,6 @@ interface SwiperWrapperProps {
 }
 
 function SwiperWrapper({ images, slideHeight = 'h-64' }: SwiperWrapperProps) {
-  // images가 undefined일 경우 빈 배열로 fallback
   const safeImagesProp = images || []; // @type {string[]} - 안전한 이미지 배열
   // @description images가 없으면 빈 배열로 처리
   // @reason 애플리케이션 깨짐 방지
@@ -41,7 +40,6 @@ function SwiperWrapper({ images, slideHeight = 'h-64' }: SwiperWrapperProps) {
   // @description 이미지 배열 확인
   // @reason 데이터 검증
 
-  // slideHeight가 유효하지 않은 경우 기본값으로 fallback
   const safeSlideHeight =
     typeof slideHeight === 'string' && slideHeight ? slideHeight : 'h-64'; // @type {string} - 안전한 슬라이드 높이
   // @description slideHeight가 유효하지 않으면 기본값 사용
@@ -50,10 +48,12 @@ function SwiperWrapper({ images, slideHeight = 'h-64' }: SwiperWrapperProps) {
   // @description 슬라이드 높이 확인
   // @reason 데이터 검증
 
-  // images를 안전하게 처리
   const safeImages = useSafeImages(safeImagesProp); // @type {string[]} - 검증된 이미지 배열
   // @description 이미지 배열 검증
   // @reason 안전한 데이터 사용
+  console.log('SwiperWrapper - safeImages:', safeImages); // @type {void} - 디버깅 로그
+  // @description 검증된 이미지 확인
+  // @reason 문제 추적
 
   return (
     <Swiper

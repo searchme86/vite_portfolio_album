@@ -37,10 +37,10 @@ function useImageUploadContextValues() {
     typeof setImageUrls === 'function' ? setImageUrls : () => {};
   // 디버깅: safeSetImageUrls 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useImageUploadContextValues - safeSetImageUrls:',
-    safeSetImageUrls
-  );
+  // console.log(
+  //   'useImageUploadContextValues - safeSetImageUrls:',
+  //   safeSetImageUrls
+  // );
 
   // setTempFiles가 함수가 아닌 경우 빈 함수로 대체
   // 호출 시 에러 방지
@@ -48,10 +48,10 @@ function useImageUploadContextValues() {
     typeof setTempFiles === 'function' ? setTempFiles : () => {};
   // 디버깅: safeSetTempFiles 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useImageUploadContextValues - safeSetTempFiles:',
-    safeSetTempFiles
-  );
+  // console.log(
+  //   'useImageUploadContextValues - safeSetTempFiles:',
+  //   safeSetTempFiles
+  // );
 
   // setButtonText가 함수가 아닌 경우 빈 함수로 대체
   // 호출 시 에러 방지
@@ -59,10 +59,10 @@ function useImageUploadContextValues() {
     typeof setButtonText === 'function' ? setButtonText : () => {};
   // 디버깅: safeSetButtonText 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useImageUploadContextValues - safeSetButtonText:',
-    safeSetButtonText
-  );
+  // console.log(
+  //   'useImageUploadContextValues - safeSetButtonText:',
+  //   safeSetButtonText
+  // );
 
   // setProgress가 함수가 아닌 경우 빈 함수로 대체
   // 호출 시 에러 방지
@@ -70,10 +70,10 @@ function useImageUploadContextValues() {
     typeof setProgress === 'function' ? setProgress : () => {};
   // 디버깅: safeSetProgress 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useImageUploadContextValues - safeSetProgress:',
-    safeSetProgress
-  );
+  // console.log(
+  //   'useImageUploadContextValues - safeSetProgress:',
+  //   safeSetProgress
+  // );
 
   // setIsUploading이 함수가 아닌 경우 빈 함수로 대체
   // 호출 시 에러 방지
@@ -81,10 +81,10 @@ function useImageUploadContextValues() {
     typeof setIsUploading === 'function' ? setIsUploading : () => {};
   // 디버깅: safeSetIsUploading 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useImageUploadContextValues - safeSetIsUploading:',
-    safeSetIsUploading
-  );
+  // console.log(
+  //   'useImageUploadContextValues - safeSetIsUploading:',
+  //   safeSetIsUploading
+  // );
 
   // onImageUrlsChange가 함수가 아닌 경우 빈 함수로 대체
   // 호출 시 에러 방지
@@ -92,10 +92,10 @@ function useImageUploadContextValues() {
     typeof onImageUrlsChange === 'function' ? onImageUrlsChange : () => {};
   // 디버깅: safeOnImageUrlsChange 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useImageUploadContextValues - safeOnImageUrlsChange:',
-    safeOnImageUrlsChange
-  );
+  // console.log(
+  //   'useImageUploadContextValues - safeOnImageUrlsChange:',
+  //   safeOnImageUrlsChange
+  // );
 
   // 컨텍스트 값과 안전 처리된 값 반환
   // 객체 형태로 반환

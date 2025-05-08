@@ -16,10 +16,10 @@ function useUpdateImageUrlsAndState() {
       : {};
   // 디버깅: safeContextValues 확인
   // contextValues가 올바르게 처리되었는지 확인
-  console.log(
-    'useUpdateImageUrlsAndState - safeContextValues:',
-    safeContextValues
-  );
+  // console.log(
+  //   'useUpdateImageUrlsAndState - safeContextValues:',
+  //   safeContextValues
+  // );
 
   const {
     safeImageUrls,
@@ -37,60 +37,60 @@ function useUpdateImageUrlsAndState() {
     : [];
   // 디버깅: validatedSafeImageUrls 확인
   // 배열이 올바르게 처리되었는지 확인
-  console.log(
-    'useUpdateImageUrlsAndState - validatedSafeImageUrls:',
-    validatedSafeImageUrls
-  );
+  // console.log(
+  //   'useUpdateImageUrlsAndState - validatedSafeImageUrls:',
+  //   validatedSafeImageUrls
+  // );
 
   // safeSetImageUrls가 함수인지 확인
   const validatedSafeSetImageUrls =
     typeof safeSetImageUrls === 'function' ? safeSetImageUrls : () => {};
   // 디버깅: validatedSafeSetImageUrls 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useUpdateImageUrlsAndState - validatedSafeSetImageUrls:',
-    validatedSafeSetImageUrls
-  );
+  // console.log(
+  //   'useUpdateImageUrlsAndState - validatedSafeSetImageUrls:',
+  //   validatedSafeSetImageUrls
+  // );
 
   // safeSetTempFiles가 함수인지 확인
   const validatedSafeSetTempFiles =
     typeof safeSetTempFiles === 'function' ? safeSetTempFiles : () => {};
   // 디버깅: validatedSafeSetTempFiles 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useUpdateImageUrlsAndState - validatedSafeSetTempFiles:',
-    validatedSafeSetTempFiles
-  );
+  // console.log(
+  //   'useUpdateImageUrlsAndState - validatedSafeSetTempFiles:',
+  //   validatedSafeSetTempFiles
+  // );
 
   // safeSetButtonText가 함수인지 확인
   const validatedSafeSetButtonText =
     typeof safeSetButtonText === 'function' ? safeSetButtonText : () => {};
   // 디버깅: validatedSafeSetButtonText 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useUpdateImageUrlsAndState - validatedSafeSetButtonText:',
-    validatedSafeSetButtonText
-  );
+  // console.log(
+  //   'useUpdateImageUrlsAndState - validatedSafeSetButtonText:',
+  //   validatedSafeSetButtonText
+  // );
 
   // safeSetProgress가 함수인지 확인
   const validatedSafeSetProgress =
     typeof safeSetProgress === 'function' ? safeSetProgress : () => {};
   // 디버깅: validatedSafeSetProgress 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useUpdateImageUrlsAndState - validatedSafeSetProgress:',
-    validatedSafeSetProgress
-  );
+  // console.log(
+  //   'useUpdateImageUrlsAndState - validatedSafeSetProgress:',
+  //   validatedSafeSetProgress
+  // );
 
   // safeSetIsUploading가 함수인지 확인
   const validatedSafeSetIsUploading =
     typeof safeSetIsUploading === 'function' ? safeSetIsUploading : () => {};
   // 디버깅: validatedSafeSetIsUploading 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useUpdateImageUrlsAndState - validatedSafeSetIsUploading:',
-    validatedSafeSetIsUploading
-  );
+  // console.log(
+  //   'useUpdateImageUrlsAndState - validatedSafeSetIsUploading:',
+  //   validatedSafeSetIsUploading
+  // );
 
   // safeOnImageUrlsChange가 함수인지 확인
   const validatedSafeOnImageUrlsChange =
@@ -99,10 +99,10 @@ function useUpdateImageUrlsAndState() {
       : () => {};
   // 디버깅: validatedSafeOnImageUrlsChange 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'useUpdateImageUrlsAndState - validatedSafeOnImageUrlsChange:',
-    validatedSafeOnImageUrlsChange
-  );
+  // console.log(
+  //   'useUpdateImageUrlsAndState - validatedSafeOnImageUrlsChange:',
+  //   validatedSafeOnImageUrlsChange
+  // );
 
   // updateImageUrlsAndState 함수: 이미지 URL과 상태 업데이트
   // newUrls, safeUploadProgress, safeUploadStatus를 받아 상태 업데이트
@@ -115,10 +115,10 @@ function useUpdateImageUrlsAndState() {
     const validatedNewUrls = Array.isArray(newUrls) ? newUrls : [];
     // 디버깅: validatedNewUrls 확인
     // 배열이 올바르게 처리되었는지 확인
-    console.log(
-      'useUpdateImageUrlsAndState - validatedNewUrls:',
-      validatedNewUrls
-    );
+    // console.log(
+    //   'useUpdateImageUrlsAndState - validatedNewUrls:',
+    //   validatedNewUrls
+    // );
 
     // safeUploadProgress가 숫자인지 확인
     const validatedSafeUploadProgress = Number.isFinite(safeUploadProgress)
@@ -126,20 +126,20 @@ function useUpdateImageUrlsAndState() {
       : 0;
     // 디버깅: validatedSafeUploadProgress 확인
     // 값이 올바르게 설정되었는지 확인
-    console.log(
-      'useUpdateImageUrlsAndState - validatedSafeUploadProgress:',
-      validatedSafeUploadProgress
-    );
+    // console.log(
+    //   'useUpdateImageUrlsAndState - validatedSafeUploadProgress:',
+    //   validatedSafeUploadProgress
+    // );
 
     // safeUploadStatus가 불리언인지 확인
     const validatedSafeUploadStatus =
       typeof safeUploadStatus === 'boolean' ? safeUploadStatus : false;
     // 디버깅: validatedSafeUploadStatus 확인
     // 값이 올바르게 설정되었는지 확인
-    console.log(
-      'useUpdateImageUrlsAndState - validatedSafeUploadStatus:',
-      validatedSafeUploadStatus
-    );
+    // console.log(
+    //   'useUpdateImageUrlsAndState - validatedSafeUploadStatus:',
+    //   validatedSafeUploadStatus
+    // );
 
     // 이미지 URL 업데이트
     // 새로운 URL 추가

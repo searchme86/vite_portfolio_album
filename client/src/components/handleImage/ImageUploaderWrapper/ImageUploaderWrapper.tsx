@@ -69,7 +69,7 @@ function ImageUploaderWrapper() {
     typeof setIsUploading === 'function' ? setIsUploading : () => {};
   // 디버깅: safeSetIsUploading 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log('ImageUploaderWrapper - safeSetIsUploading:', safeSetIsUploading);
+  // console.log('ImageUploaderWrapper - safeSetIsUploading:', safeSetIsUploading);
 
   // baseFileNamesWithoutSuffix가 배열이 아닌 경우 빈 배열로 초기화
   // prop 전달 오류 방지

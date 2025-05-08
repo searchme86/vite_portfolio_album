@@ -31,10 +31,10 @@ function usePrepareExistingFileNames() {
       : () => '';
   // 디버깅: safeExtractFileNameFromUrl 확인
   // 함수가 올바르게 설정되었는지 확인
-  console.log(
-    'usePrepareExistingFileNames - safeExtractFileNameFromUrl:',
-    safeExtractFileNameFromUrl
-  );
+  // console.log(
+  //   'usePrepareExistingFileNames - safeExtractFileNameFromUrl:',
+  //   safeExtractFileNameFromUrl
+  // );
 
   // prepareExistingFileNames 함수: 현재 URL과 파일명 준비
   // 중복 확인을 위한 데이터 생성
