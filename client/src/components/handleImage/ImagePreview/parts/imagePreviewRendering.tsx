@@ -1,28 +1,30 @@
-import ImageListContainerComponent from './ImageListContainerComponent'; // @type {Component} - 이미지 목록 컨테이너
-// @description 이미지 목록 렌더링
-// @reason UI 구성
-import MinimumImagesWarningComponent from './MinimumImagesWarningComponent'; // @type {Component} - 최소 이미지 경고
-// @description 최소 이미지 경고 렌더링
-// @reason 사용자 피드백
+import ImageListContainerComponent from './ImageListContainerComponent';
+import MinimumImagesWarningComponent from './MinimumImagesWarningComponent';
 
+// 타입 정의: ImageItem은 이미지 URL과 상태를 나타냄
+// 의미: 이미지 데이터 구조 정의
+// 이유: 타입 안전성 보장
 interface ImagePreviewRenderingProps {
-  imageUrl: string; // @type {string} - 현재 이미지 URL
-  // @description 현재 이미지 주소
-  // @reason 표시
-  isUploading: boolean; // @type {boolean} - 업로드 중 여부
-  // @description 업로드 상태
-  // @reason UI 조정
-  safeImageUrls: { url: string; isNew: boolean }[]; // @type {{ url: string; isNew: boolean }[]} - 이미지 URL 배열
-  // @description 검증된 이미지 목록
-  // @reason 표시
-  safeMinImages: number; // @type {number} - 최소 이미지 수
-  // @description 최소 이미지 수
-  // @reason 규칙 적용
-  handleRemoveImage: (index: number) => void; // @type {(index: number) => void} - 삭제 핸들러
-  // @description 인덱스 기반 삭제
-  // @reason 사용자 행동 처리
+  imageUrl: string; // 타입: string - 현재 이미지 URL
+  // 의미: 현재 이미지 주소
+  // 이유: 표시
+  isUploading: boolean; // 타입: boolean - 업로드 중 여부
+  // 의미: 업로드 상태
+  // 이유: UI 조정
+  safeImageUrls: { url: string; isNew: boolean }[]; // 타입: { url: string; isNew: boolean }[] - 이미지 URL 배열
+  // 의미: 검증된 이미지 목록
+  // 이유: 표시
+  safeMinImages: number; // 타입: number - 최소 이미지 수
+  // 의미: 최소 이미지 수
+  // 이유: 규칙 적용
+  handleRemoveImage: (index: number) => void; // 타입: (index: number) => void - 삭제 핸들러
+  // 의미: 인덱스 기반 삭제
+  // 이유: 사용자 행동 처리
 }
 
+// 이미지 미리보기 렌더링 컴포넌트
+// 의미: 이미지 목록과 경고 메시지를 렌더링
+// 이유: 사용자 경험 개선
 function ImagePreviewRendering({
   imageUrl,
   isUploading,
@@ -30,6 +32,10 @@ function ImagePreviewRendering({
   safeMinImages,
   handleRemoveImage,
 }: ImagePreviewRenderingProps) {
+  // 값이 없음
+  console.log('ImagePreviewRendering: imageUrl', imageUrl);
+  // 빈배열:[]
+  console.log('ImagePreviewRendering: safeImageUrls', safeImageUrls);
   return (
     <div className="mb-4">
       <ImageListContainerComponent
@@ -39,18 +45,19 @@ function ImagePreviewRendering({
         safeMinImages={safeMinImages}
         handleRemoveImage={handleRemoveImage}
       />
-      {/* @description 이미지 목록 렌더링 */}
-      {/* @reason 사용자에게 이미지 표시 */}
+      {/* 의미: 이미지 목록 렌더링 */}
+      {/* 이유: 사용자에게 이미지 표시 */}
       <MinimumImagesWarningComponent
         safeImageUrlsLength={safeImageUrls.length}
         safeMinImages={safeMinImages}
       />
-      {/* @description 최소 이미지 경고 렌더링 */}
-      {/* @reason 사용자에게 경고 표시 */}
+      {/* 의미: 최소 이미지 경고 렌더링 */}
+      {/* 이유: 사용자에게 경고 표시 */}
     </div>
-  ); // @type {JSX.Element} - 렌더링 결과
-  // @description UI 반환
-  // @reason 화면 표시
+  );
+  // 타입: JSX.Element - 렌더링 결과
+  // 의미: UI 반환
+  // 이유: 화면 표시
 }
 
 export default ImagePreviewRendering;

@@ -1,68 +1,79 @@
-import React from 'react';
+import ImagePreviewRendering from './parts/imagePreviewRendering';
+import { useImageValidation } from './hooks/useImageValidation';
+import { useImagePreview } from './hooks/useImagePreview';
+import useImageUrls from './hooks/useImageUrls';
+import useMinImages from './hooks/useMinImages';
 
-// 타입 정의: ImagePreviewProps는 previewUrls, imageUrls, onDelete를 받음
-// previewUrls는 파일 선택 시 생성된 blob URL 배열
-// imageUrls는 서버에서 반환된 URL 배열
-// onDelete는 이미지 삭제를 위한 함수
-interface ImagePreviewProps {
-  previewUrls: string[]; // 미리보기용 blob URL 배열
-  imageUrls: string[]; // 서버에서 반환된 최종 URL 배열
-  onDelete: (index: number) => void; // 이미지 삭제 함수
+// 타입 정의: ImageItem은 이미지 URL과 상태를 나타냄
+// 의미: 이미지 데이터 구조 정의
+// 이유: 타입 안전성 보장
+interface ImageItem {
+  url: string; // 타입: string - 이미지 URL
+  isNew: boolean; // 타입: boolean - 새 이미지 여부
 }
 
-function ImagePreview({ previewUrls, imageUrls, onDelete }: ImagePreviewProps) {
-  // 안전하게 URL 배열을 처리하기 위해 null/undefined 체크
-  // 의미: previewUrls가 있으면 미리보기로 사용, 없으면 imageUrls 사용
-  // 이유: 사용자가 업로드 중일 때 실시간으로 선택한 이미지를 확인할 수 있어야 함
+// 이미지 미리보기 컴포넌트
+// 의미: 업로드된 이미지를 사용자에게 표시
+// 이유: 사용자 피드백 제공 및 업로드 상태 시각화
+function ImagePreview() {
+  const imageUrls = useImageUrls(); // Zustand 스토어에서 이미지 URL 가져오기
+  console.log('---> ImagePreview: imageUrls', imageUrls);
+  // 타입: ImageItem[] - 이미지 목록
+  // 의미: 스토어에서 관리되는 이미지 URL 배열 가져오기
+  // 이유: 중앙 상태 관리로 데이터 일관성 유지
 
-  console.log('previewUrls:<---', previewUrls);
-  console.log('imageUrls:<---', imageUrls);
+  const minImages = useMinImages(); // Zustand 스토어에서 최소 이미지 수 가져오기
+  // 타입: number - 최소 이미지 수
+  // 의미: 스토어에서 관리되는 최소 이미지 수 가져오기
+  // 이유: 규칙 적용 및 사용자 피드백 제공
 
-  const safePreviewUrls = previewUrls ?? [];
-  const safeImageUrls = imageUrls ?? [];
+  // 데이터 유효성 검증
+  // 의미: 이미지 URL과 최소 이미지 수를 안전하게 처리
+  // 이유: undefined나 null 방지 및 애플리케이션 안정성 확보
+  const { safeImageUrls, safeMinImages } = useImageValidation(
+    imageUrls,
+    minImages
+  );
 
-  // 표시할 URL 결정: previewUrls가 있으면 우선 사용, 없으면 imageUrls 사용
-  // 의미: 미리보기가 우선순위가 높아야 함
-  // 이유: 사용자가 업로드 중일 때 실시간으로 선택한 이미지를 확인할 수 있어야 함
-  const displayUrls =
-    safePreviewUrls.length > 0 ? safePreviewUrls : safeImageUrls;
+  // 삭제 핸들러 가져오기
+  // 의미: 이미지 삭제 로직을 훅에서 가져옴
+  // 이유: 중복 로직 제거 및 상태 동기화
+  const { handleRemoveImage } = useImagePreview();
 
-  // 렌더링: displayUrls를 기반으로 이미지를 표시
-  // 의미: URL 배열을 순회하며 각 URL에 대해 img 태그와 삭제 버튼 생성
-  // 이유: 여러 이미지를 미리보기하고 삭제 기능 제공
+  // 표시할 URL 처리
+  // 의미: 이미지 URL을 기반으로 표시할 URL 목록 생성
+  // 이유: 미리보기용 blob URL이 없으므로 서버 URL 직접 사용
+  const displayUrls = safeImageUrls.map((img: ImageItem) => img.url);
+  // 현재 빈배열
+  console.log('---> ImagePreview: displayUrls', displayUrls);
+
   return (
     <div className="flex gap-2 image-preview-container">
-      {displayUrls.length > 0 ? (
-        displayUrls.map((url, index) => (
-          // 각 이미지와 삭제 버튼을 감싸는 div에 고유한 key 부여
-          // 의미: React가 리스트 렌더링 시 요소를 효율적으로 업데이트하도록 도움
-          // 이유: key가 없으면 React가 불필요한 리렌더링을 수행할 수 있음
-          <div key={index} className="relative">
-            <img
-              src={url}
-              alt={`preview-${index}`}
-              className="preview-image"
-              style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-            />
-            {/* 삭제 버튼 추가 */}
-            {/* 의미: 각 이미지에 삭제 버튼을 제공하여 사용자가 이미지를 삭제할 수 있게 함 */}
-            {/* 이유: 사용자 편의성을 높이고, 업로드된 이미지를 관리 가능 */}
-            <button
-              type="button"
-              onClick={() => onDelete(index)}
-              className="absolute top-0 right-0 flex items-center justify-center w-6 h-6 text-white bg-red-500 rounded-full"
-              aria-label={`Delete image ${index}`}
-            >
-              X
-            </button>
-          </div>
-        ))
-      ) : (
-        // 표시할 URL이 없을 때 대체 UI 제공
-        // 의미: 사용자에게 이미지가 없음을 알림
-        // 이유: UX를 개선하고, 빈 상태에서도 UI가 깨지지 않도록 함
-        <p>No images to display</p>
-      )}
+      {/* ImagePreviewRendering으로 이미지 렌더링 */}
+      {/* 의미: 이미지 목록과 삭제 기능을 렌더링 */}
+      {/* 이유: 재사용 가능한 컴포넌트로 UI 구성 */}
+      <ImagePreviewRendering
+        imageUrl={displayUrls[0] || ''} // 첫 번째 URL 또는 빈 문자열
+        // 타입: string - 현재 이미지 URL
+        // 의미: 첫 번째 이미지를 대표 URL로 사용
+        // 이유: UI 일관성 유지
+        isUploading={false} // 업로드 상태 하드코딩 (추후 필요 시 스토어에서 관리)
+        // 타입: boolean - 업로드 중 여부
+        // 의미: 현재 업로드 상태 반영
+        // 이유: UI 조정 (필요 시 스토어에서 관리 가능)
+        safeImageUrls={safeImageUrls}
+        // 타입: ImageItem[] - 안전한 이미지 URL 배열
+        // 의미: 검증된 이미지 목록 전달
+        // 이유: 안전한 데이터로 렌더링 보장
+        safeMinImages={safeMinImages}
+        // 타입: number - 안전한 최소 이미지 수
+        // 의미: 검증된 최소 이미지 수 전달
+        // 이유: 규칙 준수 및 사용자 피드백
+        handleRemoveImage={handleRemoveImage}
+        // 타입: (index: number) => void - 삭제 핸들러
+        // 의미: 이미지 삭제 기능 전달
+        // 이유: 사용자 인터랙션 처리
+      />
     </div>
   );
 }
@@ -70,9 +81,9 @@ function ImagePreview({ previewUrls, imageUrls, onDelete }: ImagePreviewProps) {
 export default ImagePreview;
 
 // 동작 매커니즘:
-// 1. ImagePreview는 previewUrls, imageUrls, onDelete를 props로 받음
-// 2. previewUrls가 존재하면 이를 우선적으로 사용하여 미리보기를 표시
-// 3. previewUrls가 없으면 imageUrls를 사용하여 서버에서 받은 이미지를 표시
-// 4. URL 배열을 매핑하여 각 URL에 대해 img 태그와 삭제 버튼을 생성
-// 5. 삭제 버튼 클릭 시 onDelete 함수를 호출하여 해당 인덱스의 이미지를 삭제
-// 6. 배열이 비어있을 경우 "No images to display" 메시지를 표시하여 UX 개선
+// 1. useImageUrls로 스토어에서 imageUrls 가져오기
+// 2. useMinImages로 스토어에서 최소 이미지 수 가져오기
+// 3. useImageValidation으로 데이터 검증 및 안전한 값 생성
+// 4. useImagePreview로 handleRemoveImage 가져오기
+// 5. safeImageUrls를 기반으로 displayUrls 생성
+// 6. ImagePreviewRendering에 데이터 전달하여 렌더링

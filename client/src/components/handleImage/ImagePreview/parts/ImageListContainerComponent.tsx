@@ -1,34 +1,35 @@
-import ImageDisplayComponent from './ImageDisplayComponent'; // @type {Component} - 이미지 표시 컴포넌트
-// @description 개별 이미지 표시
-// @reason UI 구성
-import ImageRemoveButtonComponent from './ImageRemoveButtonComponent'; // @type {Component} - 이미지 제거 버튼
-// @description 이미지 삭제 버튼
-// @reason 사용자 인터랙션
+import ImageDisplayComponent from './ImageDisplayComponent';
+import ImageRemoveButtonComponent from './ImageRemoveButtonComponent';
 
+// 타입 정의: ImageItem은 이미지 URL과 상태를 나타냄
+// 의미: 이미지 데이터 구조 정의
+// 이유: 타입 안전성 보장
 type ImageItem = {
-  url?: string; // @type {string} - 이미지 URL
-  // @description 이미지 주소
-  // @reason 이미지 표시
+  url?: string; // 타입: string - 이미지 URL
+  isNew: boolean; // 타입: boolean - 새 이미지 여부
 };
 
 type Props = {
-  imageUrl: string; // @type {string} - 현재 이미지 URL
-  // @description 현재 이미지 주소
-  // @reason 표시
-  isUploading: boolean; // @type {boolean} - 업로드 중 여부
-  // @description 업로드 상태
-  // @reason UI 조정
-  safeImageUrls: ImageItem[]; // @type {ImageItem[]} - 이미지 목록
-  // @description 검증된 이미지 목록
-  // @reason 표시
-  safeMinImages: number; // @type {number} - 최소 이미지 수
-  // @description 최소 이미지 수
-  // @reason 규칙 적용
-  handleRemoveImage?: (index: number) => void; // @type {(index: number) => void} - 삭제 핸들러
-  // @description 인덱스로 이미지 삭제
-  // @reason 사용자 행동 처리
+  imageUrl: string; // 타입: string - 현재 이미지 URL
+  // 의미: 현재 이미지 주소
+  // 이유: 표시
+  isUploading: boolean; // 타입: boolean - 업로드 중 여부
+  // 의미: 업로드 상태
+  // 이유: UI 조정
+  safeImageUrls: ImageItem[]; // 타입: ImageItem[] - 이미지 목록
+  // 의미: 검증된 이미지 목록
+  // 이유: 표시
+  safeMinImages: number; // 타입: number - 최소 이미지 수
+  // 의미: 최소 이미지 수
+  // 이유: 규칙 적용
+  handleRemoveImage?: (index: number) => void; // 타입: (index: number) => void - 삭제 핸들러
+  // 의미: 인덱스로 이미지 삭제
+  // 이유: 사용자 행동 처리
 };
 
+// 이미지 목록 컨테이너 컴포넌트
+// 의미: 이미지 목록을 그리드로 표시
+// 이유: 사용자에게 이미지 미리보기 제공
 function ImageListContainerComponent({
   imageUrl,
   isUploading,
@@ -41,9 +42,10 @@ function ImageListContainerComponent({
       <p className="text-gray-500" role="status" aria-live="polite">
         No images available.
       </p>
-    ); // @type {JSX.Element} - 이미지 없음 메시지
-    // @description 이미지 목록이 비어있으면 메시지 표시
-    // @reason 사용자 피드백
+    );
+    // 타입: JSX.Element - 이미지 없음 메시지
+    // 의미: 이미지 목록이 비어있으면 메시지 표시
+    // 이유: 사용자 피드백
   }
 
   return (
@@ -56,22 +58,23 @@ function ImageListContainerComponent({
             imageUrl={imageUrl}
             isUploading={isUploading}
           />
-          {/* @description 개별 이미지 렌더링 */}
-          {/* @reason 사용자에게 이미지 표시 */}
+          {/* 의미: 개별 이미지 렌더링 */}
+          {/* 이유: 사용자에게 이미지 표시 */}
           <ImageRemoveButtonComponent
             index={index}
             handleRemoveImage={handleRemoveImage}
             safeImageUrlsLength={safeImageUrls.length}
             safeMinImages={safeMinImages}
           />
-          {/* @description 삭제 버튼 렌더링 */}
-          {/* @reason 사용자 인터랙션 */}
+          {/* 의미: 삭제 버튼 렌더링 */}
+          {/* 이유: 사용자 인터랙션 */}
         </div>
       ))}
     </div>
-  ); // @type {JSX.Element} - 이미지 목록 렌더링
-  // @description 이미지 목록을 그리드로 표시
-  // @reason 사용자에게 이미지 보여주기
+  );
+  // 타입: JSX.Element - 이미지 목록 렌더링
+  // 의미: 이미지 목록을 그리드로 표시
+  // 이유: 사용자에게 이미지 보여주기
 }
 
 export default ImageListContainerComponent;

@@ -1,115 +1,72 @@
-import useSafeFileChangeParams from './useSafeFileChangeParams';
-import usePrepareExistingFileNames from './usePrepareExistingFileNames';
+// useHandleFilesChange 훅: 파일 변경 처리
+// 의미: 파일 업로드 후 상태 관리
+// 이유: 이벤트 핸들러 통합
 import useFilterDuplicateAndDeletedUrls from './useFilterDuplicateAndDeletedUrls';
-import useUpdateImageUrlsAndState from './useUpdateImageUrlsAndState';
+import useManageUploadState from './useManageUploadState';
+import usePrepareExistingFileNames from './usePrepareExistingFileNames';
 
-// 훅 정의
-// 파일 변경 처리 로직 반환
-function useHandleFilesChange() {
-  // 분리된 훅 가져오기
-  // 각 기능별 로직 사용
-  const { safeFileChangeParams } = useSafeFileChangeParams();
-  const { prepareExistingFileNames } = usePrepareExistingFileNames();
+// ImageUrl 타입 가져오기 (useFilterDuplicateAndDeletedUrls에서 정의)
+// 의미: 이미지 URL과 상태를 나타내는 객체
+// 이유: 타입 일관성 유지
+import { ImageUrl } from './useFilterDuplicateAndDeletedUrls';
+
+function useHandleFilesChange(): {
+  handleFilesChange: (
+    urls: string[],
+    progress: number,
+    isUploading: boolean
+  ) => void;
+} {
   const { filterDuplicateAndDeletedUrls } = useFilterDuplicateAndDeletedUrls();
-  const { updateImageUrlsAndState } = useUpdateImageUrlsAndState();
+  const { manageUploadState } = useManageUploadState();
+  const { prepareExistingFileNames } = usePrepareExistingFileNames();
 
-  // handleFilesChange 함수: 업로드된 파일 처리
-  // 분리된 훅을 조합하여 로직 실행
   const handleFilesChange = (
-    updatedFiles,
-    uploadedUrls,
-    uploadProgress,
-    uploadStatus
-  ) => {
-    // 인자 안전 처리
-    // safeFileChangeParams 훅 사용
-    const {
-      safeUpdatedFiles,
-      safeUploadedUrls,
-      safeUploadProgress,
-      safeUploadStatus,
-    } = safeFileChangeParams(
-      updatedFiles,
-      uploadedUrls,
-      uploadProgress,
-      uploadStatus
-    );
-    // 반환값 타입 확인
-    const validatedSafeUpdatedFiles = Array.isArray(safeUpdatedFiles)
-      ? safeUpdatedFiles
-      : [];
-    const validatedSafeUploadedUrls = Array.isArray(safeUploadedUrls)
-      ? safeUploadedUrls
-      : [];
-    const validatedSafeUploadProgress = Number.isFinite(safeUploadProgress)
-      ? safeUploadProgress
-      : 0;
-    const validatedSafeUploadStatus =
-      typeof safeUploadStatus === 'boolean' ? safeUploadStatus : false;
-    // 디버깅: 반환값 확인
-    // 반환값이 올바른지 확인
-    console.log('useHandleFilesChange - safeFileChangeParams result:', {
-      validatedSafeUpdatedFiles,
-      validatedSafeUploadedUrls,
-      validatedSafeUploadProgress,
-      validatedSafeUploadStatus,
-    });
+    urls: string[],
+    progress: number,
+    isUploading: boolean
+  ): void => {
+    // 입력값 안전 처리
+    const safeUrls: string[] = Array.isArray(urls) ? urls : [];
+    // 의미: null/undefined 방지
+    // 이유: 타입 안전성
 
-    // 기존 파일명과 URL 준비
-    // prepareExistingFileNames 훅 사용
+    const safeProgress: number = Number.isFinite(progress) ? progress : 0;
+    // 의미: NaN 방지
+    // 이유: 진행률 안정성
+
+    const safeIsUploading: boolean =
+      typeof isUploading === 'boolean' ? isUploading : false;
+    // 의미: 타입 오류 방지
+    // 이유: 상태 일관성
+
+    // 기존 URL과 파일명 준비
     const { currentUrls, existingBaseNames } = prepareExistingFileNames();
-    // 반환값 타입 확인
-    const validatedCurrentUrls = Array.isArray(currentUrls) ? currentUrls : [];
-    const validatedExistingBaseNames = Array.isArray(existingBaseNames)
-      ? existingBaseNames
-      : [];
-    // 디버깅: 반환값 확인
-    // 반환값이 올바른지 확인
-    console.log('useHandleFilesChange - prepareExistingFileNames result:', {
-      validatedCurrentUrls,
-      validatedExistingBaseNames,
-    });
+    // 의미: 중복 확인 데이터 준비
+    // 이유: 필터링 전 사전 작업
 
     // 중복 및 삭제된 URL 필터링
-    // filterDuplicateAndDeletedUrls 훅 사용
-    const { newUrls, hasNewUrls } = filterDuplicateAndDeletedUrls(
-      validatedSafeUploadedUrls,
-      validatedCurrentUrls,
-      validatedExistingBaseNames
+    const { newUrls }: { newUrls: ImageUrl[] } = filterDuplicateAndDeletedUrls(
+      safeUrls,
+      currentUrls,
+      existingBaseNames
     );
-    // 반환값 타입 확인
-    const validatedNewUrls = Array.isArray(newUrls) ? newUrls : [];
-    const validatedHasNewUrls =
-      typeof hasNewUrls === 'boolean' ? hasNewUrls : false;
-    // 디버깅: 반환값 확인
-    // 반환값이 올바른지 확인
-    console.log(
-      'useHandleFilesChange - filterDuplicateAndDeletedUrls result:',
-      {
-        validatedNewUrls,
-        validatedHasNewUrls,
-      }
-    );
+    // 타입: ImageUrl[]
+    // 의미: 중복 및 삭제된 URL 제외
+    // 이유: 상태 최적화
 
-    // 새로운 URL이 없는 경우 처리 중단
-    // validatedHasNewUrls 확인
-    if (!validatedHasNewUrls) return;
-
-    // 상태 업데이트 및 콜백 실행
-    // updateImageUrlsAndState 훅 사용
-    updateImageUrlsAndState(
-      validatedNewUrls,
-      validatedSafeUploadProgress,
-      validatedSafeUploadStatus
-    );
+    if (newUrls.length > 0) {
+      manageUploadState(newUrls, safeProgress, safeIsUploading);
+      // 의미: 새로운 URL로 상태 업데이트
+      // 이유: UI 동기화
+    }
   };
 
-  // handleFilesChange 함수 반환
-  // 객체 형태로 반환
   return { handleFilesChange };
+  // 타입: { handleFilesChange: (urls: string[], progress: number, isUploading: boolean) => void }
+  // 의미: 파일 변경 핸들러 반환
+  // 이유: 재사용 가능성
 }
 
-// 훅 내보내기
-// 다른 파일에서 import하여 사용할 수 있도록 모듈화
 export default useHandleFilesChange;
 //====여기까지 수정됨====
