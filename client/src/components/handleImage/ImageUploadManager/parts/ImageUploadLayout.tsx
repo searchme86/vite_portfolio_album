@@ -36,7 +36,6 @@ function ImageUploadLayout({
         <div className="flex-1">
           <ImageUploaderMain postId={postId} />
         </div>
-        <div className="flex-1"></div>
       </div>
     </div>
   );

@@ -14,6 +14,9 @@ function PreviewContainer({
   onDelete,
   isUploading,
 }: PreviewContainerProps) {
+  console.log('---> PreviewContainer 렌더링: imageUrls', imageUrls);
+  console.log('---> PreviewContainer 렌더링: previewUrls', previewUrls);
+
   return (
     <div className="flex gap-2">
       {/* 업로드된 이미지 표시 */}
@@ -26,7 +29,10 @@ function PreviewContainer({
           />
           <button
             type="button"
-            onClick={() => onDelete(index)} // imageUrls 기준 인덱스 사용
+            onClick={() => {
+              console.log('---> PreviewContainer X 버튼 클릭: index', index);
+              onDelete(index); // imageUrls 기준 인덱스 사용
+            }}
             disabled={isUploading || imageUrls.length <= 1} // 최소 1개 제한 적용
             className={`absolute top-0 right-0 p-1 text-white bg-red-500 ${
               isUploading || imageUrls.length <= 1

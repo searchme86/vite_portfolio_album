@@ -1,3 +1,4 @@
+//====여기부터 수정됨====
 // ImageUploaderMain 컴포넌트: 메인 업로더 UI
 // 의미: 파일 업로드 인터페이스 제공
 // 이유: 사용자 입력 처리
@@ -6,6 +7,7 @@ import { useImageUploadStore } from '@/stores/imageUploadStore';
 import PreviewContainer from './parts/PreviewContainer';
 import useHandleFileUpload from './hooks/useHandleFileUpload';
 import useHandleFilesChange from './hooks/useHandleFilesChange';
+import useManageUploadState from './hooks/useManageUploadState'; // 추가: 상태 직접 업데이트용
 
 interface ImageUploaderMainProps {
   postId: string;
@@ -21,8 +23,12 @@ function ImageUploaderMain({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { imageUrls, tempFiles, isUploading, progress, setPostId } =
     useImageUploadStore();
-  const { handleFileUpload } = useHandleFileUpload(); // 훅 호출 후 함수 추출
+  const { handleFileUpload } = useHandleFileUpload();
   const { handleFilesChange } = useHandleFilesChange();
+  const { manageUploadState } = useManageUploadState(); // 추가: 상태 업데이트 훅
+
+  console.log('---> ImageUploaderMain 렌더링: imageUrls', imageUrls);
+  console.log('---> ImageUploaderMain 렌더링: tempFiles', tempFiles);
 
   // postId가 변경될 때 한 번만 설정
   useEffect(() => {
@@ -36,19 +42,25 @@ function ImageUploaderMain({
   // 이유: 사용자 인터랙션 처리
 
   const handleDeleteFile = (index: number) => {
+    console.log('---> handleDeleteFile 호출됨: index', index);
+    console.log('---> handleDeleteFile 호출됨: imageUrls', imageUrls);
     if (index < 0 || index >= imageUrls.length) return;
     if (imageUrls.length <= 1) return; // 최소 이미지 개수 제한
     // 의미: 삭제 조건 확인
     // 이유: 데이터 손실 방지
 
     const newImageUrls = imageUrls.filter((_, i) => i !== index);
-    handleFilesChange(
-      newImageUrls.map((img) => img.url),
-      0,
-      false
+    console.log('---> handleDeleteFile 처리됨: newImageUrls', newImageUrls);
+
+    // 수정: handleFilesChange 대신 manageUploadState를 직접 호출
+    // 의미: 중복 확인 로직을 거치지 않고 직접 상태 업데이트
+    // 이유: 삭제 시 중복 확인 불필요
+    // 중요! newImageUrls상태가 삭제가 됐으나 아직 화면에 적용은 안됨
+    manageUploadState(newImageUrls, 0, false);
+    console.log(
+      '---> handleDeleteFile 이후 상태 업데이트됨: newImageUrls',
+      newImageUrls
     );
-    // 의미: 이미지 삭제 및 상태 업데이트
-    // 이유: UI와 상태 동기화
   };
 
   return (
@@ -59,7 +71,7 @@ function ImageUploaderMain({
           accept="image/*"
           multiple
           ref={fileInputRef}
-          onChange={(e) => handleFileUpload(e, existingBaseFileNames)} // 함수 사용
+          onChange={(e) => handleFileUpload(e, existingBaseFileNames)}
           className="hidden"
           id="image-upload"
         />

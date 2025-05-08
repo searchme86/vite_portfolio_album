@@ -33,19 +33,25 @@ function useManageUploadState(): {
     // 의미: 업로드 상태 설정
     // 이유: UI 상태 업데이트
 
-    if (safeProgress >= 100) {
-      const updatedUrls = [
-        ...(useImageUploadStore.getState().imageUrls || []),
-        ...newUrls.map((item) => ({ ...item, isNew: false })),
-      ];
-      // 타입: ImageUrl[] - 최종 URL 배열
-      // 의미: isNew 플래그 업데이트 및 병합
-      // 이유: 업로드 완료 처리
+    // 여기까지 제대로 동작함!
+    // 중요!!
+    console.log('집에가기전에 확인!,newUrls', newUrls);
 
-      setImageUrls(updatedUrls);
-      // 의미: URL 상태 업데이트
-      // 이유: 상태 일관성 유지
-    }
+    const updatedUrls = [
+      ...(useImageUploadStore.getState().imageUrls || []),
+      ...newUrls.map((item) => ({ ...item, isNew: false })),
+    ];
+
+    console.log('정말 마지막 확인! updatedUrls', updatedUrls);
+    // 타입: ImageUrl[] - 최종 URL 배열
+    // 의미: isNew 플래그 업데이트 및 병합
+    // 이유: 업로드 완료 처리
+
+    setImageUrls(updatedUrls);
+    // 의미: URL 상태 업데이트
+    // 이유: 상태 일관성 유지
+    // if (safeProgress >= 100) {
+    // }
   };
 
   return { manageUploadState };
