@@ -13,33 +13,41 @@ import useImagePreviewEventHandling from './hooks/useImagePreviewEventHandling';
 import { useImageValidation } from './hooks/useImageValidation'; // @type {Function} - 이미지 유효성 검사 훅
 // @description 이미지 데이터 검증 도구
 // @reason 안전한 데이터 전달
-import ImagePreviewRendering from './parts/ImagePreviewRendering'; // @type {Component} - 렌더링 컴포넌트
+import ImagePreviewRendering from './parts/imagePreviewRendering'; // @type {Component} - 렌더링 컴포넌트
 // @description UI 렌더링 로직
 // @reason 렌더링 분리
+
+//====여기부터 수정됨====
+// interface ImageItem {
+//   url: string; // @type {string} - 이미지 URL
+//   // @description 이미지 주소
+//   // @reason 표시
+//   isNew: boolean; // @type {boolean} - 새 이미지 여부
+//   // @description 새 이미지인지 확인
+//   // @reason 상태 관리
+// }
 
 interface ImagePreviewProps {
   imageUrl: string; // @type {string} - 이미지 URL
   // @description 사진의 인터넷 주소
   // @reason 이미지 표시
-  onDelete: (index: number) => void; // @type {(index: number) => void} - 삭제 핸들러
-  // @description 인덱스로 사진을 지우는 함수
-  // @reason 사용자 행동 처리
   isUploading: boolean; // @type {boolean} - 업로드 중 여부
   // @description 업로드 상태 확인
   // @reason UI 조정
 }
 
-function ImagePreview({ imageUrl, onDelete, isUploading }: ImagePreviewProps) {
+function ImagePreview({ imageUrl, isUploading }: ImagePreviewProps) {
   // 상태 관리 훅 호출
-  const imageUrls = useImageUrls(); // @type {{ url: string; isNew: boolean }[]} - 이미지 URL 배열
+  const imageUrls = useImageUrls(); // @type {ImageItem[]} - 이미지 URL 배열
   // @description Zustand에서 이미지 URL 가져오기
   // @reason 상태 분리
+  // @why ImageItem 적용: imageUrls가 ImageItem[] 형태임을 명확히 함
   const minImages = useMinImages(); // @type {number} - 최소 이미지 수
   // @description Zustand에서 최소 이미지 수 가져오기
   // @reason 상태 분리
 
   // 이벤트 핸들러 훅 호출
-  const { handleRemoveImage } = useImagePreviewEventHandling(onDelete); // @type {{ handleRemoveImage: (index: number) => void }} - 이벤트 핸들러
+  const { handleRemoveImage } = useImagePreviewEventHandling(); // @type {{ handleRemoveImage: (index: number) => void }} - 이벤트 핸들러
   // @description 삭제 이벤트 처리
   // @reason 사용자 행동 반영
 
@@ -66,5 +74,6 @@ function ImagePreview({ imageUrl, onDelete, isUploading }: ImagePreviewProps) {
   // @description UI 렌더링 컴포넌트 호출
   // @reason 분리된 로직 재사용
 }
+//====여기까지 수정됨====
 
 export default ImagePreview;
