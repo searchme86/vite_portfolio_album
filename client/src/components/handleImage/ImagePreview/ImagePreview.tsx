@@ -1,11 +1,8 @@
 import { useMemo } from 'react'; // @type {Function} - React 훅
 // @description 계산 결과를 캐싱하는 도구
 // @reason 성능 최적화
-import useImageUrls from './hooks/useImageUrls'; // @type {Function} - 이미지 URL 관리 훅
-// @description 이미지 URL 상태 관리
-// @reason 상태 분리
-import useMinImages from './hooks/useMinImages'; // @type {Function} - 최소 이미지 수 관리 훅
-// @description 최소 이미지 수 상태 관리
+import { useGetImageManagementState } from '@/stores/imageManagement/useGetImageManagementState'; // @type {Function} - 이미지 상태 가져오기 훅
+// @description 이미지 상태 관리
 // @reason 상태 분리
 import useImagePreviewEventHandling from './hooks/useImagePreviewEventHandling'; // @type {Function} - 이벤트 핸들링 훅
 // @description 이벤트 처리 로직 관리
@@ -16,16 +13,6 @@ import { useImageValidation } from './hooks/useImageValidation'; // @type {Funct
 import ImagePreviewRendering from './parts/imagePreviewRendering'; // @type {Component} - 렌더링 컴포넌트
 // @description UI 렌더링 로직
 // @reason 렌더링 분리
-
-//====여기부터 수정됨====
-// interface ImageItem {
-//   url: string; // @type {string} - 이미지 URL
-//   // @description 이미지 주소
-//   // @reason 표시
-//   isNew: boolean; // @type {boolean} - 새 이미지 여부
-//   // @description 새 이미지인지 확인
-//   // @reason 상태 관리
-// }
 
 interface ImagePreviewProps {
   imageUrl: string; // @type {string} - 이미지 URL
@@ -38,11 +25,10 @@ interface ImagePreviewProps {
 
 function ImagePreview({ imageUrl, isUploading }: ImagePreviewProps) {
   // 상태 관리 훅 호출
-  const imageUrls = useImageUrls(); // @type {ImageItem[]} - 이미지 URL 배열
+  const imageUrls = useGetImageManagementState((state) => state.imageUrls); // @type {{ url: string; isNew: boolean }[]} - 이미지 URL 배열
   // @description Zustand에서 이미지 URL 가져오기
   // @reason 상태 분리
-  // @why ImageItem 적용: imageUrls가 ImageItem[] 형태임을 명확히 함
-  const minImages = useMinImages(); // @type {number} - 최소 이미지 수
+  const minImages = useGetImageManagementState((state) => state.minImages); // @type {number} - 최소 이미지 수
   // @description Zustand에서 최소 이미지 수 가져오기
   // @reason 상태 분리
 
@@ -74,6 +60,5 @@ function ImagePreview({ imageUrl, isUploading }: ImagePreviewProps) {
   // @description UI 렌더링 컴포넌트 호출
   // @reason 분리된 로직 재사용
 }
-//====여기까지 수정됨====
 
 export default ImagePreview;

@@ -1,73 +1,107 @@
-// SwiperWrapper 컴포넌트: Swiper 라이브러리 래퍼
-// 단일 책임: Swiper 슬라이드 기능 제공 및 공통 컴포넌트 사용
-import { Swiper, SwiperSlide } from 'swiper/react';
-import useSafeImages from './hooks/useSafeImages';
-import SlideImage from './parts/SlideImage';
-import SlideFallback from './parts/SlideFallback';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react'; // @type {Component} - Swiper 컴포넌트
+// @description 슬라이드 기능 제공
+// @reason UI 구성
+import useSafeImages from './hooks/useSafeImages'; // @type {Function} - 이미지 안전 처리 훅
+// @description 이미지 데이터 검증
+// @reason 안전한 데이터 전달
+import SlideImage from './parts/SlideImage'; // @type {Component} - 슬라이드 이미지 컴포넌트
+// @description 개별 이미지 렌더링
+// @reason UI 구성
+import SlideFallback from './parts/SlideFallback'; // @type {Component} - 슬라이드 폴백 컴포넌트
+// @description 이미지 없음 UI
+// @reason 사용자 피드백
+import 'swiper/css'; // @type {CSS} - Swiper 기본 스타일
+// @description Swiper 기본 스타일 적용
+// @reason UI 스타일링
+import 'swiper/css/navigation'; // @type {CSS} - Swiper 내비게이션 스타일
+// @description 내비게이션 스타일 적용
+// @reason UI 스타일링
+import 'swiper/css/pagination'; // @type {CSS} - Swiper 페이지네이션 스타일
+// @description 페이지네이션 스타일 적용
+// @reason UI 스타일링
+import { Navigation, Pagination } from 'swiper/modules'; // @type {Module} - Swiper 모듈
+// @description 내비게이션 및 페이지네이션 기능
+// @reason 사용자 인터랙션
 
-// SwiperWrapper 컴포넌트 정의
-// images와 slideHeight를 props로 받음
-function SwiperWrapper({ images, slideHeight = 'h-64' }) {
-  //====여기부터 수정됨====
+interface SwiperWrapperProps {
+  images: string[]; // @type {string[]} - 이미지 URL 배열
+  // @description 슬라이드에 표시할 이미지 목록
+  // @reason 데이터 전달
+  slideHeight?: string; // @type {string} - 슬라이드 높이
+  // @description 슬라이드 높이 스타일
+  // @reason UI 스타일링
+}
+
+function SwiperWrapper({ images, slideHeight = 'h-64' }: SwiperWrapperProps) {
   // images가 undefined일 경우 빈 배열로 fallback
-  // 타입스크립트 대비: string[] 타입으로 예상
-  const safeImagesProp = images || []; // <!---여기추가
-  // 디버깅: safeImagesProp 확인
-  // images가 올바르게 전달되었는지 확인
-  console.log('SwiperWrapper - safeImagesProp:', safeImagesProp); // <!---여기추가
+  const safeImagesProp = images || []; // @type {string[]} - 안전한 이미지 배열
+  // @description images가 없으면 빈 배열로 처리
+  // @reason 애플리케이션 깨짐 방지
+  console.log('SwiperWrapper - safeImagesProp:', safeImagesProp); // @type {void} - 디버깅 로그
+  // @description 이미지 배열 확인
+  // @reason 데이터 검증
 
-  // slideHeight가 undefined이거나 문자열이 아닌 경우 기본값 "h-64"로 fallback
-  // 타입스크립트 대비: string 타입으로 명확히 처리
+  // slideHeight가 유효하지 않은 경우 기본값으로 fallback
   const safeSlideHeight =
-    typeof slideHeight === 'string' && slideHeight ? slideHeight : 'h-64'; // <!---여기수정
-  // 디버깅: safeSlideHeight 확인
-  // safeSlideHeight가 올바르게 처리되었는지 확인
-  console.log('SwiperWrapper - safeSlideHeight:', safeSlideHeight); // 이미 존재하는 로그
-  //====여기까지 수정됨====
+    typeof slideHeight === 'string' && slideHeight ? slideHeight : 'h-64'; // @type {string} - 안전한 슬라이드 높이
+  // @description slideHeight가 유효하지 않으면 기본값 사용
+  // @reason 애플리케이션 깨짐 방지
+  console.log('SwiperWrapper - safeSlideHeight:', safeSlideHeight); // @type {void} - 디버깅 로그
+  // @description 슬라이드 높이 확인
+  // @reason 데이터 검증
 
   // images를 안전하게 처리
-  // useSafeImages 훅으로 배열 안전성 보장
-  const safeImages = useSafeImages(safeImagesProp);
+  const safeImages = useSafeImages(safeImagesProp); // @type {string[]} - 검증된 이미지 배열
+  // @description 이미지 배열 검증
+  // @reason 안전한 데이터 사용
 
-  // Swiper 컴포넌트로 슬라이드 기능 제공
-  // Navigation과 Pagination 모듈 사용, 접근성 고려
   return (
     <Swiper
-      modules={[Navigation, Pagination]}
-      spaceBetween={10}
-      slidesPerView={1}
-      navigation
-      pagination={{ clickable: true }}
-      className={`w-full ${safeSlideHeight}`}
-      aria-label="Image slide carousel"
+      modules={[Navigation, Pagination]} // @type {Module[]} - Swiper 모듈
+      // @description 내비게이션 및 페이지네이션 기능 활성화
+      // @reason 사용자 인터랙션
+      spaceBetween={10} // @type {number} - 슬라이드 간 간격
+      // @description 슬라이드 간격 설정
+      // @reason UI 스타일링
+      slidesPerView={1} // @type {number} - 한 번에 보여줄 슬라이드 수
+      // @description 한 번에 하나의 슬라이드 표시
+      // @reason UI 설정
+      navigation // @type {boolean} - 내비게이션 활성화
+      // @description 내비게이션 버튼 표시
+      // @reason 사용자 인터랙션
+      pagination={{ clickable: true }} // @type {Object} - 페이지네이션 설정
+      // @description 클릭 가능한 페이지네이션 표시
+      // @reason 사용자 인터랙션
+      className={`w-full ${safeSlideHeight}`} // @type {string} - 스타일 클래스
+      // @description 슬라이드 크기 및 스타일 적용
+      // @reason UI 스타일링
+      aria-label="Image slide carousel" // @type {string} - 접근성 속성
+      // @description 스크린 리더를 위한 설명
+      // @reason 접근성
     >
       {safeImages.length > 0 ? (
-        // safeImages가 있을 경우 각 이미지를 SwiperSlide로 렌더링
-        // SlideImage 컴포넌트 사용
         safeImages.map((image, index) => (
           <SwiperSlide key={index}>
             {image ? (
-              <SlideImage imageSrc={image} index={index} />
+              <SlideImage imageSrc={image} index={index} /> // @type {JSX.Element} - 이미지 렌더링
             ) : (
-              <SlideFallback message="Image not available" />
+              // @description 유효한 이미지 렌더링
+              // @reason UI 표시
+              <SlideFallback message="Image not available" /> // @type {JSX.Element} - 폴백 UI
+              // @description 이미지 없음 UI
+              // @reason 사용자 피드백
             )}
           </SwiperSlide>
         ))
       ) : (
-        // safeImages가 없을 경우 fallback UI 렌더링
-        // SlideFallback 컴포넌트 사용
         <SwiperSlide>
           <SlideFallback message="No images available for slide." />
         </SwiperSlide>
       )}
     </Swiper>
-  );
+  ); // @type {JSX.Element} - Swiper 컴포넌트 렌더링
+  // @description 슬라이드 UI 반환
+  // @reason 화면 표시
 }
 
-// 컴포넌트 내보내기
-// 다른 파일에서 import하여 사용할 수 있도록 모듈화
 export default SwiperWrapper;

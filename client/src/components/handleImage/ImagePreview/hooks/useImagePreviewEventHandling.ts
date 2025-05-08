@@ -1,46 +1,24 @@
 import { useCallback } from 'react'; // @type {Function} - React 훅
 // @description 함수 안정화 도구
 // @reason 재사용성 보장
-import { useImageUploadStore } from '@/stores/imageUploadStore'; // @type {Function} - Zustand 스토어 훅
-// @description 이미지 업로드 상태 관리
-// @reason 데이터 접근
-
-//====여기부터 수정됨====
-interface ImageItem {
-  url: string; // @type {string} - 이미지 URL
-  // @description 이미지 주소
-  // @reason 표시
-  isNew: boolean; // @type {boolean} - 새 이미지 여부
-  // @description 새 이미지인지 확인
-  // @reason 상태 관리
-}
-
-// Zustand 스토어의 타입 정의
-interface ImageUploadState {
-  imageUrls: ImageItem[]; // @type {ImageItem[]} - 이미지 URL 배열
-  // @description 스토어에서 관리되는 이미지 목록
-  // @reason 상태 구조화
-  minImages: number; // @type {number} - 최소 이미지 수
-  // @description 스토어에서 관리되는 최소 이미지 수
-  // @reason 규칙 적용
-  setImageUrls: (urls: ImageItem[]) => void; // @type {(urls: ImageItem[]) => void} - 이미지 URL 설정 함수
-  // @description 이미지 목록 업데이트
-  // @reason 상태 변경
-}
+import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore'; // @type {Function} - Zustand 스토어
+// @description 이미지 관리 스토어 접근
+// @reason 상태 사용
+import { useGetImageManagementState } from '@/stores/imageManagement/useGetImageManagementState'; // @type {Function} - 이미지 상태 가져오기 훅
+// @description 이미지 상태 관리
+// @reason 상태 분리
 
 export default function useImagePreviewEventHandling() {
-  const imageUrls = useImageUploadStore(
-    (state: ImageUploadState) => state.imageUrls || []
-  ); // @type {ImageItem[]} - 이미지 URL 배열
+  const imageUrls = useGetImageManagementState(
+    (state) => state.imageUrls || []
+  ); // @type {{ url: string; isNew: boolean }[]} - 이미지 URL 배열
   // @description Zustand 스토어에서 이미지 URL 가져오기, 없으면 빈 배열
   // @reason 상태 접근
-  // @why ImageItem 적용: 타입 안전성 보장, imageUrls가 ImageItem[] 형태임을 명확히 함
-  const setImageUrls = useImageUploadStore(
-    (state: ImageUploadState) => state.setImageUrls
-  ); // @type {(urls: ImageItem[]) => void} - 이미지 URL 설정 함수
+  // @why: 타입 안전성 보장, imageUrls가 { url: string; isNew: boolean }[] 형태임을 명확히 함
+  const setImageUrls = useImageManagementStore((state) => state.setImageUrls); // @type {(urls: { url: string; isNew: boolean }[]) => void} - 이미지 URL 설정 함수
   // @description Zustand 스토어에서 이미지 URL 업데이트 함수 가져오기
   // @reason 상태 변경
-  // @why ImageItem 적용: setImageUrls가 ImageItem[]을 인자로 받음을 명확히 함
+  // @why: setImageUrls가 { url: string; isNew: boolean }[]을 인자로 받음을 명확히 함
 
   const handleRemoveImage = useCallback(
     (index: number) => {
@@ -51,7 +29,7 @@ export default function useImagePreviewEventHandling() {
         return;
       }
 
-      const updatedUrls = imageUrls.filter((_, i) => i !== index); // @type {ImageItem[]} - 필터링된 이미지 목록
+      const updatedUrls = imageUrls.filter((_, i) => i !== index); // @type {{ url: string; isNew: boolean }[]} - 필터링된 이미지 목록
       // @description 인덱스에 해당하는 이미지 제거
       // @reason 이미지 삭제
 
@@ -67,4 +45,3 @@ export default function useImagePreviewEventHandling() {
   // @description 삭제 핸들러 반환
   // @reason 상위 사용
 }
-//====여기까지 수정됨====

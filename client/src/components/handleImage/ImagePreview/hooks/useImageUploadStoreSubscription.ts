@@ -1,12 +1,12 @@
 import { useMemo } from 'react'; // @type {Function} - React 훅
 // @description 계산 결과 캐싱
 // @reason 성능 최적화
-import { useImageUploadStore } from '@/stores/imageUploadStore'; // @type {Function} - Zustand 스토어 훅
+import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore'; // @type {Function} - Zustand 스토어 훅
 // @description 이미지 업로드 상태 관리
 // @reason 데이터 접근
 
 // Zustand 스토어 상태 타입 정의
-interface ImageUploadState {
+interface ImageManagementState {
   imageUrls: { url: string; isNew: boolean }[]; // @type {{ url: string; isNew: boolean }[]} - 이미지 URL 배열
   // @description 스토어에서 관리되는 이미지 목록
   // @reason 상태 구조화
@@ -16,7 +16,7 @@ interface ImageUploadState {
 }
 
 // 제네릭 타입을 사용하여 selector의 반환 타입 정의
-type Selector<T> = (state: ImageUploadState) => T; // @type {(state: ImageUploadState) => T} - 상태 선택 함수
+type Selector<T> = (state: ImageManagementState) => T; // @type {(state: ImageManagementState) => T} - 상태 선택 함수
 // @description Zustand 상태에서 특정 값을 선택하는 함수
 // @reason 타입 안전성 보장
 // @generic T: selector가 반환하는 값의 타입
@@ -26,7 +26,7 @@ type Selector<T> = (state: ImageUploadState) => T; // @type {(state: ImageUpload
 export default function useImageUploadStoreSubscription<T>(
   selector: Selector<T>
 ): T {
-  const selectedValue = useImageUploadStore(selector); // @type {T} - 선택된 값
+  const selectedValue = useImageManagementStore(selector); // @type {T} - 선택된 값
   // @description Zustand 스토어에서 selector로 값 선택
   // @reason 상태 구독
 
