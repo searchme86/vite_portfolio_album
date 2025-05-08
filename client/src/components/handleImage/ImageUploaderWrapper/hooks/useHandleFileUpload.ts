@@ -58,7 +58,7 @@ function useHandleFileUpload() {
       return;
     }
 
-    setTempFiles(newFiles);
+    setTempFiles([...tempFiles, ...newFiles]); // 기존 파일에 새 파일 추가
     setIsUploading(true);
     toast.info('파일을 올리는 중이에요');
     setProgress(0);
@@ -87,16 +87,15 @@ function useHandleFileUpload() {
               const loaded = Number.isFinite(progressEvent?.loaded)
                 ? progressEvent.loaded
                 : 0;
-              // total이 undefined일 가능성을 제거하기 위해 명시적 기본값 설정
-              const total = progressEvent?.total ?? 1; // nullish coalescing 연산자로 기본값 1 설정
+              const total = progressEvent?.total ?? 1;
               const progress =
                 total > 0 ? Math.round((loaded * 100) / total) : 0;
               const overallProgress =
-                newFiles.length > 0
+                newFiles.length > 1
                   ? Math.round(
-                      (uploadedFiles / newFiles.length) * 100 * (progress / 100)
+                      ((uploadedFiles + progress / 100) / newFiles.length) * 100
                     )
-                  : 0;
+                  : progress;
               setProgress(overallProgress);
             },
           }
@@ -105,21 +104,15 @@ function useHandleFileUpload() {
         newUploadedUrls.push({ url: res.data.url, isNew: true });
       }
 
+      // 업로드 완료 후 tempFiles 초기화 및 imageUrls 업데이트
+      setTempFiles([]); // 업로드 완료 후 임시 파일 제거
+      setIsUploading(false);
       handleFilesChange(
         newUploadedUrls.map((img) => img.url),
         100,
         false
       );
-      setIsUploading(false);
-      setTimeout(() => {
-        setTempFiles([]);
-        setProgress(0);
-        handleFilesChange(
-          newUploadedUrls.map((img) => img.url),
-          0,
-          false
-        );
-      }, 1000);
+      toast.success('파일 업로드가 완료되었습니다!');
     } catch (error) {
       console.error('사진 업로드 실패:', error);
       const errorMessage =

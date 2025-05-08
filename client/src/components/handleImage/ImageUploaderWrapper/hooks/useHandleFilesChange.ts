@@ -55,17 +55,24 @@ function useHandleFilesChange(): {
     // 의미: 중복 및 삭제된 URL 제외
     // 이유: 상태 최적화
 
-    if (newUrls.length > 0) {
-      manageUploadState(newUrls, safeProgress, safeIsUploading);
+    // 추가: 중복 URL 필터링 강화
+    const uniqueNewUrls = newUrls.filter(
+      (newUrl, index, self) =>
+        self.findIndex((u) => u.url === newUrl.url) === index
+    );
+    // 의미: newUrls 배열에서 중복 URL 제거
+    // 이유: 동일한 이미지가 두 번 표시되는 문제 해결
+
+    if (uniqueNewUrls.length > 0) {
+      manageUploadState(uniqueNewUrls, safeProgress, safeIsUploading);
       // 의미: 새로운 URL로 상태 업데이트
       // 이유: UI 동기화
     }
   };
 
   return { handleFilesChange };
-  // 타입: { handleFilesChange: (urls: string[], progress: number, isUploading: boolean) => void }
   // 의미: 파일 변경 핸들러 반환
-  // 이유: 재사용 가능성
+  // 이유: 재사용 가능
 }
 
 export default useHandleFilesChange;

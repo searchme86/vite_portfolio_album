@@ -19,9 +19,9 @@ function ImageUploaderMain({
   existingBaseFileNames = [],
 }: ImageUploaderMainProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { imageUrls, tempFiles, isUploading, setPostId } =
+  const { imageUrls, tempFiles, isUploading, progress, setPostId } =
     useImageUploadStore();
-  const { handleFileUpload } = useHandleFileUpload();
+  const { handleFileUpload } = useHandleFileUpload(); // 훅 호출 후 함수 추출
   const { handleFilesChange } = useHandleFilesChange();
 
   // postId가 변경될 때 한 번만 설정
@@ -43,9 +43,9 @@ function ImageUploaderMain({
 
     const newImageUrls = imageUrls.filter((_, i) => i !== index);
     handleFilesChange(
-      newImageUrls.map((img) => img.url), // urls
-      0, // progress
-      false // isUploading
+      newImageUrls.map((img) => img.url),
+      0,
+      false
     );
     // 의미: 이미지 삭제 및 상태 업데이트
     // 이유: UI와 상태 동기화
@@ -59,7 +59,7 @@ function ImageUploaderMain({
           accept="image/*"
           multiple
           ref={fileInputRef}
-          onChange={(e) => handleFileUpload(e, existingBaseFileNames)}
+          onChange={(e) => handleFileUpload(e, existingBaseFileNames)} // 함수 사용
           className="hidden"
           id="image-upload"
         />
@@ -69,9 +69,11 @@ function ImageUploaderMain({
         <button
           type="button"
           onClick={handleAddFileClick}
-          disabled={isUploading}
+          disabled={isUploading || tempFiles.length >= 5} // 업로드 중 또는 최대 5개 제한
           className={`px-4 py-2 text-white bg-blue-600 rounded-md ${
-            isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+            isUploading || tempFiles.length >= 5
+              ? 'opacity-50 cursor-not-allowed'
+              : 'hover:bg-blue-700'
           }`}
         >
           {buttonText || 'Add a Cover Image'}
@@ -79,7 +81,21 @@ function ImageUploaderMain({
         {/* 의미: 업로드 버튼 */}
         {/* 이유: 사용자 인터랙션 */}
       </div>
-      {tempFiles.length > 0 && (
+
+      {/* 프로그래스바 추가 */}
+      {isUploading && (
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div
+            className="bg-blue-600 h-2.5 rounded-full"
+            style={{ width: `${progress}%` }}
+          />
+          <p className="mt-1 text-sm text-gray-600">업로드 진행: {progress}%</p>
+        </div>
+      )}
+      {/* 의미: 업로드 진행 상황 표시 */}
+      {/* 이유: 사용자 피드백 제공 */}
+
+      {(tempFiles.length > 0 || imageUrls.length > 0) && (
         <PreviewContainer
           previewUrls={tempFiles.map((file) => URL.createObjectURL(file))}
           imageUrls={imageUrls.map((img) => img.url)}
