@@ -7,7 +7,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import ImageUploadManager from '../../components/handleImage/ImageUploadManager/ImageUploadManager';
+// import ImageUploadManager from '../../components/handleImage/ImageUploadManager/ImageUploadManager';
 
 // 1. EditPostPage 컴포넌트: 기존 포스트 편집 페이지
 // 2. 이미지 업로드, 포스트 내용 수정, 서버 업데이트 기능 제공
@@ -164,7 +164,7 @@ function EditPostPage() {
         <h1 className="mb-4 text-2xl font-bold">Edit Post</h1>
         {/* 1. ImageUploadManager 사용: 이미지 업로드 기능 통합 */}
         {/* 2. 내부적으로 ImageUploadContext.Provider를 통해 Context 값 제공 */}
-        <ImageUploadManager
+        {/* <ImageUploadManager
           postId={safePostId}
           initialImageUrls={post?.img || []}
           onImageUrlsChange={(urls) => setImageUrls(urls || [])}
@@ -172,7 +172,7 @@ function EditPostPage() {
           minImages={1}
           maxImages={10}
           showSlide={false}
-        />
+        /> */}
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 // import PostTagManager from '../../components/tags/PostTagManager';
 import PostTagManager from '@/components/tags/PostTagManager';
 // import ImageUploadManager from '../../components/handleImage/ImageUploadManager/ImageUploadManager';
-import ImageUploadManager from '@/components/handleImage/ImageUploadManager/ImageUploadManager';
+// import ImageUploadManager from '@/components/handleImage/ImageUploadManager/ImageUploadManager';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 // import { useCreatePost } from '../../api/post/write/useCreatePost';
@@ -111,7 +111,7 @@ function Write() {
         <h1 className="mb-4 text-2xl font-bold">Create a New Post</h1>
         {/* 1. ImageUploadManager 사용 */}
         {/* 2. 이미지 업로드 기능 통합 */}
-        <ImageUploadManager
+        {/* <ImageUploadManager
           postId="temp"
           initialImageUrls={[]}
           onImageUrlsChange={(urls) => {
@@ -124,7 +124,7 @@ function Write() {
           minImages={1}
           maxImages={10}
           showSlide={false}
-        />
+        /> */}
       </div>
       {/* 1. 폼 요소로 입력 필드와 버튼 구성 */}
       {/* 2. flex-col로 세로 정렬, gap-4로 간격 설정 */}
