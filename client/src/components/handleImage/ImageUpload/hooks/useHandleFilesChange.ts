@@ -4,11 +4,11 @@
 import useFilterDuplicateAndDeletedUrls from './useFilterDuplicateAndDeletedUrls';
 import useManageUploadState from './useManageUploadState';
 import usePrepareExistingFileNames from './usePrepareExistingFileNames';
+import type { ImageUrl } from '../../utils/ImageFileType';
 
 // ImageUrl 타입 가져오기 (useFilterDuplicateAndDeletedUrls에서 정의)
 // 의미: 이미지 URL과 상태를 나타내는 객체
 // 이유: 타입 일관성 유지
-import { ImageUrl } from './useFilterDuplicateAndDeletedUrls';
 
 function useHandleFilesChange(): {
   handleFilesChange: (

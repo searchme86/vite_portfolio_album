@@ -1,16 +1,8 @@
 // useFilterDuplicateAndDeletedUrls 훅: 중복 및 삭제된 URL 필터링
 // 의미: 새로운 URL을 중복 기준으로 필터링
 // 이유: 상태 일관성 유지
-export interface ImageUrl {
-  url: string;
-  isNew: boolean;
-}
 
-interface FilterResult {
-  newUrls: ImageUrl[];
-  hasNewUrls: boolean;
-}
-
+import type { FilterResult } from '../utils/ImageUploadType';
 import useExtractFileName from './useExtractFileName';
 
 function useFilterDuplicateAndDeletedUrls(): {

@@ -1,24 +1,10 @@
-// initialImageManagementState: 초기 상태 정의
-// 의미: Zustand 스토어의 초기 상태 제공
-// 이유: 스토어 초기화 및 기본값 설정
-
-// ImageItem 인터페이스: 이미지 항목 정의
-// 의미: 이미지 데이터 구조 정의
-// 이유: 타입 안정성
-export interface ImageItem {
-  url: string; // @type {string} - 이미지 URL
-  // @description 이미지 주소
-  // @reason 표시
-  isNew: boolean; // @type {boolean} - 새 이미지 여부
-  // @description 새 이미지인지 확인
-  // @reason 상태 관리
-}
+import { ImageUrl } from '@/components/handleImage/utils/ImageFileType';
 
 // GetterState 인터페이스: 상태 값들 정의
 // 의미: 상태 읽기 전용 속성 정의
 // 이유: 역할 분리 및 타입 안정성
 export interface GetterState {
-  imageUrls: ImageItem[]; // @type {ImageItem[]} - 이미지 URL 배열
+  imageUrls: ImageUrl[]; // @type {ImageUrl[]} - 이미지 URL 배열
   minImages: number; // @type {number} - 최소 이미지 수
   maxImages: number; // @type {number} - 최대 이미지 수
   postId: string; // @type {string} - 게시물 ID
@@ -36,7 +22,7 @@ export interface GetterState {
 // 의미: 상태 업데이트 함수 정의
 // 이유: 역할 분리 및 타입 안정성
 export interface SetterActions {
-  setImageUrls: (urls: ImageItem[]) => void; // @type {(urls: ImageItem[]) => void}
+  setImageUrls: (urls: ImageUrl[]) => void; // @type {(urls: ImageUrl[]) => void}
   // @description 이미지 URL 목록 업데이트
   // @reason 상태 변경
   setMinImages: (count: number) => void; // @type {(count: number) => void}
@@ -86,7 +72,7 @@ export interface ImageManagementState extends GetterState, SetterActions {}
 // 의미: Zustand 스토어의 초기 값 제공
 // 이유: 상태 초기화
 export const initialImageManagementState: GetterState = {
-  imageUrls: [] as ImageItem[], // @type {ImageItem[]} - 초기 이미지 URL 배열
+  imageUrls: [] as ImageUrl[], // @type {ImageUrl[]} - 초기 이미지 URL 배열
   // @description 초기 상태로 빈 이미지 목록
   // @reason 상태 초기화
   progress: 0, // @type {number} - 초기 진행률
