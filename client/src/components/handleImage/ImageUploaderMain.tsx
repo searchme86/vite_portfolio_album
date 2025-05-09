@@ -3,8 +3,10 @@
 // 이유: 사용자 입력 처리
 import { useRef, useEffect } from 'react';
 import { useImageUploadStore } from '@/stores/imageUploadStore';
-import PreviewContainer from './parts/PreviewContainer';
-import useHandleFileUpload from './hooks/useHandleFileUpload';
+import PreviewContainer from './ImageUploaderWrapper/parts/PreviewContainer';
+import useHandleFileUpload from './ImageUpload/hooks/useHandleFileUpload';
+import ImageSlide from './ImageSlide/ImageSlide';
+import ImagePreview from './ImagePreview/ImagePreview';
 
 interface ImageUploaderMainProps {
   postId: string;
@@ -61,9 +63,12 @@ function ImageUploaderMain({
     // 의미: Zustand 상태 업데이트
     // 이유: UI 반영을 위해 상태 변경
   };
+  const showSlide = true; // 슬라이드 모드 여부
+  const safeShowSlide = typeof showSlide === 'boolean' ? showSlide : false;
 
   return (
     <div className="flex flex-col gap-4">
+      {/* {safeShowSlide ? <ImageSlide /> : <ImagePreview />} */}
       <div className="flex items-center gap-2">
         <input
           type="file"
@@ -92,7 +97,6 @@ function ImageUploaderMain({
         {/* 의미: 업로드 버튼 */}
         {/* 이유: 사용자 인터랙션 */}
       </div>
-
       {/* 프로그래스바 추가 */}
       {isUploading && (
         <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -105,7 +109,6 @@ function ImageUploaderMain({
       )}
       {/* 의미: 업로드 진행 상황 표시 */}
       {/* 이유: 사용자 피드백 제공 */}
-
       {(tempFiles.length > 0 || imageUrls.length > 0) && (
         <PreviewContainer
           previewUrls={tempFiles.map((file) => URL.createObjectURL(file))}

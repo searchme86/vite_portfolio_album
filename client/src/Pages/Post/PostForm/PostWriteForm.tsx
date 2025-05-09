@@ -139,10 +139,7 @@ function PostWriteForm({ initialImageUrls = [] }: PostWriteFormProps) {
           <PostAutoSave formData={formData} /> {/* PostAutoSave 컴포넌트 */}
           {/* @description formData를 PostAutoSave에 전달 */}
           {/* @reason 자동저장 로직에서 폼 데이터 사용 */}
-          <PostWriteImageUploader
-            initialImageUrls={initialImageUrls}
-            onImageUrlsChange={setImageUrls}
-          />{' '}
+          <PostWriteImageUploader />
           {/* 이미지 업로드 컴포넌트 */}
           {/* @description 이미지 업로드 UI */}
           {/* @reason 이미지 업로드 관리 */}

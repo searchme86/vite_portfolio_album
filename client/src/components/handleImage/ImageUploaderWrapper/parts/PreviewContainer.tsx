@@ -14,8 +14,14 @@ function PreviewContainer({
   onDelete,
   isUploading,
 }: PreviewContainerProps) {
-  console.log('---> PreviewContainer 렌더링: imageUrls', imageUrls);
-  console.log('---> PreviewContainer 렌더링: previewUrls', previewUrls);
+  console.log(
+    '---> PreviewContainer : ImageUploaderMain에서 전달 imageUrls',
+    imageUrls
+  );
+  console.log(
+    '---> PreviewContainer : ImageUploaderMain에서 전달 previewUrls',
+    previewUrls
+  );
 
   return (
     <div className="flex gap-2">
