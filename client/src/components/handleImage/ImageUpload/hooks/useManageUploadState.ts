@@ -1,22 +1,24 @@
 // useManageUploadState 훅: 업로드 상태 관리
 // 의미: 업로드 진행률 및 상태 관리
 // 이유: UI 업데이트 지원
-import { ImageUrl, useImageUploadStore } from '@/stores/imageUploadStore';
+import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
+import type { ImageItem } from '@/stores/imageManagement/initialImageManagementState';
 
 function useManageUploadState(): {
   manageUploadState: (
-    newUrls: ImageUrl[],
+    newUrls: ImageItem[],
     progress: number,
     status: boolean
   ) => void;
 } {
-  const { setProgress, setIsUploading, setImageUrls } = useImageUploadStore();
+  const { setProgress, setIsUploading, setImageUrls } =
+    useImageManagementStore();
 
   // manageUploadState 함수: 상태 관리
   // 의미: 업로드 후 상태 업데이트
   // 이유: UI와 상태 동기화
   const manageUploadState = (
-    newUrls: ImageUrl[],
+    newUrls: ImageItem[],
     progress: number,
     status: boolean
   ): void => {
@@ -39,7 +41,7 @@ function useManageUploadState(): {
 
     if (safeProgress >= 100) {
       const updatedUrls = [
-        ...(useImageUploadStore.getState().imageUrls || []),
+        ...(useImageManagementStore.getState().imageUrls || []),
         ...newUrls.map((item) => ({ ...item, isNew: false })),
       ];
 

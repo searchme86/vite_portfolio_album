@@ -1,81 +1,107 @@
-// imageManagementGetters: 상태 접근 함수
-// 의미: Zustand 스토어 상태를 안전하게 가져오기 위한 getter 함수
-// 이유: 상태 접근 로직 분리 및 재사용성 강화
+import { ImageManagementState, ImageItem } from './initialImageManagementState';
 
-interface ImageItem {
-  url: string; // @type {string} - 이미지 URL
-  // @description 이미지 주소
-  // @reason 표시
-  isNew: boolean; // @type {boolean} - 새 이미지 여부
-  // @description 새 이미지인지 확인
-  // @reason 상태 관리
-}
-
-interface ImageManagementState {
-  imageUrls: ImageItem[]; // @type {ImageItem[]} - 이미지 URL 배열
-  // @description 스토어에서 관리되는 이미지 목록
-  // @reason 상태 구조화
-  minImages: number; // @type {number} - 최소 이미지 수
-  // @description 스토어에서 관리되는 최소 이미지 수
-  // @reason 규칙 적용
-  postId: string; // @type {string} - 게시물 ID
-  // @description 현재 게시물 식별자
-  // @reason 업로드 요청 시 사용
-  tempFiles: File[]; // @type {File[]} - 임시 파일 배열
-  // @description 업로드 전 임시 파일 목록
-  // @reason 미리보기 제공
-  buttonText: string; // @type {string} - 버튼 텍스트
-  // @description 업로드 버튼의 표시 텍스트
-  // @reason 사용자 인터페이스 커스터마이징
-  isUploading: boolean; // @type {boolean} - 업로드 진행 상태
-  // @description 업로드 중인지 여부
-  // @reason UI 상태 관리
-  progress: number; // @type {number} - 업로드 진행률
-  // @description 업로드 진행 상태 표시
-  // @reason 사용자 피드백
-  existingBaseFileNames: string[]; // @type {string[]} - 기존 파일명 배열
-  // @description 중복 확인용 기존 파일명
-  // @reason 중복 파일 업로드 방지
-}
-
-export const getImageUrls = (state: ImageManagementState): ImageItem[] =>
+// getImageUrls: 이미지 URL 목록 반환
+// 의미: 상태에서 이미지 URL 배열 추출
+// 이유: 상태 접근
+export const getImageUrls = (state: ImageManagementState) =>
   state.imageUrls || []; // @type {ImageItem[]}
 // @description 이미지 URL 배열 반환
 // @reason 상태 접근
+// @fallback 빈 배열로 초기화하여 undefined 방지
 
-export const getMinImages = (state: ImageManagementState): number =>
+// getMinImages: 최소 이미지 수 반환
+// 의미: 상태에서 최소 이미지 수 추출
+// 이유: 상태 접근
+export const getMinImages = (state: ImageManagementState) =>
   state.minImages || 1; // @type {number}
 // @description 최소 이미지 수 반환
 // @reason 상태 접근
+// @fallback 1로 초기화하여 잘못된 값 방지
 
-export const getPostId = (state: ImageManagementState): string =>
-  state.postId || ''; // @type {string}
+// getMaxImages: 최대 이미지 수 반환
+// 의미: 상태에서 최대 이미지 수 추출
+// 이유: 상태 접근
+export const getMaxImages = (state: ImageManagementState) =>
+  state.maxImages || 10; // @type {number}
+// @description 최대 이미지 수 반환
+// @reason 상태 접근
+// @fallback 10으로 초기화하여 잘못된 값 방지
+
+// getPostId: 게시물 ID 반환
+// 의미: 상태에서 게시물 ID 추출
+// 이유: 상태 접근
+export const getPostId = (state: ImageManagementState) => state.postId || ''; // @type {string}
 // @description 게시물 ID 반환
 // @reason 상태 접근
+// @fallback 빈 문자열로 초기화하여 undefined 방지
 
-export const getTempFiles = (state: ImageManagementState): File[] =>
+// getTempFiles: 임시 파일 목록 반환
+// 의미: 상태에서 임시 파일 배열 추출
+// 이유: 상태 접근
+export const getTempFiles = (state: ImageManagementState) =>
   state.tempFiles || []; // @type {File[]}
 // @description 임시 파일 배열 반환
 // @reason 상태 접근
+// @fallback 빈 배열로 초기화하여 undefined 방지
 
-export const getButtonText = (state: ImageManagementState): string =>
+// getButtonText: 버튼 텍스트 반환
+// 의미: 상태에서 버튼 텍스트 추출
+// 이유: 상태 접근
+export const getButtonText = (state: ImageManagementState) =>
   state.buttonText || 'Add a Cover Image'; // @type {string}
 // @description 버튼 텍스트 반환
 // @reason 상태 접근
+// @fallback 기본 텍스트로 초기화하여 빈 문자열 방지
 
-export const getIsUploading = (state: ImageManagementState): boolean =>
+// getIsUploading: 업로드 상태 반환
+// 의미: 상태에서 업로드 진행 상태 추출
+// 이유: 상태 접근
+export const getIsUploading = (state: ImageManagementState) =>
   state.isUploading || false; // @type {boolean}
 // @description 업로드 상태 반환
 // @reason 상태 접근
+// @fallback false로 초기화하여 undefined 방지
 
-export const getProgress = (state: ImageManagementState): number =>
-  state.progress || 0; // @type {number}
+// getProgress: 진행률 반환
+// 의미: 상태에서 업로드 진행률 추출
+// 이유: 상태 접근
+export const getProgress = (state: ImageManagementState) => state.progress || 0; // @type {number}
 // @description 진행률 반환
 // @reason 상태 접근
+// @fallback 0으로 초기화하여 잘못된 값 방지
 
-export const getExistingBaseFileNames = (
-  state: ImageManagementState
-): string[] => state.existingBaseFileNames || []; // @type {string[]}
+// getExistingBaseFileNames: 기존 파일명 배열 반환
+// 의미: 상태에서 기존 파일명 배열 추출
+// 이유: 상태 접근
+export const getExistingBaseFileNames = (state: ImageManagementState) =>
+  state.existingBaseFileNames || []; // @type {string[]}
 // @description 기존 파일명 배열 반환
 // @reason 상태 접근
-//====여기까지 수정됨====
+// @fallback 빈 배열로 초기화하여 undefined 방지
+
+// getBaseFileNamesWithoutSuffix: 파일 이름 배열 반환
+// 의미: 상태에서 파일 이름 배열 추출
+// 이유: 상태 접근
+export const getBaseFileNamesWithoutSuffix = (state: ImageManagementState) =>
+  state.baseFileNamesWithoutSuffix || []; // @type {string[]}
+// @description 파일 이름 배열 반환
+// @reason 상태 접근
+// @fallback 빈 배열로 초기화하여 undefined 방지
+
+// getImageTitle: 이미지 제목 반환
+// 의미: 상태에서 이미지 제목 추출
+// 이유: 상태 접근
+export const getImageTitle = (state: ImageManagementState) =>
+  state.imageTitle || ''; // @type {string}
+// @description 이미지 제목 반환
+// @reason 상태 접근
+// @fallback 빈 문자열로 초기화하여 undefined 방지
+
+// getImageUploaderKey: 업로더 키 반환
+// 의미: 상태에서 업로더 키 추출
+// 이유: 상태 접근
+export const getImageUploaderKey = (state: ImageManagementState) =>
+  state.imageUploaderKey || ''; // @type {string}
+// @description 업로더 키 반환
+// @reason 상태 접근
+// @fallback 빈 문자열로 초기화하여 undefined 방지

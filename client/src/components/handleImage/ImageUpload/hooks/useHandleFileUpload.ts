@@ -1,7 +1,7 @@
 // useHandleFileUpload 훅: 파일 업로드 처리
 // 의미: 파일 선택 및 업로드 로직 처리
 // 이유: 사용자 파일 업로드 관리
-import { useImageUploadStore } from '@/stores/imageUploadStore';
+import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
 import { useAuth } from '@clerk/clerk-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -32,7 +32,7 @@ const fetchAuthParams = async (
 
 function useHandleFileUpload() {
   const { tempFiles, setTempFiles, setIsUploading, setProgress } =
-    useImageUploadStore();
+    useImageManagementStore();
   const { handleFilesChange } = useHandleFilesChange();
   const auth = useAuth(); // 훅 호출은 최상위에서만
   const safeGetToken =

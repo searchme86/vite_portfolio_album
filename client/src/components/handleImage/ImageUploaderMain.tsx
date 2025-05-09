@@ -2,7 +2,7 @@
 // 의미: 파일 업로드 인터페이스 제공
 // 이유: 사용자 입력 처리
 import { useRef, useEffect } from 'react';
-import { useImageUploadStore } from '@/stores/imageUploadStore';
+import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
 import PreviewContainer from './ImageUploaderWrapper/parts/PreviewContainer';
 import useHandleFileUpload from './ImageUpload/hooks/useHandleFileUpload';
 import ImageSlide from './ImageSlide/ImageSlide';
@@ -29,8 +29,8 @@ function ImageUploaderMain({
     setProgress,
     setIsUploading,
     setImageUrls,
-  } = useImageUploadStore();
-  // 수정: useImageUploadStore를 컴포넌트 본문 최상단에서 호출
+  } = useImageManagementStore();
+  // 수정: useImageManagementStore를 컴포넌트 본문 최상단에서 호출
   // 의미: Zustand 스토어에서 상태와 액션 가져오기
   // 이유: Rules of Hooks 준수
   const { handleFileUpload } = useHandleFileUpload();

@@ -1,7 +1,8 @@
 // usePrepareExistingFileNames 훅: 기존 파일명 추출 및 중복 확인 준비
 // 단일 책임: 현재 이미지 URL과 파일명 추출 로직 제공
-import { useImageUploadStore, ImageUrl } from '@/stores/imageUploadStore';
 import useExtractFileName from './useExtractFileName';
+import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
+import type { ImageItem } from '@/stores/imageManagement/initialImageManagementState';
 
 function usePrepareExistingFileNames(): {
   prepareExistingFileNames: () => {
@@ -9,7 +10,7 @@ function usePrepareExistingFileNames(): {
     existingBaseNames: string[];
   };
 } {
-  const { imageUrls } = useImageUploadStore();
+  const { imageUrls } = useImageManagementStore();
   const { extractFileNameFromUrl } = useExtractFileName();
 
   // prepareExistingFileNames 함수: 현재 URL과 파일명 준비
@@ -20,16 +21,16 @@ function usePrepareExistingFileNames(): {
     existingBaseNames: string[];
   } => {
     const safeImageUrls = Array.isArray(imageUrls) ? imageUrls : [];
-    // 타입: ImageUrl[] - 안전한 이미지 URL 배열
+    // 타입: ImageItem[] - 안전한 이미지 URL 배열
     // 의미: null/undefined 방지
     // 이유: 타입 안전성
 
-    const currentUrls = safeImageUrls.map((item: ImageUrl) => item.url || '');
+    const currentUrls = safeImageUrls.map((item: ImageItem) => item.url || '');
     // 타입: string[] - 현재 URL 배열
     // 의미: URL 추출
     // 이유: 중복 확인 준비
 
-    const existingBaseNames = safeImageUrls.map((item: ImageUrl) => {
+    const existingBaseNames = safeImageUrls.map((item: ImageItem) => {
       const fileName = extractFileNameFromUrl(item.url || '');
       // 타입: string - 파일명
       // 의미: URL에서 파일명 추출

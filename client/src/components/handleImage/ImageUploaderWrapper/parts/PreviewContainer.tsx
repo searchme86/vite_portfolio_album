@@ -28,11 +28,13 @@ function PreviewContainer({
       {/* 업로드된 이미지 표시 */}
       {imageUrls.map((url, index) => (
         <div key={`uploaded-${url}`} className="relative">
-          <img
-            src={url}
-            alt={`Uploaded ${index + 1}`}
-            className="object-cover w-32 h-32"
-          />
+          <div className="">
+            <img
+              src={url}
+              alt={`Uploaded ${index + 1}`}
+              className="object-cover w-32 h-32"
+            />
+          </div>
           <button
             type="button"
             onClick={() => {
@@ -48,8 +50,6 @@ function PreviewContainer({
           >
             ✕
           </button>
-          {/* 의미: 삭제 버튼 */}
-          {/* 이유: 이미지 삭제 가능 */}
         </div>
       ))}
       {/* 임시 파일 표시 */}
