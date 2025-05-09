@@ -57,18 +57,12 @@ function useHandleFilesChange(): {
 
     // 추가: 중복 URL 필터링 강화
 
-    console.log('여기부터 문제시작되는듯,newUrls', newUrls);
     const uniqueNewUrls = newUrls.filter(
       (newUrl, index, self) =>
         self.findIndex((u) => u.url === newUrl.url) === index
     );
     // 의미: newUrls 배열에서 중복 URL 제거
     // 이유: 동일한 이미지가 두 번 표시되는 문제 해결
-
-    console.log(
-      '---> useHandleFilesChange 훅 안에서 처리됨: uniqueNewUrls',
-      uniqueNewUrls
-    );
 
     if (uniqueNewUrls.length > 0) {
       manageUploadState(uniqueNewUrls, safeProgress, safeIsUploading);
@@ -83,4 +77,3 @@ function useHandleFilesChange(): {
 }
 
 export default useHandleFilesChange;
-//====여기까지 수정됨====
