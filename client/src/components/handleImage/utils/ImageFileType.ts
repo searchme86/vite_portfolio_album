@@ -6,3 +6,7 @@ export interface ImageUrl {
   // @description 새 이미지인지 확인
   // @reason 상태 관리
 }
+
+export type ImageFileName = {
+  name: string;
+};

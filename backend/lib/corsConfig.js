@@ -39,9 +39,15 @@ export const configureCors = () => {
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], // 의미: 허용된 HTTP 메서드 설정
     // 이유: 요청 메서드 제한
     // 비유: 도서관에서 허용된 행동 정의
-    allowedHeaders: ['Content-Type', 'Authorization'], // 의미: 허용된 요청 헤더 설정
-    // 이유: 필요한 헤더만 허용
-    // 비유: 손님이 제출할 수 있는 정보 제한
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Cache-Control',
+      'X-Unique-Request',
+    ], // 수정: 허용 헤더에 추가
+    // 의미: 허용된 요청 헤더 설정
+    // 이유: 클라이언트가 보낸 헤더 허용
+    // 비유: 손님이 제출할 수 있는 정보에 '빠른 배달'과 '특별 스티커' 허용
     exposedHeaders: ['Access-Control-Allow-Origin'], // 의미: 노출 헤더 추가
     // 이유: 브라우저가 헤더 확인 가능
     // 비유: 손님에게 공개할 정보 정의

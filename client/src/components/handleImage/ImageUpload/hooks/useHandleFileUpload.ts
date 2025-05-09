@@ -6,6 +6,7 @@ import { useAuth } from '@clerk/clerk-react'; // useAuth: Clerk에서 인증 정
 import axios, { AxiosProgressEvent } from 'axios'; // axios: HTTP 요청 라이브러리, AxiosProgressEvent: 업로드 진행 이벤트를 위한 타입, 이유: 서버와의 통신 및 진행률 추적
 import { toast } from 'react-toastify'; // toast: 사용자 알림을 위한 라이브러리, 이유: 업로드 상태 피드백 제공
 import useHandleFilesChange from './useHandleFilesChange'; // useHandleFilesChange: 파일 변경 처리 훅, 이유: 이미지 URL 업데이트 로직 재사용
+import type { ImageFileName } from '../../utils/ImageFileType';
 
 // ImageKitAuthParams: ImageKit 인증 파라미터 타입
 // 의미: ImageKit API가 업로드를 인증하기 위한 데이터 구조를 정의
@@ -17,8 +18,8 @@ interface ImageKitAuthParams {
 }
 
 // fetchAuthParams: ImageKit 인증 파라미터 요청
-// 의미: 서버에서 ImageKit 인증 정보를 가져오는 비동기 함수
-// 이유: 업로드 요청에 필요한 인증 데이터를 동적으로 획득
+// 의미: 서버에서 ImageKit 기본 인증 정보를 가져오는 비동기 함수
+// 이유: 업로드 요청에 필요한 초기 인증 데이터를 동적으로 획득
 const fetchAuthParams = async (
   getToken: () => Promise<string | null> // getToken: Clerk에서 제공하는 토큰 가져오기 함수, 이유: 사용자 인증 토큰 획득, 의미: 인증 정보
 ): Promise<ImageKitAuthParams> => {
@@ -41,6 +42,31 @@ const fetchAuthParams = async (
     toast.error('Failed to fetch ImageKit authentication parameters'); // 사용자 알림, 이유: UI 피드백
     throw error; // 에러 throw, 이유: 상위 호출자에게 에러 전달
   }
+};
+
+// fetchUniqueAuthParams: 각 요청마다 고유한 인증 정보 생성
+// 의미: 각 파일 업로드에 대해 새로운 인증 정보를 요청
+// 이유: ImageKit에서 동일한 토큰 재사용 시 400 Bad Request를 방지
+// 비유: "친구에게 매번 새로운 편지 봉투를 만들어주는 거야!"
+const fetchUniqueAuthParams = async (
+  getToken: () => Promise<string | null>
+): Promise<ImageKitAuthParams> => {
+  // 캐시 방지 및 고유성 보장
+  // 의미: 서버 요청이 캐싱되지 않도록 하고, 새로운 인증 정보 획득
+  // 이유: iOS Safari 캐싱 문제와 토큰 중복 방지
+  const token = await getToken();
+  const safeApiUrl =
+    typeof import.meta.env.VITE_API_URL === 'string'
+      ? import.meta.env.VITE_API_URL
+      : 'http://localhost:3000';
+  const res = await axios.get(`${safeApiUrl}/posts/upload-auth`, {
+    headers: {
+      Authorization: `Bearer ${token || 'default-token'}`,
+      'Cache-Control': 'no-cache', // 캐시 방지 헤더 추가
+      'X-Unique-Request': Date.now().toString(), // 고유성 보장
+    },
+  });
+  return res.data;
 };
 
 // filterNewFiles: 새 파일 필터링
@@ -126,10 +152,21 @@ const checkUploadConditionsAndSetState = (
     urls: string[],
     progress: number,
     isUploading: boolean
-  ) => void // handleFilesChange: 파일 변경 핸들러, 이유: 상위 컴포넌트와 동기화
+  ) => void,
+  // handleFilesChange: 파일 변경 핸들러, 이유: 상위 컴포넌트와 동기화
+  setImageTitle: (name: ImageFileName[]) => void
 ): { success: boolean; newFiles: File[] } => {
   // 반환 타입: 성공 여부와 새 파일, 이유: 후속 로직 전달
   const files = Array.from(e.target.files || []); // files: 선택된 파일 배열, 이유: input에서 파일 추출, 의미: 사용자 입력
+  if (files.length === 0) {
+    toast.warn('선택된 파일이 없습니다. 업로드할 파일을 선택해주세요.'); // 알림: 사용자에게 경고
+    return { success: false, newFiles: [] }; // 실패 반환, 이유: 더 이상 진행할 필요 없음
+  }
+  console.log('테스트중files', files);
+  const firstFileName = files.map((file) => ({ name: file.name })); // firstFileName: 첫 번째 파일 이름, 이유: 제목으로 사용
+  setImageTitle(firstFileName); // setImageTitle 호출, 이유: 상태에 제목 저장
+  console.log('테스트: 첫 번째 파일명 설정됨 -', firstFileName); // 디버깅: 확인용 로그
+
   const newFiles = filterNewFiles(files, existingBaseFileNames); // newFiles: 중복 제거된 파일, 이유: filterNewFiles 호출
   if (newFiles.length === 0) {
     // 조건: 파일 없음 체크, 이유: 불필요한 처리 방지
@@ -150,7 +187,7 @@ const checkUploadConditionsAndSetState = (
 // 이유: 서버로 파일 전송 및 응답 처리
 async function performUpload(
   newFiles: File[], // newFiles: 업로드할 파일, 이유: checkUploadConditionsAndSetState에서 전달
-  authParams: ImageKitAuthParams, // authParams: 인증 정보, 이유: 서버 인증
+  getAuthParams: () => Promise<ImageKitAuthParams>, // 인증 정보 동적 생성 함수, 이유: 각 요청마다 새 토큰 필요
   setProgress: (progress: number) => void // setProgress: 진행률 업데이트, 이유: UI 반영
 ): Promise<{ url: string; isNew: boolean }[]> {
   // 반환 타입: 업로드된 URL 배열, 이유: 비동기 결과
@@ -159,6 +196,10 @@ async function performUpload(
   for (const file of newFiles) {
     // 루프: 각 파일 처리, 이유: 다중 파일 업로드
     const uploadData = new FormData(); // uploadData: 폼 데이터 객체, 이유: 파일 업로드 형식, 동적 처리: 객체로 데이터 준비
+    const authParams = await getAuthParams(); // 각 파일마다 새로운 인증 정보 요청
+    // 의미: 동일한 토큰 재사용 방지
+    // 이유: ImageKit 400 Bad Request 에러 해결
+    // 비유: "매번 새로운 편지 봉투를 만들어서 보내는 거야!"
     const uploadParams = {
       file,
       fileName: file.name,
@@ -268,8 +309,15 @@ async function handleFileUpload(
     progress: number,
     isUploading: boolean
   ) => void, // handleFilesChange: 상위 동기화, 이유: UI 갱신
-  safeGetToken: () => Promise<string | null> // safeGetToken: 인증 토큰, 이유: 인증 처리
+  safeGetToken: () => Promise<string | null>, // safeGetToken: 인증 토큰, 이유: 인증 처리
+  setImageTitle: (name: ImageFileName[]) => void
 ) {
+  // 초기 인증 정보 가져오기
+  // 의미: 업로드 시작 전 기본 인증 정보 설정
+  // 이유: fetchAuthParams를 활용해 초기 인증 데이터 확보
+  const initialAuthParams = await fetchAuthParams(safeGetToken);
+  console.log('초기 인증 정보:', initialAuthParams); // 디버깅용 로그
+
   const { success, newFiles } = checkUploadConditionsAndSetState(
     // 준비 단계 호출, 이유: 조건 체크 및 파일 준비
     e,
@@ -278,7 +326,8 @@ async function handleFileUpload(
     setTempFiles,
     setIsUploading,
     setProgress,
-    handleFilesChange
+    handleFilesChange,
+    setImageTitle
   );
   if (!success) {
     // 조건: 준비 실패, 이유: 불필요한 처리 방지
@@ -286,11 +335,12 @@ async function handleFileUpload(
   }
   try {
     // try: 비동기 처리 블록, 이유: 에러 처리
-    const authParams = await fetchAuthParams(safeGetToken); // authParams: 인증 정보, 이유: 업로드 인증
     const newUploadedUrls = await performUpload(
       // newUploadedUrls: 업로드 결과, 이유: 파일 업로드
       newFiles,
-      authParams,
+      () => fetchUniqueAuthParams(safeGetToken), // 각 요청마다 새로운 인증 정보 생성
+      // 의미: fetchUniqueAuthParams 호출로 토큰 중복 방지
+      // 이유: ImageKit 400 에러 해결
       setProgress
     );
     handleUploadSuccess(
@@ -315,8 +365,13 @@ async function handleFileUpload(
 
 function useHandleFileUpload() {
   // useHandleFileUpload: React 훅 정의, 이유: 파일 업로드 기능 제공
-  const { tempFiles, setTempFiles, setIsUploading, setProgress } =
-    useImageManagementStore(); // 상태 및 함수 추출, 이유: Zustand 스토어 사용
+  const {
+    tempFiles,
+    setTempFiles,
+    setIsUploading,
+    setProgress,
+    setImageTitle,
+  } = useImageManagementStore(); // 상태 및 함수 추출, 이유: Zustand 스토어 사용
   const { handleFilesChange } = useHandleFilesChange(); // 파일 변경 핸들러, 이유: 재사용
   const auth = useAuth(); // auth: 인증 객체, 이유: Clerk 인증
   const safeGetToken = // safeGetToken: 안전한 토큰 함수, 이유: null 방지
@@ -338,7 +393,8 @@ function useHandleFileUpload() {
         setIsUploading,
         setProgress,
         handleFilesChange,
-        safeGetToken
+        safeGetToken,
+        setImageTitle
       ),
   };
 }

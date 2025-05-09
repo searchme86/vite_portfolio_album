@@ -1,6 +1,9 @@
 import { ImageManagementState } from './initialImageManagementState';
 
-import type { ImageUrl } from '@/components/handleImage/utils/ImageFileType';
+import type {
+  ImageUrl,
+  ImageFileName,
+} from '@/components/handleImage/utils/ImageFileType';
 
 // 공통 SetFn 타입 정의
 // 의미: Zustand의 set 함수 타입 정의
@@ -109,8 +112,8 @@ export const setBaseFileNamesWithoutSuffix =
 // setImageTitle: 이미지 제목 상태 업데이트
 // 의미: 이미지 제목 설정
 // 이유: 상태 관리
-export const setImageTitle = (set: SetFn) => (title: string) =>
-  set((state) => ({ ...state, imageTitle: title || '' })); // @type {(title: string) => void}
+export const setImageTitle = (set: SetFn) => (name: ImageFileName[]) =>
+  set((state) => ({ ...state, imageTitle: name || [] })); // @type {(title: string) => void}
 // @description 이미지 제목 상태 업데이트
 // @reason 상태 변경
 // @fallback 빈 문자열로 초기화하여 undefined 방지

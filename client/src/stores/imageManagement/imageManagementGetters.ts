@@ -92,7 +92,7 @@ export const getBaseFileNamesWithoutSuffix = (state: ImageManagementState) =>
 // 의미: 상태에서 이미지 제목 추출
 // 이유: 상태 접근
 export const getImageTitle = (state: ImageManagementState) =>
-  state.imageTitle || ''; // @type {string}
+  state.imageTitle || []; // @type {string}
 // @description 이미지 제목 반환
 // @reason 상태 접근
 // @fallback 빈 문자열로 초기화하여 undefined 방지

@@ -1,4 +1,7 @@
-import { ImageUrl } from '@/components/handleImage/utils/ImageFileType';
+import type {
+  ImageUrl,
+  ImageFileName,
+} from '@/components/handleImage/utils/ImageFileType';
 
 // GetterState 인터페이스: 상태 값들 정의
 // 의미: 상태 읽기 전용 속성 정의
@@ -14,7 +17,7 @@ export interface GetterState {
   progress: number; // @type {number} - 업로드 진행률
   existingBaseFileNames: string[]; // @type {string[]} - 기존 파일명 배열
   baseFileNamesWithoutSuffix: string[]; // @type {string[]} - 파일 이름 배열
-  imageTitle: string; // @type {string} - 업로드된 이미지 제목
+  imageTitle: ImageFileName[]; // @type {string} - 업로드된 이미지 제목
   imageUploaderKey: string; // @type {string} - 업로더 키
 }
 
@@ -52,7 +55,7 @@ export interface SetterActions {
   setBaseFileNamesWithoutSuffix: (names: string[]) => void; // @type {(names: string[]) => void}
   // @description 파일 이름 배열 업데이트
   // @reason 중복 방지
-  setImageTitle: (title: string) => void; // @type {(title: string) => void}
+  setImageTitle: (name: ImageFileName[]) => void; // @type {(title: ImageFileName) => void}
   // @description 이미지 제목 업데이트
   // @reason 상태 변경
   setImageUploaderKey: (key: string) => void; // @type {(key: string) => void}
@@ -105,7 +108,7 @@ export const initialImageManagementState: GetterState = {
   existingBaseFileNames: [] as string[], // @type {string[]} - 초기 기존 파일명 배열
   // @description 초기 상태로 빈 파일명 목록
   // @reason 상태 초기화
-  imageTitle: '', // @type {string} - 초기 이미지 제목
+  imageTitle: [] as ImageFileName[], // @type { name: '' } - 초기 이미지 제목
   // @description 초기 상태로 빈 문자열
   // @reason 상태 초기화
 };
