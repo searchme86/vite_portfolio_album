@@ -19,6 +19,10 @@ export const useSetImageManagementState = (): SetterActions => {
     setProgress,
     setExistingBaseFileNames,
     setImageTitle,
+    setMaxImages,
+    setBaseFileNamesWithoutSuffix,
+    setImageUploaderKey,
+    onImageUrlsChange,
   } = useImageManagementStore((state) => ({
     setImageUrls: state.setImageUrls,
     setMinImages: state.setMinImages,
@@ -29,6 +33,10 @@ export const useSetImageManagementState = (): SetterActions => {
     setProgress: state.setProgress,
     setExistingBaseFileNames: state.setExistingBaseFileNames,
     setImageTitle: state.setImageTitle,
+    setMaxImages: state.setMaxImages,
+    setBaseFileNamesWithoutSuffix: state.setBaseFileNamesWithoutSuffix,
+    setImageUploaderKey: state.setImageUploaderKey,
+    onImageUrlsChange: state.onImageUrlsChange,
   })); // 의미: Zustand 스토어에서 Setter 함수들만 선택
   // 이유: 역할 분리
 
@@ -42,6 +50,10 @@ export const useSetImageManagementState = (): SetterActions => {
     setProgress,
     setExistingBaseFileNames,
     setImageTitle,
+    setMaxImages,
+    setBaseFileNamesWithoutSuffix,
+    setImageUploaderKey,
+    onImageUrlsChange,
   }; // 의미: Setter 함수들 반환
   // 이유: 컴포넌트에서 사용 가능
 };
