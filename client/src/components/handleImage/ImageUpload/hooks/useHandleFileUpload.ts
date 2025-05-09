@@ -1,6 +1,7 @@
 // useHandleFileUpload 훅: 파일 업로드 처리
 // 의미: 이 훅은 사용자가 파일을 선택하고 업로드하는 전체 로직을 관리
 // 이유: 사용자 파일 업로드 경험을 중앙화하고 상태를 효율적으로 관리하기 위함
+// 다중이미지를 위해 각 이미지를 업로드할때 매번 새로운 토큰을 생성하도록 코드 변경
 import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore'; // useImageManagementStore: Zustand 스토어에서 이미지 관리 상태와 함수를 가져옴, 이유: 전역 상태 관리
 import { useAuth } from '@clerk/clerk-react'; // useAuth: Clerk에서 인증 정보를 제공하는 훅, 이유: 사용자 인증 토큰 필요
 import axios, { AxiosProgressEvent } from 'axios'; // axios: HTTP 요청 라이브러리, AxiosProgressEvent: 업로드 진행 이벤트를 위한 타입, 이유: 서버와의 통신 및 진행률 추적
