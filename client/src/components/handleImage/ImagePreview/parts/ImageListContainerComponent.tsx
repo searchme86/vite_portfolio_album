@@ -1,13 +1,7 @@
 import ImageDisplayComponent from './ImageDisplayComponent';
 import ImageRemoveButtonComponent from './ImageRemoveButtonComponent';
 
-// 타입 정의: ImageItem은 이미지 URL과 상태를 나타냄
-// 의미: 이미지 데이터 구조 정의
-// 이유: 타입 안전성 보장
-type ImageItem = {
-  url?: string; // 타입: string - 이미지 URL
-  isNew: boolean; // 타입: boolean - 새 이미지 여부
-};
+import type { ImageUrl } from '../../utils/ImageFileType';
 
 type Props = {
   imageUrl: string; // 타입: string - 현재 이미지 URL
@@ -16,7 +10,7 @@ type Props = {
   isUploading: boolean; // 타입: boolean - 업로드 중 여부
   // 의미: 업로드 상태
   // 이유: UI 조정
-  safeImageUrls: ImageItem[]; // 타입: ImageItem[] - 이미지 목록
+  safeImageUrls: ImageUrl[]; // 타입: ImageUrl[] - 이미지 목록
   // 의미: 검증된 이미지 목록
   // 이유: 표시
   safeMinImages: number; // 타입: number - 최소 이미지 수

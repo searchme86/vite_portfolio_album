@@ -2,11 +2,11 @@
 // 의미: 업로드 진행률 및 상태 관리
 // 이유: UI 업데이트 지원
 import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
-import type { ImageItem } from '@/stores/imageManagement/initialImageManagementState';
+import type { ImageUrl } from '../../utils/ImageFileType';
 
 function useManageUploadState(): {
   manageUploadState: (
-    newUrls: ImageItem[],
+    newUrls: ImageUrl[],
     progress: number,
     status: boolean
   ) => void;
@@ -18,7 +18,7 @@ function useManageUploadState(): {
   // 의미: 업로드 후 상태 업데이트
   // 이유: UI와 상태 동기화
   const manageUploadState = (
-    newUrls: ImageItem[],
+    newUrls: ImageUrl[],
     progress: number,
     status: boolean
   ): void => {

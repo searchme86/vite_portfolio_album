@@ -3,14 +3,7 @@ import { useImageValidation } from './hooks/useImageValidation';
 import { useImagePreview } from './hooks/useImagePreview';
 import useImageUrls from './hooks/useImageUrls';
 import useMinImages from './hooks/useMinImages';
-
-// 타입 정의: ImageItem은 이미지 URL과 상태를 나타냄
-// 의미: 이미지 데이터 구조 정의
-// 이유: 타입 안전성 보장
-interface ImageItem {
-  url: string; // 타입: string - 이미지 URL
-  isNew: boolean; // 타입: boolean - 새 이미지 여부
-}
+import type { ImageUrl } from '../utils/ImageFileType';
 
 // 이미지 미리보기 컴포넌트
 // 의미: 업로드된 이미지를 사용자에게 표시
@@ -18,7 +11,7 @@ interface ImageItem {
 function ImagePreview() {
   const imageUrls = useImageUrls(); // Zustand 스토어에서 이미지 URL 가져오기
   console.log('---> ImagePreview: imageUrls', imageUrls);
-  // 타입: ImageItem[] - 이미지 목록
+  // 타입: ImageUrl[] - 이미지 목록
   // 의미: 스토어에서 관리되는 이미지 URL 배열 가져오기
   // 이유: 중앙 상태 관리로 데이터 일관성 유지
 
@@ -43,7 +36,7 @@ function ImagePreview() {
   // 표시할 URL 처리
   // 의미: 이미지 URL을 기반으로 표시할 URL 목록 생성
   // 이유: 미리보기용 blob URL이 없으므로 서버 URL 직접 사용
-  const displayUrls = safeImageUrls.map((img: ImageItem) => img.url);
+  const displayUrls = safeImageUrls.map((img: ImageUrl) => img.url);
   // 현재 빈배열
   console.log('---> ImagePreview: displayUrls', displayUrls);
 
@@ -62,7 +55,7 @@ function ImagePreview() {
         // 의미: 현재 업로드 상태 반영
         // 이유: UI 조정 (필요 시 스토어에서 관리 가능)
         safeImageUrls={safeImageUrls}
-        // 타입: ImageItem[] - 안전한 이미지 URL 배열
+        // 타입: ImageUrl[] - 안전한 이미지 URL 배열
         // 의미: 검증된 이미지 목록 전달
         // 이유: 안전한 데이터로 렌더링 보장
         safeMinImages={safeMinImages}

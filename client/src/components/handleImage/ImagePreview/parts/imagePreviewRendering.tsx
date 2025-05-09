@@ -1,7 +1,6 @@
 import ImageListContainerComponent from './ImageListContainerComponent';
 import MinimumImagesWarningComponent from './MinimumImagesWarningComponent';
 
-// 타입 정의: ImageItem은 이미지 URL과 상태를 나타냄
 // 의미: 이미지 데이터 구조 정의
 // 이유: 타입 안전성 보장
 interface ImagePreviewRenderingProps {

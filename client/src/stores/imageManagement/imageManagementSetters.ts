@@ -1,4 +1,6 @@
-import { ImageItem, ImageManagementState } from './initialImageManagementState';
+import { ImageManagementState } from './initialImageManagementState';
+
+import type { ImageUrl } from '@/components/handleImage/utils/ImageFileType';
 
 // 공통 SetFn 타입 정의
 // 의미: Zustand의 set 함수 타입 정의
@@ -10,8 +12,8 @@ type SetFn = (
 // setImageUrls: 이미지 URL 목록 상태 업데이트
 // 의미: 새로운 이미지 URL 목록으로 상태 변경
 // 이유: 상태 관리
-export const setImageUrls = (set: SetFn) => (urls: ImageItem[]) =>
-  set((state) => ({ ...state, imageUrls: urls || [] })); // @type {(urls: ImageItem[]) => void}
+export const setImageUrls = (set: SetFn) => (urls: ImageUrl[]) =>
+  set((state) => ({ ...state, imageUrls: urls || [] })); // @type {(urls: ImageUrl[]) => void}
 // @description 새로운 이미지 목록으로 상태 업데이트
 // @reason 상태 변경
 // @fallback 빈 배열로 초기화하여 undefined 방지

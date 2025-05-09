@@ -1,10 +1,10 @@
-import { ImageManagementState, ImageItem } from './initialImageManagementState';
+import { ImageManagementState } from './initialImageManagementState';
 
 // getImageUrls: 이미지 URL 목록 반환
 // 의미: 상태에서 이미지 URL 배열 추출
 // 이유: 상태 접근
 export const getImageUrls = (state: ImageManagementState) =>
-  state.imageUrls || []; // @type {ImageItem[]}
+  state.imageUrls || [];
 // @description 이미지 URL 배열 반환
 // @reason 상태 접근
 // @fallback 빈 배열로 초기화하여 undefined 방지
