@@ -4,7 +4,7 @@ import { useImageManagementStore } from '@/stores/imageManagement/imageManagemen
 // useImageFilePreviewUrls: 미리보기 URL 관리 훅
 // 의미: 미리보기 URL 생성 및 메모리 정리
 // 이유: 메모리 누수 방지 및 연산 최적화
-function useImageFilePreviewUrls() {
+export function useImageFilePreviewUrls() {
   const { tempFiles, imageUrls } = useImageManagementStore();
 
   // previewUrls: 임시 파일의 미리보기 URL 생성
@@ -40,5 +40,3 @@ function useImageFilePreviewUrls() {
 
   return { previewUrls, formattedImageUrls };
 }
-
-export default useImageFilePreviewUrls;

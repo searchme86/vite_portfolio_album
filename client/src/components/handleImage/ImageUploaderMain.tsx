@@ -2,9 +2,9 @@ import { useImageManagementStore } from '@/stores/imageManagement/imageManagemen
 import ImageUploadInputAndButton from './ImageUpload/parts/ImageUploadInputAndButton';
 import ImageUploadProgressBar from './ImageUpload/parts/ImageUploadProgressBar';
 import PreviewContainer from './ImageUploaderWrapper/parts/PreviewContainer';
-import useImageFileSetPostId from './ImageUpload/hooks/useImageFileSetPostId';
-import useImageFileDeleteHandler from './ImageUpload/hooks/useImageFileDeleteHandler';
-import useImageFilePreviewUrls from './ImageUpload/hooks/useImageFilePreviewUrls';
+import { useImageFileSetPostId } from './ImageUpload/hooks/useImageFileSetPostId';
+import { useImageFileDeleteHandler } from './ImageUpload/hooks/useImageFileDeleteHandler';
+import { useImageFilePreviewUrls } from './ImageUpload/hooks/useImageFilePreviewUrls';
 
 interface ImageUploaderMainProps {
   postId: string;

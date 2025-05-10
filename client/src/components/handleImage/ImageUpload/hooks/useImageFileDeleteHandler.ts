@@ -1,9 +1,9 @@
-import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
-
 // useImageFileDeleteHandler: 파일 삭제 핸들러 훅
 // 의미: 이미지와 제목을 삭제하는 로직 처리
 // 이유: 재사용성과 코드 분리
-function useImageFileDeleteHandler() {
+import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
+
+export function useImageFileDeleteHandler() {
   const {
     imageUrls,
     imageTitle,
@@ -52,5 +52,3 @@ function useImageFileDeleteHandler() {
 
   return handleDeleteFile;
 }
-
-export default useImageFileDeleteHandler;
