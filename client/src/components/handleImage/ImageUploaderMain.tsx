@@ -3,8 +3,7 @@ import ImageUploadInputAndButton from './ImageUpload/parts/ImageUploadInputAndBu
 import ImageUploadProgressBar from './ImageUpload/parts/ImageUploadProgressBar';
 import PreviewContainer from './ImageUploaderWrapper/parts/PreviewContainer';
 import { useImageFileSetPostId } from './preview/Common/hooks/useImageFileSetPostId';
-import { useImageFileDeleteHandler } from './preview/Common/hooks/useImageFileDeleteHandler';
-import { useImageFilePreviewUrls } from './preview/Common/hooks/useImageFilePreviewUrls';
+
 import ImagePreviewContainer from './preview/ImagePreviewContainer';
 
 interface ImageUploaderMainProps {
@@ -29,27 +28,6 @@ function ImageUploaderMain({
   // 이유: 다른 컴포넌트에서 사용 가능
   useImageFileSetPostId(postId);
 
-  // 파일 삭제 핸들러 훅
-  // 의미: 이미지와 제목 삭제 로직 처리
-  // 이유: 재사용 가능한 로직 분리
-  const handleDeleteFile = useImageFileDeleteHandler();
-
-  // 미리보기 URL 관리 훅
-  // 의미: 미리보기 URL 생성 및 정리
-  // 이유: 메모리 관리와 연산 최적화
-  const { previewUrls, formattedImageUrls } = useImageFilePreviewUrls();
-
-  // PreviewContainer props
-  // 의미: 미리보기 컴포넌트에 필요한 데이터 전달
-  // 이유: 데이터 캡슐화
-  const previewContainerProps = {
-    previewUrls,
-    imageUrls: formattedImageUrls,
-    imageTitles: useImageManagementStore((state) => state.imageTitle),
-    onDelete: handleDeleteFile,
-    isUploading,
-  };
-
   return (
     <div className="flex flex-col gap-4">
       {/* 파일 입력 및 버튼 컴포넌트 */}
@@ -64,9 +42,7 @@ function ImageUploaderMain({
       <ImageUploadProgressBar isUploading={isUploading} progress={progress} />
 
       {/* 미리보기 컨테이너 */}
-      {(tempFiles.length > 0 || imageUrls.length > 0) && (
-        <PreviewContainer {...previewContainerProps} />
-      )}
+      {(tempFiles.length > 0 || imageUrls.length > 0) && <PreviewContainer />}
       {(tempFiles.length > 0 || imageUrls.length > 0) && (
         <ImagePreviewContainer />
       )}

@@ -1,33 +1,35 @@
 import ImagePreviewItem from './ImagePreviewItem';
+import ImagePreviewButton from './ImagePreviewButton';
 import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
+import { useImageFilePreviewUrls } from '../hooks/useImageFilePreviewUrls';
+import { useImageFileDeleteHandler } from '../hooks/useImageFileDeleteHandler';
 
-function ImagePreviewList({
-  images,
-  onDelete,
-}: {
-  images: string[];
-  onDelete: (index: number) => void;
-}) {
-  const safeImages = images || [];
-  const maxImages = useImageManagementStore((state) => state.maxImages || 10); // @type {number}
-  // @description Zustand 상태에서 최대 이미지 수 가져오기
-  // @reason 상태 기반 제한
+function ImagePreviewList() {
+  const { formattedImageUrls } = useImageFilePreviewUrls();
+  const { imageTitle, isUploading } = useImageManagementStore();
+  const handleDeleteFile = useImageFileDeleteHandler();
 
   return (
-    <ul
-      className="flex flex-wrap gap-4"
-      role="list"
-      aria-label="Image preview list"
-    >
-      {safeImages.slice(0, maxImages).map((image, index) => (
-        <ImagePreviewItem
-          key={index}
-          imageSrc={image}
-          index={index}
-          onDelete={onDelete}
-        />
-      ))}
-    </ul>
+    <>
+      {formattedImageUrls.map((url, index) => {
+        const fileName =
+          imageTitle && imageTitle[index]?.name
+            ? imageTitle[index].name
+            : `Uploaded ${index + 1}`;
+
+        return (
+          <li key={`uploaded-${url}`} className="relative">
+            <ImagePreviewItem imageSrc={url} fileName={fileName} />
+            <ImagePreviewButton
+              index={index}
+              onDelete={handleDeleteFile}
+              formattedImageUrls={formattedImageUrls}
+              isUploading={isUploading}
+            />
+          </li>
+        );
+      })}
+    </>
   );
 }
 
