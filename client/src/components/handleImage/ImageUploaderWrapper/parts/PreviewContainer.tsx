@@ -1,6 +1,7 @@
 // PreviewContainer 컴포넌트: 업로드된 이미지와 임시 파일 미리보기
 // 의미: 이미지 미리보기 UI 제공
 // 이유: 사용자에게 업로드 상태 시각화
+import ImagePreviewTempList from '../../preview/Common/parts/ImagePreviewTempList';
 import type { ImageFileName } from '../../utils/ImageFileType';
 
 interface PreviewContainerProps {
@@ -72,23 +73,9 @@ function PreviewContainer({
         );
       })}
       {/* 임시 파일 표시 */}
-      {previewUrls.map((url, index) => (
-        <div key={`preview-${url}`} className="relative">
-          <img
-            src={url}
-            alt={`Preview ${index + 1}`}
-            className="object-cover w-32 h-32 opacity-50"
-          />
-          <span className="absolute top-0 left-0 p-1 text-white bg-gray-500">
-            Uploading...
-          </span>
-          {/* 의미: 업로드 중 표시 */}
-          {/* 이유: 사용자 피드백 */}
-        </div>
-      ))}
+      <ImagePreviewTempList />
     </div>
   );
 }
 
 export default PreviewContainer;
-//====여기까지 수정됨====

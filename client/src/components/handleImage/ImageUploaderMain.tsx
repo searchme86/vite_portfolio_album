@@ -2,9 +2,10 @@ import { useImageManagementStore } from '@/stores/imageManagement/imageManagemen
 import ImageUploadInputAndButton from './ImageUpload/parts/ImageUploadInputAndButton';
 import ImageUploadProgressBar from './ImageUpload/parts/ImageUploadProgressBar';
 import PreviewContainer from './ImageUploaderWrapper/parts/PreviewContainer';
-import { useImageFileSetPostId } from './ImageUpload/hooks/useImageFileSetPostId';
-import { useImageFileDeleteHandler } from './ImageUpload/hooks/useImageFileDeleteHandler';
-import { useImageFilePreviewUrls } from './ImageUpload/hooks/useImageFilePreviewUrls';
+import { useImageFileSetPostId } from './preview/Common/hooks/useImageFileSetPostId';
+import { useImageFileDeleteHandler } from './preview/Common/hooks/useImageFileDeleteHandler';
+import { useImageFilePreviewUrls } from './preview/Common/hooks/useImageFilePreviewUrls';
+import ImagePreviewContainer from './preview/ImagePreviewContainer';
 
 interface ImageUploaderMainProps {
   postId: string;
@@ -65,6 +66,9 @@ function ImageUploaderMain({
       {/* 미리보기 컨테이너 */}
       {(tempFiles.length > 0 || imageUrls.length > 0) && (
         <PreviewContainer {...previewContainerProps} />
+      )}
+      {(tempFiles.length > 0 || imageUrls.length > 0) && (
+        <ImagePreviewContainer />
       )}
     </div>
   );

@@ -105,7 +105,7 @@ export const initialImageManagementState: GetterState = {
   minImages: 1, // @type {number} - 초기 최소 이미지 수
   // @description 초기 상태로 최소 1개 설정
   // @reason 규칙 적용
-  maxImages: 10, // @type {number} - 초기 최대 이미지 수
+  maxImages: 5, // @type {number} - 초기 최대 이미지 수
   // @description 초기 상태로 최대 10개 설정
   // @reason 규칙 적용
   existingBaseFileNames: [] as string[], // @type {string[]} - 초기 기존 파일명 배열
