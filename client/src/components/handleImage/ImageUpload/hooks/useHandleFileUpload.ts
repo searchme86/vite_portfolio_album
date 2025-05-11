@@ -83,6 +83,7 @@ const filterNewFiles = (
     toast.warn('선택된 파일이 없습니다. 업로드할 파일을 선택해주세요.'); // 알림, 이유: 사용자가 빈 배열 문제 인지 가능
     return [];
   }
+
   const safeExistingFileNames = Array.isArray(existingBaseFileNames) // safeExistingFileNames: 안전한 파일명 배열, 이유: null/undefined 방지, 의미: 안전한 배열로서 null/undefined 방지, 자세한 설명: existingBaseFileNames가 배열이 아니면 빈 배열로 초기화, 이는 중복 체크 실패 시에도 앱이 crash되지 않도록 보호
     ? existingBaseFileNames
     : [];
@@ -155,7 +156,8 @@ const checkUploadConditionsAndSetState = (
     isUploading: boolean
   ) => void,
   // handleFilesChange: 파일 변경 핸들러, 이유: 상위 컴포넌트와 동기화
-  setImageTitle: (name: ImageFileName[]) => void
+  setImageTitle: (name: ImageFileName[]) => void,
+  setImagesCount: (count: number) => void
 ): { success: boolean; newFiles: File[] } => {
   // 반환 타입: 성공 여부와 새 파일, 이유: 후속 로직 전달
   const files = Array.from(e.target.files || []); // files: 선택된 파일 배열, 이유: input에서 파일 추출, 의미: 사용자 입력
@@ -176,6 +178,7 @@ const checkUploadConditionsAndSetState = (
     handleFilesChange([], 0, false); // 상위 동기화, 이유: UI 갱신
     return { success: false, newFiles: [] }; // 실패 반환, 이유: 후속 로직 중단
   }
+  setImagesCount(newFiles.length);
   setTempFiles([...tempFiles, ...newFiles]); // tempFiles 업데이트, 이유: 업로드 중 이미지 표시
   setIsUploading(true); // 업로드 시작, 이유: 상태 전환
   toast.info('파일을 올리는 중이에요'); // 알림, 이유: 사용자 피드백
@@ -311,7 +314,8 @@ async function handleFileUpload(
     isUploading: boolean
   ) => void, // handleFilesChange: 상위 동기화, 이유: UI 갱신
   safeGetToken: () => Promise<string | null>, // safeGetToken: 인증 토큰, 이유: 인증 처리
-  setImageTitle: (name: ImageFileName[]) => void
+  setImageTitle: (name: ImageFileName[]) => void,
+  setImagesCount: (count: number) => void
 ) {
   // 초기 인증 정보 가져오기
   // 의미: 업로드 시작 전 기본 인증 정보 설정
@@ -328,7 +332,8 @@ async function handleFileUpload(
     setIsUploading,
     setProgress,
     handleFilesChange,
-    setImageTitle
+    setImageTitle,
+    setImagesCount
   );
   if (!success) {
     // 조건: 준비 실패, 이유: 불필요한 처리 방지
@@ -372,6 +377,7 @@ function useHandleFileUpload() {
     setIsUploading,
     setProgress,
     setImageTitle,
+    setImagesCount,
   } = useImageManagementStore(); // 상태 및 함수 추출, 이유: Zustand 스토어 사용
   const { handleFilesChange } = useHandleFilesChange(); // 파일 변경 핸들러, 이유: 재사용
   const auth = useAuth(); // auth: 인증 객체, 이유: Clerk 인증
@@ -395,7 +401,8 @@ function useHandleFileUpload() {
         setProgress,
         handleFilesChange,
         safeGetToken,
-        setImageTitle
+        setImageTitle,
+        setImagesCount
       ),
   };
 }

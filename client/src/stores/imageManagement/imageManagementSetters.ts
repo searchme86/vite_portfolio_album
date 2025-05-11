@@ -12,6 +12,8 @@ type SetFn = (
   fn: (state: ImageManagementState) => ImageManagementState
 ) => void;
 
+export const setImagesCount = (set: SetFn) => (count: number) =>
+  set((state) => ({ ...state, imagesCount: count || 0 }));
 // setImageUrls: 이미지 URL 목록 상태 업데이트
 // 의미: 새로운 이미지 URL 목록으로 상태 변경
 // 이유: 상태 관리

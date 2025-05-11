@@ -7,6 +7,7 @@ import type {
 // 의미: 상태 읽기 전용 속성 정의
 // 이유: 역할 분리 및 타입 안정성
 export interface GetterState {
+  imagesCount: number;
   imageUrls: ImageUrl[]; // @type {ImageUrl[]} - 이미지 URL 배열
   minImages: number; // @type {number} - 최소 이미지 수
   maxImages: number; // @type {number} - 최대 이미지 수
@@ -25,6 +26,7 @@ export interface GetterState {
 // 의미: 상태 업데이트 함수 정의
 // 이유: 역할 분리 및 타입 안정성
 export interface SetterActions {
+  setImagesCount: (count: number) => void;
   setImageUrls: (urls: ImageUrl[]) => void; // @type {(urls: ImageUrl[]) => void}
   // @description 이미지 URL 목록 업데이트
   // @reason 상태 변경
@@ -75,6 +77,7 @@ export interface ImageManagementState extends GetterState, SetterActions {}
 // 의미: Zustand 스토어의 초기 값 제공
 // 이유: 상태 초기화
 export const initialImageManagementState: GetterState = {
+  imagesCount: 0,
   imageUrls: [] as ImageUrl[], // @type {ImageUrl[]} - 초기 이미지 URL 배열
   // @description 초기 상태로 빈 이미지 목록
   // @reason 상태 초기화

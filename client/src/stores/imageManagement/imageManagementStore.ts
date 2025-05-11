@@ -13,6 +13,7 @@ import {
   setImageUploaderKey,
   setMaxImages,
   setBaseFileNamesWithoutSuffix,
+  setImagesCount,
   onImageUrlsChange,
 } from './imageManagementSetters'; // @type {Function} - 상태 setter
 // @description 상태 변경 함수 임포트
@@ -44,7 +45,9 @@ export const useImageManagementStore = create<
       setExistingBaseFileNames: setExistingBaseFileNames(set),
       setBaseFileNamesWithoutSuffix: setBaseFileNamesWithoutSuffix(set),
       setImageTitle: setImageTitle(set),
+      setImagesCount: setImagesCount(set),
       setImageUploaderKey: setImageUploaderKey(set),
+
       onImageUrlsChange: onImageUrlsChange(set),
     }),
     {

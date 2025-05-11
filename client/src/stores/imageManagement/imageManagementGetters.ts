@@ -1,5 +1,7 @@
 import { ImageManagementState } from './initialImageManagementState';
 
+export const getImagesCount = (state: ImageManagementState) =>
+  state.imagesCount || 0;
 // getImageUrls: 이미지 URL 목록 반환
 // 의미: 상태에서 이미지 URL 배열 추출
 // 이유: 상태 접근
