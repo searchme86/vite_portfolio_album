@@ -10,26 +10,28 @@ function ImagePreviewList() {
   const handleDeleteFile = useImageFileDeleteHandler();
 
   return (
-    <>
-      {formattedImageUrls.map((url, index) => {
-        const fileName =
-          imageTitle && imageTitle[index]?.name
-            ? imageTitle[index].name
-            : `Uploaded ${index + 1}`;
+    <div className="my-[20px]">
+      <ul className="flex gap-4">
+        {formattedImageUrls.map((url, index) => {
+          const fileName =
+            imageTitle && imageTitle[index]?.name
+              ? imageTitle[index].name
+              : `Uploaded ${index + 1}`;
 
-        return (
-          <li key={`uploaded-${url}`} className="relative list-none">
-            <ImagePreviewItem imageSrc={url} fileName={fileName} />
-            <ImagePreviewButton
-              index={index}
-              onDelete={handleDeleteFile}
-              formattedImageUrls={formattedImageUrls}
-              isUploading={isUploading}
-            />
-          </li>
-        );
-      })}
-    </>
+          return (
+            <li key={`uploaded-${url}`} className="relative list-none w-[20%]">
+              <ImagePreviewItem imageSrc={url} fileName={fileName} />
+              <ImagePreviewButton
+                index={index}
+                onDelete={handleDeleteFile}
+                formattedImageUrls={formattedImageUrls}
+                isUploading={isUploading}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 

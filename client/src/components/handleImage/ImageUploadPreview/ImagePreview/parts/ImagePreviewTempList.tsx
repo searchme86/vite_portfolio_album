@@ -7,7 +7,7 @@ function ImagePreviewTempList() {
   const imageTitles = useImageManagementStore((state) => state.imageTitle);
 
   return (
-    <div>
+    <>
       {previewUrls.map((url, index) => {
         const fileName =
           imageTitles && imageTitles[index]?.name
@@ -24,7 +24,7 @@ function ImagePreviewTempList() {
           </ul>
         );
       })}
-    </div>
+    </>
   );
 }
 

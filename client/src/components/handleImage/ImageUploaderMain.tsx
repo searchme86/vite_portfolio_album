@@ -21,13 +21,11 @@ function ImageUploaderMain({
   useImageFileSetPostId(postId);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div>
       {(tempFiles.length > 0 || imageUrls.length > 0) && <ImageUploadPreview />}
-      <div className="">
-        {(tempFiles.length > 0 || imageUrls.length > 0) && (
-          <ImagePreviewTempList />
-        )}
-      </div>
+      {(tempFiles.length > 0 || imageUrls.length > 0) && (
+        <ImagePreviewTempList />
+      )}
       {/* 업로드 진행률 표시 컴포넌트 */}
       <ImageUploadProgressBar isUploading={isUploading} progress={progress} />
       {/* 파일 입력 및 버튼 컴포넌트 */}

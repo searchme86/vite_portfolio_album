@@ -9,7 +9,7 @@ function ImagePreviewItem({
 
   return (
     <>
-      <div className="h-full">
+      <div className="w-full h-[10rem]">
         <img
           src={safeImageSrc}
           alt={fileName} // 수정: alt 속성에 파일 이름 적용

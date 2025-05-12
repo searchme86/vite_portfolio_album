@@ -55,53 +55,49 @@ function ImagePreviewSwiperSlider() {
   }, [swiperInstance]);
 
   return (
-    <>
-      <div>
-        <div className="relative flex flex-row w-full">
-          {/* 이전 버튼 */}
-          <SwiperPrevButton
-            swiper={swiperInstance}
-            isBeginning={isBeginning}
-            isEnd={isEnd}
-          />
-          {/* 슬라이더 리스트 */}
-          <div className="w-full">
-            <ImagePreviewSwiperSlideList setSwiperInstance={setSwiperInstance}>
-              {formattedImageUrls.map((url, index) => {
-                const fileName =
-                  imageTitle && imageTitle[index]?.name
-                    ? imageTitle[index].name
-                    : `업로드 중인 ${index + 1}번째 파일`;
+    <div className="relative flex flex-row w-full">
+      {/* 이전 버튼 */}
+      <SwiperPrevButton
+        swiper={swiperInstance}
+        isBeginning={isBeginning}
+        isEnd={isEnd}
+      />
+      {/* 슬라이더 리스트 */}
+      <div className="w-full">
+        <ImagePreviewSwiperSlideList setSwiperInstance={setSwiperInstance}>
+          {formattedImageUrls.map((url, index) => {
+            const fileName =
+              imageTitle && imageTitle[index]?.name
+                ? imageTitle[index].name
+                : `업로드 중인 ${index + 1}번째 파일`;
 
-                return (
-                  <ImagePreviewSwiperSlideItem key={`uploaded-${url}`}>
-                    {/* 이미지 */}
-                    <ImagePreviewItem imageSrc={url} fileName={fileName} />
-                    {/* 버튼 */}
-                    <ImagePreviewButton
-                      index={index}
-                      onDelete={handleDeleteFile}
-                      formattedImageUrls={formattedImageUrls}
-                      isUploading={isUploading}
-                    />
-                  </ImagePreviewSwiperSlideItem>
-                );
-              })}
-            </ImagePreviewSwiperSlideList>
-            {/* 다음 버튼 */}
-            <SwiperNextButton
-              swiper={swiperInstance}
-              isBeginning={isBeginning}
-              isEnd={isEnd}
-            />
-            <div className="absolute bottom-[-2rem] w-full flex flex-col items-center gap-2">
-              <div className="text-sm font-medium text-gray-700 custom-swiper-pagination-text" />
-              <div className="flex gap-2 custom-swiper-pagination-dots" />
-            </div>
-          </div>
+            return (
+              <ImagePreviewSwiperSlideItem key={`uploaded-${url}`}>
+                {/* 이미지 */}
+                <ImagePreviewItem imageSrc={url} fileName={fileName} />
+                {/* 버튼 */}
+                <ImagePreviewButton
+                  index={index}
+                  onDelete={handleDeleteFile}
+                  formattedImageUrls={formattedImageUrls}
+                  isUploading={isUploading}
+                />
+              </ImagePreviewSwiperSlideItem>
+            );
+          })}
+        </ImagePreviewSwiperSlideList>
+        {/* 다음 버튼 */}
+        <SwiperNextButton
+          swiper={swiperInstance}
+          isBeginning={isBeginning}
+          isEnd={isEnd}
+        />
+        <div className="absolute bottom-[-2rem] w-full flex flex-col items-center gap-2">
+          <div className="text-sm font-medium text-gray-700 custom-swiper-pagination-text" />
+          <div className="flex gap-2 custom-swiper-pagination-dots" />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
