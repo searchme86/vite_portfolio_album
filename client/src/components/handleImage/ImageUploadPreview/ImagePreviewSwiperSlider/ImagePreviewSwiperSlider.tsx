@@ -7,6 +7,7 @@ import {
   SwiperPrevButton,
 } from './parts/ImagePreviewSwiperButtons';
 import { useImageFilePreviewUrls } from '../ImagePreview/hooks/useImageFilePreviewUrls';
+import ImagePreviewTempList from '../ImagePreview/parts/ImagePreviewTempList';
 
 // ImagePreviewSwiperSlider: Swiper 슬라이드 컴포넌트
 // 의미: 이미지 개수가 maxImages를 초과할 때 슬라이드 형태로 표시
@@ -61,40 +62,45 @@ function ImagePreviewSwiperSlider() {
   }, [swiperInstance]);
 
   return (
-    <div className="relative flex flex-row w-full">
-      {/* 이전 버튼 */}
-      <SwiperPrevButton
-        swiper={swiperInstance}
-        isBeginning={isBeginning}
-        isEnd={isEnd}
-      />
-      {/* 슬라이더 리스트 */}
-      <div className="w-full">
-        <ImagePreviewSwiperSlideList setSwiperInstance={setSwiperInstance}>
-          {images.map((url, index) => (
-            <ImagePreviewSwiperSlideItem key={index}>
-              <div className="flex-shrink-0">
-                <img
-                  src={url}
-                  alt={`slide-${index}`}
-                  className="object-cover w-full h-auto max-h-48"
-                />
-              </div>
-            </ImagePreviewSwiperSlideItem>
-          ))}
-        </ImagePreviewSwiperSlideList>
+    <>
+      <div>
+        <div className="relative flex flex-row w-full">
+          {/* 이전 버튼 */}
+          <SwiperPrevButton
+            swiper={swiperInstance}
+            isBeginning={isBeginning}
+            isEnd={isEnd}
+          />
+          {/* 슬라이더 리스트 */}
+          <div className="w-full">
+            <ImagePreviewSwiperSlideList setSwiperInstance={setSwiperInstance}>
+              {images.map((url, index) => (
+                <ImagePreviewSwiperSlideItem key={index}>
+                  <div className="flex-shrink-0">
+                    <img
+                      src={url}
+                      alt={`slide-${index}`}
+                      className="object-cover w-full h-auto max-h-48"
+                    />
+                  </div>
+                </ImagePreviewSwiperSlideItem>
+              ))}
+            </ImagePreviewSwiperSlideList>
+          </div>
+          {/* 다음 버튼 */}
+          <SwiperNextButton
+            swiper={swiperInstance}
+            isBeginning={isBeginning}
+            isEnd={isEnd}
+          />
+          <div className="absolute bottom-[-2rem] w-full flex flex-col items-center gap-2">
+            <div className="text-sm font-medium text-gray-700 custom-swiper-pagination-text" />
+            <div className="flex gap-2 custom-swiper-pagination-dots" />
+          </div>
+        </div>
+        <ImagePreviewTempList />
       </div>
-      {/* 다음 버튼 */}
-      <SwiperNextButton
-        swiper={swiperInstance}
-        isBeginning={isBeginning}
-        isEnd={isEnd}
-      />
-      <div className="absolute bottom-[-2rem] w-full flex flex-col items-center gap-2">
-        <div className="text-sm font-medium text-gray-700 custom-swiper-pagination-text" />
-        <div className="flex gap-2 custom-swiper-pagination-dots" />
-      </div>
-    </div>
+    </>
   );
 }
 
