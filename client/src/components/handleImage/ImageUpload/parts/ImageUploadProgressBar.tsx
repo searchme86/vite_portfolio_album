@@ -7,18 +7,19 @@ function ImageUploadProgressBar({
   isUploading,
   progress,
 }: ImageUploadProgressBarProps) {
-  // 조건부 렌더링: 업로드 중일 때만 표시
-  // 의미: 진행률 표시
-  // 이유: 사용자 피드백 제공
   if (!isUploading) return null;
 
   return (
-    <div className="w-full bg-gray-200 rounded-full h-2.5">
-      <div
-        className="bg-blue-600 h-2.5 rounded-full"
+    <div className="w-[160px] my-[10px]">
+      <span
+        className="block h-2 transition-all duration-300 ease-in-out bg-blue-600 rounded-lg"
         style={{ width: `${progress}%` }}
       />
-      <p className="mt-1 text-sm text-gray-600">업로드 진행: {progress}%</p>
+      <p className="mt-[5px] text-lg text-gray-600">
+        <span className="sr-only">현재</span> 업로드 진행 중:
+        <span>{progress}%</span>
+        <span className="sr-only">입니다</span>
+      </p>
     </div>
   );
 }

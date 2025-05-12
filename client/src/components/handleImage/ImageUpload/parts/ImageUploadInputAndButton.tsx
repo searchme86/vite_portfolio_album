@@ -20,9 +20,6 @@ function ImageUploadInputAndButton({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { handleFileUpload } = useHandleFileUpload();
 
-  // handleAddFileClick: 파일 입력 클릭 트리거
-  // 의미: 사용자가 버튼 클릭 시 파일 입력 창 열기
-  // 이유: 사용자 인터랙션 처리
   const handleAddFileClick = () => fileInputRef.current?.click();
 
   return (
@@ -36,8 +33,6 @@ function ImageUploadInputAndButton({
         className="hidden"
         id="image-upload"
       />
-      {/* 의미: 파일 입력 요소 */}
-      {/* 이유: 이미지 파일 선택 */}
 
       <button
         type="button"
@@ -51,8 +46,6 @@ function ImageUploadInputAndButton({
       >
         {buttonText || 'Add a Cover Image'}
       </button>
-      {/* 의미: 업로드 버튼 */}
-      {/* 이유: 사용자 인터랙션 */}
     </div>
   );
 }
