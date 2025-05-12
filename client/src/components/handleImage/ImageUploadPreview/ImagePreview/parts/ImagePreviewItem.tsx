@@ -9,11 +9,11 @@ function ImagePreviewItem({
 
   return (
     <>
-      <div className="">
+      <div className="h-full">
         <img
           src={safeImageSrc}
           alt={fileName} // 수정: alt 속성에 파일 이름 적용
-          className="object-cover w-32 h-32"
+          className="block object-cover w-full h-full"
         />
       </div>
     </>

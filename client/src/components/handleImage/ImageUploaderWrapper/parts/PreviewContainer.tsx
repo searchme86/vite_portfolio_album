@@ -2,7 +2,7 @@
 // 의미: 이미지 미리보기 UI 제공
 // 이유: 사용자에게 업로드 상태 시각화
 
-import ImagePreviewList from '../../ImageUploadPreview/ImagePreview/parts/ImagePreviewList';
+import ImagePreviewList from '../../ImageUploadPreview/ImagePreview/ImagePreviewList';
 import ImagePreviewTempList from '../../ImageUploadPreview/ImagePreview/parts/ImagePreviewTempList';
 
 function PreviewContainer() {

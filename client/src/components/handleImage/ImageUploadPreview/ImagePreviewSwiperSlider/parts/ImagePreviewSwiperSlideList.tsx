@@ -73,6 +73,7 @@ const swiperParams: SwiperOptions = {
   grabCursor: true, // @type {boolean}
   // @description 마우스 커서를 "grab" 모양으로
   // @reason 사용자 피드백
+  autoHeight: true,
 };
 
 // ImagePreviewSwiperSlideList: Swiper 슬라이드 리스트

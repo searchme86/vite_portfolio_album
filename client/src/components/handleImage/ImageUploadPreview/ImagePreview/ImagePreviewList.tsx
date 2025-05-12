@@ -1,8 +1,8 @@
-import ImagePreviewItem from './ImagePreviewItem';
-import ImagePreviewButton from './ImagePreviewButton';
+import ImagePreviewItem from './parts/ImagePreviewItem';
+import ImagePreviewButton from './parts/ImagePreviewButton';
 import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
-import { useImageFilePreviewUrls } from '../hooks/useImageFilePreviewUrls';
-import { useImageFileDeleteHandler } from '../hooks/useImageFileDeleteHandler';
+import { useImageFilePreviewUrls } from './hooks/useImageFilePreviewUrls';
+import { useImageFileDeleteHandler } from './hooks/useImageFileDeleteHandler';
 
 function ImagePreviewList() {
   const { formattedImageUrls } = useImageFilePreviewUrls();
@@ -18,7 +18,7 @@ function ImagePreviewList() {
             : `Uploaded ${index + 1}`;
 
         return (
-          <li key={`uploaded-${url}`} className="relative">
+          <li key={`uploaded-${url}`} className="relative list-none">
             <ImagePreviewItem imageSrc={url} fileName={fileName} />
             <ImagePreviewButton
               index={index}

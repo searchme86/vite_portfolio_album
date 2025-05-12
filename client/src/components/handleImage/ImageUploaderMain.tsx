@@ -1,11 +1,9 @@
 import ImageUploadInputAndButton from './ImageUpload/parts/ImageUploadInputAndButton';
 import ImageUploadProgressBar from './ImageUpload/parts/ImageUploadProgressBar';
-
+import ImageUploadPreview from './ImageUploadPreview/ImageUploadPreview';
+import ImagePreviewTempList from './ImageUploadPreview/ImagePreview/parts/ImagePreviewTempList';
 import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
 import { useImageFileSetPostId } from './ImageUploadPreview/ImagePreview/hooks/useImageFileSetPostId';
-
-import ImagePreview from './ImageUploadPreview/ImagePreview/ImagePreview';
-import ImageUploadPreview from './ImageUploadPreview/ImageUploadPreview';
 
 interface ImageUploaderMainProps {
   postId: string;
@@ -24,10 +22,12 @@ function ImageUploaderMain({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* 미리보기 컨테이너 */}
-
-      {/* {(tempFiles.length > 0 || imageUrls.length > 0) && <ImagePreview />} */}
       {(tempFiles.length > 0 || imageUrls.length > 0) && <ImageUploadPreview />}
+      <div className="">
+        {(tempFiles.length > 0 || imageUrls.length > 0) && (
+          <ImagePreviewTempList />
+        )}
+      </div>
       {/* 업로드 진행률 표시 컴포넌트 */}
       <ImageUploadProgressBar isUploading={isUploading} progress={progress} />
       {/* 파일 입력 및 버튼 컴포넌트 */}

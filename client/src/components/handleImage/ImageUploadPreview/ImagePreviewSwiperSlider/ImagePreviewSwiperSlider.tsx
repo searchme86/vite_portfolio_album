@@ -7,7 +7,6 @@ import {
   SwiperPrevButton,
 } from './parts/ImagePreviewSwiperButtons';
 import { useImageFilePreviewUrls } from '../ImagePreview/hooks/useImageFilePreviewUrls';
-import ImagePreviewTempList from '../ImagePreview/parts/ImagePreviewTempList';
 import { useImageManagementStore } from '@/stores/imageManagement/imageManagementStore';
 import { useImageFileDeleteHandler } from '../ImagePreview/hooks/useImageFileDeleteHandler';
 import ImagePreviewButton from '../ImagePreview/parts/ImagePreviewButton';
@@ -89,19 +88,18 @@ function ImagePreviewSwiperSlider() {
                 );
               })}
             </ImagePreviewSwiperSlideList>
-          </div>
-          {/* 다음 버튼 */}
-          <SwiperNextButton
-            swiper={swiperInstance}
-            isBeginning={isBeginning}
-            isEnd={isEnd}
-          />
-          <div className="absolute bottom-[-2rem] w-full flex flex-col items-center gap-2">
-            <div className="text-sm font-medium text-gray-700 custom-swiper-pagination-text" />
-            <div className="flex gap-2 custom-swiper-pagination-dots" />
+            {/* 다음 버튼 */}
+            <SwiperNextButton
+              swiper={swiperInstance}
+              isBeginning={isBeginning}
+              isEnd={isEnd}
+            />
+            <div className="absolute bottom-[-2rem] w-full flex flex-col items-center gap-2">
+              <div className="text-sm font-medium text-gray-700 custom-swiper-pagination-text" />
+              <div className="flex gap-2 custom-swiper-pagination-dots" />
+            </div>
           </div>
         </div>
-        <ImagePreviewTempList />
       </div>
     </>
   );
